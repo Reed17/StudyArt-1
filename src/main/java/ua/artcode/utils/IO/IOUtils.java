@@ -14,7 +14,7 @@ import java.io.IOException;
 public class IOUtils {
 
     private static final String PATH_FOR_GIT_PROJECTS =
-            "/home/v21k/Java/dev/StudyArtNew/complete/src/main/resources/courses";
+            "/home/v21k/Java/dev/StudyArtNew/src/main/resources/courses";
 
     public static File createDir(Course course) throws IOException {
 

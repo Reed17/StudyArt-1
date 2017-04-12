@@ -33,6 +33,6 @@ public class CourseController {
 
     @RequestMapping(path = {"/run-task"})
     public GeneralResponse runTask(@RequestParam String mainClass, @RequestParam int courseId) {
-        return courseService.runTask("Test", courseId) ? GeneralResponse.DONE : GeneralResponse.FAILED;
+        return courseService.runTask(mainClass, courseId) ? GeneralResponse.DONE : GeneralResponse.FAILED;
     }
 }

@@ -3,7 +3,6 @@ package ua.artcode.service;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.CourseDB;
 import ua.artcode.exception.CourseNotFoundException;
@@ -16,19 +15,18 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.stream.Collectors;
 
 /**
  * Created by v21k on 09.04.17.
  */
 
 @Service
-@Component
 public class CourseServiceImpl implements CourseService {
 
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
@@ -61,7 +59,7 @@ public class CourseServiceImpl implements CourseService {
         if (course != null) {
             return course;
         } else {
-            throw new CourseNotFoundException(String.format("Coruse with id %d not found", id));
+            throw new CourseNotFoundException(String.format("Course with id %d not found", id));
         }
     }
 
@@ -70,37 +68,54 @@ public class CourseServiceImpl implements CourseService {
         String projectPath = courseDB.getCoursePath(courseDB.get(courseId));
 
         try {
-            // compiling all .java files
-            Files.walk(Paths.get(projectPath))
-                    .filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().contains(".java"))
-                    .forEach(path -> {
-                        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                        compiler.run(null, null, null, path.toAbsolutePath().toString());
-                    });
+            // get all .java files
+            String[] sourceJavaFilesPaths = getSourceJavaFilesPaths(projectPath);
 
-            // run .class file with <mainClass> name
-            Files.walk(Paths.get(projectPath))
-                    .filter(path -> path.toString().contains(mainClass + ".class"))
-                    .limit(1)
-                    .forEach((Path path) -> {
-                        try {
-                            File root = new File(path.getParent().toString());
-                            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{root.toURI().toURL()});
+            // compile
+            COMPILER.run(null, null, null, sourceJavaFilesPaths);
 
-                            Class<?> cls = Class.forName(mainClass, true, classLoader);
-                            Method main = cls.getMethod("main", String[].class);
-                            String[] arguments = null;
-                            main.invoke(null, (Object) arguments);
-                        } catch (MalformedURLException | ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                            e.printStackTrace();
-                        }
-                    });
+            // get root directory (src)
+            File rootDirectoryPath = getRootDirectory(projectPath, "src");
+
+            // load all classes from root
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
+
+            // run mainClass
+            runMain(mainClass, classLoader);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return true;
+    }
+
+    private void runMain(String mainClass, URLClassLoader classLoader) {
+        Class<?> cls = null;
+        String mainMethod = "main";
+        String[] argumentsForMain = null;
+
+        try {
+            cls = Class.forName(mainClass, true, classLoader);
+            Method clsMethod = cls.getMethod(mainMethod, String[].class);
+            clsMethod.invoke(null, (Object) argumentsForMain);
+        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String[] getSourceJavaFilesPaths(String projectPath) throws IOException {
+        return Files.walk(Paths.get(projectPath))
+                .filter(path -> path.toString().contains(".java"))
+                .map(Path::toString)
+                .toArray(String[]::new);
+    }
+
+    private File getRootDirectory(String projectPath, String packageName) throws IOException {
+        String root = Files.walk(Paths.get(projectPath))
+                .filter(path -> path.toString().endsWith(packageName))
+                .map(Path::toString)
+                .collect(Collectors.joining());
+        return new File(root);
     }
 
 }
