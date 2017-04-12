@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import ua.artcode.dao.CourseDB;
 import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
+import ua.artcode.model.SolutionModel;
 import ua.artcode.utils.IO.IOUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -20,6 +22,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Collectors;
 
 /**
@@ -89,13 +92,64 @@ public class CourseServiceImpl implements CourseService {
         return true;
     }
 
+    @Override
+    public boolean checkSolution(String mainClass, int courseId, SolutionModel solution) {
+
+        // replace class body with <solution> (append), then call runTask() for it
+        // after this - reset changes (get back to original state)
+
+        // get path for project
+        String projectPath = courseDB.getCoursePath(courseDB.get(courseId));
+        String sourceJavaFileOriginal = null;
+        Path sourceJavaFile = null;
+        boolean result = false;
+        try {
+            // path for source file (which we have to run)
+            sourceJavaFile = Files.walk(Paths.get(projectPath))
+                    .filter(path -> path.toString().contains(mainClass + ".java"))
+                    .findFirst()
+                    .get();
+
+            // save original
+            sourceJavaFileOriginal = Files.readAllLines(sourceJavaFile)
+                    .stream()
+                    .collect(Collectors.joining());
+
+            // append our solution at the end
+            String sourceJavaFileWithSolution =
+                    sourceJavaFileOriginal.substring(0, sourceJavaFileOriginal.lastIndexOf("}"))
+                    + solution.getSolution() + "}";
+
+            // write solution string to original file
+            Files.write(sourceJavaFile, sourceJavaFileWithSolution.getBytes(), StandardOpenOption.CREATE);
+
+            // run task
+            result = runTask(mainClass, courseId);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (sourceJavaFileOriginal != null) {
+                try (PrintWriter pw = new PrintWriter(new File(sourceJavaFile.toString()))) {
+                    // reset changes - to original state
+                    // write empty string to file
+                    pw.write("");
+                    pw.flush();
+                    // write original content
+                    Files.write(sourceJavaFile, sourceJavaFileOriginal.getBytes(), StandardOpenOption.CREATE);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
+
     private void runMain(String mainClass, URLClassLoader classLoader) {
-        Class<?> cls = null;
         String mainMethod = "main";
         String[] argumentsForMain = null;
-
         try {
-            cls = Class.forName(mainClass, true, classLoader);
+            Class<?> cls = Class.forName(mainClass, true, classLoader);
             Method clsMethod = cls.getMethod(mainMethod, String[].class);
             clsMethod.invoke(null, (Object) argumentsForMain);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
