@@ -14,6 +14,7 @@ import java.util.Collection;
 
 public interface CourseService {
 
+    // todo throw more informative exception corresponding our logic, not IOExc
     boolean addCourse(Course course) throws IOException;
 
     Course getCourse(int id) throws CourseNotFoundException;

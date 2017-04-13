@@ -25,6 +25,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    // todo think about static initialization
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
     private static final String STANDARD_ROOT_PACKAGE = "src";
 
@@ -42,15 +44,18 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public boolean addCourse(Course course) {
+        // todo add validation
         try {
             File courseDir = IOUtils.createCourseDirectory(course);
             course.setCourseLocalPath(courseDir.getAbsolutePath());
 
+            // todo we should check  operation result. How to check?
             Git git = Git.cloneRepository()
                     .setURI(course.getGitURL())
                     .setDirectory(courseDir)
                     .call();
 
+            // todo
             courseDB.add(course);
 
             return true;
@@ -114,10 +119,13 @@ public class CourseServiceImpl implements CourseService {
         try {
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
             // path for source class with tests (which we have to run)
-            sourceClassPath = Files.walk(Paths.get(projectPath))
+            //todo see how to use Optional?
+            Optional<Path> first = Files.walk(Paths.get(projectPath))
                     .filter(path -> path.toString().contains(className + ".java"))
-                    .findFirst()
-                    .get();
+                    .findFirst();
+
+            sourceClassPath = first
+                    .orElse(null);
 
             // save original content of class
             sourceClassContentOriginal = Files.readAllLines(sourceClassPath)
@@ -125,6 +133,7 @@ public class CourseServiceImpl implements CourseService {
                     .collect(Collectors.joining());
 
             // append our solution at the end of sourceClassContentOriginal string
+            // todo extract to StringUtils
             String sourceClassContentWithSolution =
                     sourceClassContentOriginal.substring(0, sourceClassContentOriginal.lastIndexOf("}"))
                             + solution.getSolution() + "}";
@@ -139,6 +148,7 @@ public class CourseServiceImpl implements CourseService {
             e.printStackTrace();
         } finally {
             if (sourceClassContentOriginal != null) {
+                // todo extract to appropriate method
                 try (PrintWriter pw = new PrintWriter(new File(sourceClassPath.toString()))) {
                     // reset changes - to original state
                     // write empty string to file

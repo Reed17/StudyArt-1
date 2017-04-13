@@ -5,8 +5,8 @@ import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by v21k on 09.04.17.
@@ -17,7 +17,7 @@ public class CourseDBImpl implements CourseDB {
     private Map<Integer, Course> courses;
 
     public CourseDBImpl() {
-        this.courses = new HashMap<>();
+        this.courses = new ConcurrentHashMap<>();
     }
 
     @Override

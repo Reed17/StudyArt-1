@@ -17,13 +17,14 @@ import java.util.stream.Collectors;
 @Component
 public class IOUtils {
 
+    // todo remove hardcode line, get from Spring
     private static final String PATH_FOR_GIT_PROJECTS =
             "/home/v21k/Java/dev/StudyArtNew/src/main/resources/courses";
 
     public static File createCourseDirectory(Course course) throws IOException {
 
         File courseDir = new File(generatePath(course));
-        courseDir.mkdir();
+        courseDir.mkdir(); // todo do not ignore of the result of method
         FileUtils.cleanDirectory(courseDir);
 
         return courseDir;
