@@ -1,11 +1,12 @@
 package ua.artcode.dao;
 
+import org.springframework.stereotype.Component;
 import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
-import org.springframework.stereotype.Component;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by v21k on 09.04.17.
@@ -21,8 +22,8 @@ public class CourseDBImpl implements CourseDB {
 
     @Override
     public boolean add(Course course) {
-        if (course.getId() == 0){
-            course.setId(courses.size()+1);
+        if (course.getId() == 0) {
+            course.setId(courses.size() + 1);
         }
         if (!courses.values().contains(course)) {
             courses.put(course.getId(), course);

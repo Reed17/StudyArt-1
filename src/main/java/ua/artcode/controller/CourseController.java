@@ -3,6 +3,7 @@ package ua.artcode.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exception.CourseNotFoundException;
+import ua.artcode.model.CheckResult;
 import ua.artcode.model.Course;
 import ua.artcode.model.GeneralResponse;
 import ua.artcode.model.SolutionModel;
@@ -10,7 +11,6 @@ import ua.artcode.service.CourseService;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Set;
 
 @RestController
 public class CourseController {
@@ -30,7 +30,7 @@ public class CourseController {
     }
 
     @RequestMapping("courses/getAll")
-    public Collection<Course> getAllCourses(){
+    public Collection<Course> getAllCourses() {
         return courseService.getAllCourses();
     }
 
@@ -40,12 +40,12 @@ public class CourseController {
     }
 
     @RequestMapping(path = {"/run-task"})
-    public String runTask(@RequestParam String mainClass, @RequestParam int courseId) {
+    public CheckResult runTask(@RequestParam String mainClass, @RequestParam int courseId) {
         return courseService.runTask(mainClass, courseId);
     }
 
     @RequestMapping(value = "/send-solution", method = RequestMethod.POST)
-    public String sendSolution(@RequestBody SolutionModel solution, @RequestParam String mainClass, @RequestParam int courseId){
+    public CheckResult sendSolution(@RequestBody SolutionModel solution, @RequestParam String mainClass, @RequestParam int courseId) {
         return courseService.checkSolution(mainClass, courseId, solution);
     }
 }

@@ -4,8 +4,6 @@ import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Created by v21k on 09.04.17.

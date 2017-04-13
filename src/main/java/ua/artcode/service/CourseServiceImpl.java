@@ -6,20 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.CourseDB;
 import ua.artcode.exception.CourseNotFoundException;
+import ua.artcode.model.CheckResult;
 import ua.artcode.model.Course;
 import ua.artcode.model.GeneralResponse;
 import ua.artcode.model.SolutionModel;
 import ua.artcode.utils.IO_utils.IOUtils;
 import ua.artcode.utils.check_utils.CheckUtils;
-import ua.artcode.utils.stats_utils.StatsUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -80,9 +78,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public String runTask(String className, int courseId) {
+    public CheckResult runTask(String className, int courseId) {
         String projectPath;
-        String result = String.valueOf(GeneralResponse.FAILED);
+        CheckResult checkResult = new CheckResult(GeneralResponse.FAILED);
         try {
             // getting path for course
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
@@ -95,15 +93,15 @@ public class CourseServiceImpl implements CourseService {
             // load all classes from root
             URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
             // run className and save results
-            result = CheckUtils.runCheckMethod(className, classLoader);
+            checkResult = CheckUtils.runCheckMethod(className, classLoader);
         } catch (IOException | CourseNotFoundException e) {
             e.printStackTrace();
         }
-        return result;
+        return checkResult;
     }
 
     @Override
-    public String checkSolution(String className, int courseId, SolutionModel solution) {
+    public CheckResult checkSolution(String className, int courseId, SolutionModel solution) {
 
         // replace class body with <solution> (append), then call runTask() for it
         // after this - reset changes (get back to original state)
@@ -112,7 +110,7 @@ public class CourseServiceImpl implements CourseService {
         String projectPath;
         String sourceClassContentOriginal = null;
         Path sourceClassPath = null;
-        String result = String.valueOf(GeneralResponse.FAILED);
+        CheckResult checkResult = new CheckResult(GeneralResponse.FAILED);
         try {
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
             // path for source class with tests (which we have to run)
@@ -135,7 +133,7 @@ public class CourseServiceImpl implements CourseService {
             Files.write(sourceClassPath, sourceClassContentWithSolution.getBytes(), StandardOpenOption.CREATE);
 
             // run task
-            result = runTask(className, courseId);
+            checkResult = runTask(className, courseId);
 
         } catch (IOException | CourseNotFoundException e) {
             e.printStackTrace();
@@ -153,6 +151,6 @@ public class CourseServiceImpl implements CourseService {
                 }
             }
         }
-        return result;
+        return checkResult;
     }
 }
