@@ -1,17 +1,24 @@
 package ua.artcode.dao;
 
+import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by v21k on 09.04.17.
  */
 public interface CourseDB {
 
-    boolean add(Course course, String path);
+    boolean add(Course course);
 
-    boolean remove(int id, Course course);
+    boolean remove(Course course);
 
-    Course get(int id);
+    Course getCourseByID(int id) throws CourseNotFoundException;
 
-    String getCoursePath(Course course);
+    String getCoursePath(Course course) throws CourseNotFoundException;
+
+    Collection<Course> getAllCourses();
 }

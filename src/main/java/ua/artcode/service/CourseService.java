@@ -5,6 +5,8 @@ import ua.artcode.model.Course;
 import ua.artcode.model.SolutionModel;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * Created by v21k on 09.04.17.
@@ -16,7 +18,9 @@ public interface CourseService {
 
     Course getCourse(int id) throws CourseNotFoundException;
 
-    public boolean runTask(String mainClass, int courseId);
+    String runTask(String mainClass, int courseId);
 
-    boolean checkSolution(String mainClass, int courseId, SolutionModel solution);
+    String checkSolution(String mainClass, int courseId, SolutionModel solution);
+
+    Collection<Course> getAllCourses();
 }

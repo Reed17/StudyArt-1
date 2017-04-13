@@ -1,10 +1,11 @@
 package ua.artcode.dao;
 
+import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by v21k on 09.04.17.
@@ -13,42 +14,49 @@ import java.util.Map;
 @Component
 public class CourseDBImpl implements CourseDB {
     private Map<Integer, Course> courses;
-    private Map<Course, String> coursesPaths;
-    private static int counter = 0;
 
     public CourseDBImpl() {
         this.courses = new HashMap<>();
-        this.coursesPaths = new HashMap<>();
-    }
-
-    public CourseDBImpl(Map<Integer, Course> courses, Map<Course, String> coursesPaths) {
-        this.courses = courses;
-        this.coursesPaths = coursesPaths;
     }
 
     @Override
-    public boolean add(Course course, String path) {
+    public boolean add(Course course) {
+        if (course.getId() == 0){
+            course.setId(courses.size()+1);
+        }
         if (!courses.values().contains(course)) {
-            courses.put(++counter, course);
-            coursesPaths.put(course, path);
+            courses.put(course.getId(), course);
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean remove(int id, Course course) {
-
-        return courses.remove(id) != null && coursesPaths.remove(course) != null;
+    public boolean remove(Course course) {
+        return courses.remove(course.getId()) != null;
     }
 
     @Override
-    public Course get(int id) {
-        return courses.get(id);
+    public Course getCourseByID(int id) throws CourseNotFoundException {
+        return courses.values()
+                .stream()
+                .filter(course -> course.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new CourseNotFoundException("No course with id " + id));
     }
 
     @Override
-    public String getCoursePath(Course course){
-        return coursesPaths.get(course);
+    public String getCoursePath(Course course) throws CourseNotFoundException {
+        return courses.values()
+                .stream()
+                .filter(c -> c.equals(course))
+                .map(Course::getCourseLocalPath)
+                .findFirst()
+                .orElseThrow(() -> new CourseNotFoundException("No course found"));
+    }
+
+    @Override
+    public Collection<Course> getAllCourses() {
+        return courses.values();
     }
 }

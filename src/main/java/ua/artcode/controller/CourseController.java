@@ -9,6 +9,8 @@ import ua.artcode.model.SolutionModel;
 import ua.artcode.service.CourseService;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Set;
 
 @RestController
 public class CourseController {
@@ -27,18 +29,23 @@ public class CourseController {
         return course;
     }
 
-    @RequestMapping(path = {"/course/add"}, method = RequestMethod.POST)
+    @RequestMapping("courses/getAll")
+    public Collection<Course> getAllCourses(){
+        return courseService.getAllCourses();
+    }
+
+    @RequestMapping(path = {"/courses/add"}, method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody Course course) throws IOException {
         return courseService.addCourse(course) ? GeneralResponse.DONE : GeneralResponse.FAILED;
     }
 
     @RequestMapping(path = {"/run-task"})
-    public GeneralResponse runTask(@RequestParam String mainClass, @RequestParam int courseId) {
-        return courseService.runTask(mainClass, courseId) ? GeneralResponse.DONE : GeneralResponse.FAILED;
+    public String runTask(@RequestParam String mainClass, @RequestParam int courseId) {
+        return courseService.runTask(mainClass, courseId);
     }
 
     @RequestMapping(value = "/send-solution", method = RequestMethod.POST)
-    public GeneralResponse sendSolution(@RequestBody SolutionModel solution, @RequestParam String mainClass, @RequestParam int courseId){
-        return courseService.checkSolution(mainClass, courseId, solution) ? GeneralResponse.DONE : GeneralResponse.FAILED;
+    public String sendSolution(@RequestBody SolutionModel solution, @RequestParam String mainClass, @RequestParam int courseId){
+        return courseService.checkSolution(mainClass, courseId, solution);
     }
 }

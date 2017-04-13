@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import ua.artcode.dao.CourseDB;
 import ua.artcode.exception.CourseNotFoundException;
 import ua.artcode.model.Course;
+import ua.artcode.model.GeneralResponse;
 import ua.artcode.model.SolutionModel;
-import ua.artcode.utils.IO.IOUtils;
+import ua.artcode.utils.IO_utils.IOUtils;
+import ua.artcode.utils.check_utils.CheckUtils;
+import ua.artcode.utils.stats_utils.StatsUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -23,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 /**
@@ -33,110 +37,117 @@ import java.util.stream.Collectors;
 public class CourseServiceImpl implements CourseService {
 
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private static final String STANDARD_ROOT_PACKAGE = "src";
 
     @Autowired
     private CourseDB courseDB;
 
     @Override
-    public boolean addCourse(Course course) throws IOException {
-
-        File courseDir = IOUtils.createDir(course);
-
+    public boolean addCourse(Course course) {
         try {
+            File courseDir = IOUtils.createCourseDirectory(course);
+            course.setCourseLocalPath(courseDir.getAbsolutePath());
+
             Git git = Git.cloneRepository()
                     .setURI(course.getGitURL())
                     .setDirectory(courseDir)
                     .call();
-            courseDB.add(course, courseDir.getPath());
+
+            courseDB.add(course);
+
             return true;
-        } catch (GitAPIException e) {
+        } catch (GitAPIException | IOException e) {
             e.printStackTrace();
         }
+
         return false;
     }
 
     @Override
-    public Course getCourse(int id) throws CourseNotFoundException {
-        Course course = courseDB.get(id);
-
-        if (course != null) {
-            return course;
-        } else {
-            throw new CourseNotFoundException(String.format("Course with id %d not found", id));
-        }
-    }
-
-    @Override
-    public boolean runTask(String mainClass, int courseId) {
-        String projectPath = courseDB.getCoursePath(courseDB.get(courseId));
-
+    public Course getCourse(int id) {
+        Course course = null;
         try {
-            // get all .java files
-            String[] sourceJavaFilesPaths = getSourceJavaFilesPaths(projectPath);
-
-            // compile
-            COMPILER.run(null, null, null, sourceJavaFilesPaths);
-
-            // get root directory (src)
-            File rootDirectoryPath = getRootDirectory(projectPath, "src");
-
-            // load all classes from root
-            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
-
-            // run mainClass
-            runMain(mainClass, classLoader);
-        } catch (IOException e) {
+            course = courseDB.getCourseByID(id);
+        } catch (CourseNotFoundException e) {
             e.printStackTrace();
         }
-
-        return true;
+        return course;
     }
 
     @Override
-    public boolean checkSolution(String mainClass, int courseId, SolutionModel solution) {
+    public Collection<Course> getAllCourses() {
+        return courseDB.getAllCourses();
+    }
+
+    @Override
+    public String runTask(String className, int courseId) {
+        String projectPath;
+        String result = String.valueOf(GeneralResponse.FAILED);
+        try {
+            // getting path for course
+            projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
+            // get all .java files
+            String[] sourceJavaFilesPaths = IOUtils.getSourceJavaFilesPaths(projectPath);
+            // compile
+            COMPILER.run(null, null, null, sourceJavaFilesPaths);
+            // get root directory (src)
+            File rootDirectoryPath = IOUtils.getRootDirectory(projectPath, STANDARD_ROOT_PACKAGE);
+            // load all classes from root
+            URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
+            // run className and save results
+            result = CheckUtils.runCheckMethod(className, classLoader);
+        } catch (IOException | CourseNotFoundException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    @Override
+    public String checkSolution(String className, int courseId, SolutionModel solution) {
 
         // replace class body with <solution> (append), then call runTask() for it
         // after this - reset changes (get back to original state)
 
         // get path for project
-        String projectPath = courseDB.getCoursePath(courseDB.get(courseId));
-        String sourceJavaFileOriginal = null;
-        Path sourceJavaFile = null;
-        boolean result = false;
+        String projectPath;
+        String sourceClassContentOriginal = null;
+        Path sourceClassPath = null;
+        String result = String.valueOf(GeneralResponse.FAILED);
         try {
-            // path for source file (which we have to run)
-            sourceJavaFile = Files.walk(Paths.get(projectPath))
-                    .filter(path -> path.toString().contains(mainClass + ".java"))
+            projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
+            // path for source class with tests (which we have to run)
+            sourceClassPath = Files.walk(Paths.get(projectPath))
+                    .filter(path -> path.toString().contains(className + ".java"))
                     .findFirst()
                     .get();
 
-            // save original
-            sourceJavaFileOriginal = Files.readAllLines(sourceJavaFile)
+            // save original content of class
+            sourceClassContentOriginal = Files.readAllLines(sourceClassPath)
                     .stream()
                     .collect(Collectors.joining());
 
-            // append our solution at the end
-            String sourceJavaFileWithSolution =
-                    sourceJavaFileOriginal.substring(0, sourceJavaFileOriginal.lastIndexOf("}"))
-                    + solution.getSolution() + "}";
+            // append our solution at the end of sourceClassContentOriginal string
+            String sourceClassContentWithSolution =
+                    sourceClassContentOriginal.substring(0, sourceClassContentOriginal.lastIndexOf("}"))
+                            + solution.getSolution() + "}";
 
-            // write solution string to original file
-            Files.write(sourceJavaFile, sourceJavaFileWithSolution.getBytes(), StandardOpenOption.CREATE);
+            // write sourceClassContentWithSolution to source class
+            Files.write(sourceClassPath, sourceClassContentWithSolution.getBytes(), StandardOpenOption.CREATE);
 
             // run task
-            result = runTask(mainClass, courseId);
+            result = runTask(className, courseId);
 
-        } catch (IOException e) {
+        } catch (IOException | CourseNotFoundException e) {
             e.printStackTrace();
         } finally {
-            if (sourceJavaFileOriginal != null) {
-                try (PrintWriter pw = new PrintWriter(new File(sourceJavaFile.toString()))) {
+            if (sourceClassContentOriginal != null) {
+                try (PrintWriter pw = new PrintWriter(new File(sourceClassPath.toString()))) {
                     // reset changes - to original state
                     // write empty string to file
                     pw.write("");
                     pw.flush();
                     // write original content
-                    Files.write(sourceJavaFile, sourceJavaFileOriginal.getBytes(), StandardOpenOption.CREATE);
+                    Files.write(sourceClassPath, sourceClassContentOriginal.getBytes(), StandardOpenOption.CREATE);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -144,32 +155,4 @@ public class CourseServiceImpl implements CourseService {
         }
         return result;
     }
-
-    private void runMain(String mainClass, URLClassLoader classLoader) {
-        String mainMethod = "main";
-        String[] argumentsForMain = null;
-        try {
-            Class<?> cls = Class.forName(mainClass, true, classLoader);
-            Method clsMethod = cls.getMethod(mainMethod, String[].class);
-            clsMethod.invoke(null, (Object) argumentsForMain);
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String[] getSourceJavaFilesPaths(String projectPath) throws IOException {
-        return Files.walk(Paths.get(projectPath))
-                .filter(path -> path.toString().contains(".java"))
-                .map(Path::toString)
-                .toArray(String[]::new);
-    }
-
-    private File getRootDirectory(String projectPath, String packageName) throws IOException {
-        String root = Files.walk(Paths.get(projectPath))
-                .filter(path -> path.toString().endsWith(packageName))
-                .map(Path::toString)
-                .collect(Collectors.joining());
-        return new File(root);
-    }
-
 }
