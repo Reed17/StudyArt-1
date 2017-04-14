@@ -18,11 +18,13 @@ import ua.artcode.utils.StringUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -122,14 +124,22 @@ public class CourseServiceImpl implements CourseService {
             throws NoSuchDirectoryException, CourseNotFoundException, ClassNotFoundException {
         String projectPath;
         CheckResult checkResult = new CheckResult(new GeneralResponse("FAILED"));
+
         try {
             // getting path for course
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
             // get all .java files
             String[] sourceJavaFilesPaths = IOUtils.getSourceJavaFilesPaths(projectPath);
+            // OS to redirect compilation errors
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             // compile
-            // todo redirect sout to OS and save results (in case of compilation errors)
-            COMPILER.run(null, null, null, sourceJavaFilesPaths);
+            COMPILER.run(null, null, baos, sourceJavaFilesPaths);
+            // save compilation results
+            String compilationResult = new String(baos.toByteArray(), StandardCharsets.UTF_8);
+            // if not empty - return CheckResult with error message
+            if(compilationResult.trim().length()>0){
+                return new CheckResult(new GeneralResponse(compilationResult));
+            }
             // get root directory (src)
             File rootDirectoryPath = IOUtils.getRootDirectory(projectPath, packageName);
             // load all classes from root
