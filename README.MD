@@ -1,4 +1,5 @@
 Hi there
+
 **To run app you need to have:**
 1. Git repo with appropriate test Classes
 Test class example:
@@ -11,6 +12,7 @@ Test class example:
     }
 ```    
 How tests should look like:
+
 _"Result: <true/false>, expected: <expected value>, actual: <actual value>"_
     
 You can use another structure, but method has to return List<String>
@@ -38,9 +40,11 @@ and have <true/false> in text;
      ```
 4. If you want to run class with check() (method is hardcoded for now - you
 can pass any method, but it won't work) method - use next POST request:
+
 http://localhost:8080/run-class?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
 
 5. If you want to send your solution which has to be added to certain class - use next POST request:
+
 http://localhost:8080/send-solution?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
     
 **That's all for now!**
