@@ -5,13 +5,16 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.CourseDB;
+import ua.artcode.exception.CourseDirectoryCreatingExcpetion;
 import ua.artcode.exception.CourseNotFoundException;
+import ua.artcode.exception.NoSuchDirectoryException;
 import ua.artcode.model.CheckResult;
 import ua.artcode.model.Course;
 import ua.artcode.model.GeneralResponse;
 import ua.artcode.model.SolutionModel;
-import ua.artcode.utils.IO_utils.IOUtils;
-import ua.artcode.utils.check_utils.CheckUtils;
+import ua.artcode.utils.CheckUtils;
+import ua.artcode.utils.IOUtils;
+import ua.artcode.utils.StringUtils;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -25,7 +28,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -37,32 +39,31 @@ public class CourseServiceImpl implements CourseService {
 
     // todo think about static initialization
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
-    private static final String STANDARD_ROOT_PACKAGE = "src";
 
     @Autowired
     private CourseDB courseDB;
 
     @Override
-    public boolean addCourse(Course course) {
-        // todo add validation
+    public boolean addCourseFromGit(Course course) throws CourseDirectoryCreatingExcpetion, GitAPIException {
         try {
             File courseDir = IOUtils.createCourseDirectory(course);
             course.setCourseLocalPath(courseDir.getAbsolutePath());
 
-            // todo we should check  operation result. How to check?
-            Git git = Git.cloneRepository()
+            Git.cloneRepository()
                     .setURI(course.getGitURL())
                     .setDirectory(courseDir)
                     .call();
 
-            // todo
-            courseDB.add(course);
+            if (!IOUtils.checkDirectoryIsEmpty(courseDir)) {
+                courseDB.add(course);
+            } else {
+                throw new CourseDirectoryCreatingExcpetion("Can't create directory for course");
+            }
 
             return true;
-        } catch (GitAPIException | IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
         return false;
     }
 
@@ -83,7 +84,8 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CheckResult runTask(String className, int courseId) {
+    public CheckResult runClass(String packageName, String className, int courseId)
+            throws NoSuchDirectoryException, CourseNotFoundException, ClassNotFoundException {
         String projectPath;
         CheckResult checkResult = new CheckResult(GeneralResponse.FAILED);
         try {
@@ -94,21 +96,25 @@ public class CourseServiceImpl implements CourseService {
             // compile
             COMPILER.run(null, null, null, sourceJavaFilesPaths);
             // get root directory (src)
-            File rootDirectoryPath = IOUtils.getRootDirectory(projectPath, STANDARD_ROOT_PACKAGE);
+            File rootDirectoryPath = IOUtils.getRootDirectory(projectPath, packageName);
             // load all classes from root
             URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
             // run className and save results
-            checkResult = CheckUtils.runCheckMethod(className, classLoader);
-        } catch (IOException | CourseNotFoundException e) {
+            checkResult = CheckUtils.runCheckMethod(className, classLoader, packageName);
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return checkResult;
     }
 
     @Override
-    public CheckResult checkSolution(String className, int courseId, SolutionModel solution) {
+    public CheckResult sendSolution(String packageName,
+                                    String className,
+                                    int courseId,
+                                    SolutionModel solution)
+            throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException {
 
-        // replace class body with <solution> (append), then call runTask() for it
+        // replace class body with <solution> (append), then call runClass() for it
         // after this - reset changes (get back to original state)
 
         // get path for project
@@ -119,13 +125,10 @@ public class CourseServiceImpl implements CourseService {
         try {
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
             // path for source class with tests (which we have to run)
-            //todo see how to use Optional?
-            Optional<Path> first = Files.walk(Paths.get(projectPath))
+            sourceClassPath = Files.walk(Paths.get(projectPath))
                     .filter(path -> path.toString().contains(className + ".java"))
-                    .findFirst();
-
-            sourceClassPath = first
-                    .orElse(null);
+                    .findFirst()
+                    .orElseThrow(() -> new ClassNotFoundException("No class with name: " + className));
 
             // save original content of class
             sourceClassContentOriginal = Files.readAllLines(sourceClassPath)
@@ -133,29 +136,21 @@ public class CourseServiceImpl implements CourseService {
                     .collect(Collectors.joining());
 
             // append our solution at the end of sourceClassContentOriginal string
-            // todo extract to StringUtils
-            String sourceClassContentWithSolution =
-                    sourceClassContentOriginal.substring(0, sourceClassContentOriginal.lastIndexOf("}"))
-                            + solution.getSolution() + "}";
+            String sourceClassContentWithSolution = StringUtils.addSoulution(sourceClassContentOriginal, solution);
 
             // write sourceClassContentWithSolution to source class
             Files.write(sourceClassPath, sourceClassContentWithSolution.getBytes(), StandardOpenOption.CREATE);
 
             // run task
-            checkResult = runTask(className, courseId);
+            checkResult = runClass(packageName, className, courseId);
 
-        } catch (IOException | CourseNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (sourceClassContentOriginal != null) {
-                // todo extract to appropriate method
                 try (PrintWriter pw = new PrintWriter(new File(sourceClassPath.toString()))) {
                     // reset changes - to original state
-                    // write empty string to file
-                    pw.write("");
-                    pw.flush();
-                    // write original content
-                    Files.write(sourceClassPath, sourceClassContentOriginal.getBytes(), StandardOpenOption.CREATE);
+                    IOUtils.writeToFile(pw, sourceClassPath, sourceClassContentOriginal);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
