@@ -37,15 +37,18 @@ public class IOUtils {
         return (files != null && files.length == 0);
     }
 
+    /**
+     * Clears file's original content and writes input content into it
+     */
     public static void writeToFile(Writer writer, Path path, String content) throws IOException {
-        // reset changes - to original state
-        // write empty string to file
         writer.write("");
         writer.flush();
-        // write original content
         Files.write(path, content.getBytes(), StandardOpenOption.CREATE);
     }
 
+    /**
+     * Getting all .java files as String[]
+     */
     public static String[] getSourceJavaFilesPaths(String projectPath) throws IOException {
         return Files.walk(Paths.get(projectPath))
                 .filter(path -> path.toString().contains(".java"))

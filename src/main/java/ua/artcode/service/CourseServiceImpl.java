@@ -43,6 +43,17 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     private CourseDB courseDB;
 
+
+    /**
+     * @param course - Course to add
+     *               Course will automatically verified before passing as argument
+     *               Algorithm:
+     *               1. Create new directory for course
+     *               2. Clone Git Repo to this dir
+     *               3. Add course to DB if everything is OK
+     * @return true if course downloaded and added, false otherwise
+     * @throws CourseDirectoryCreatingExcpetion if unable to create a directory
+     */
     @Override
     public boolean addCourseFromGit(Course course) throws CourseDirectoryCreatingExcpetion, GitAPIException {
         try {
@@ -67,6 +78,11 @@ public class CourseServiceImpl implements CourseService {
         return false;
     }
 
+    /**
+     * @param id - id for course
+     * @return Course if found, null otherwise
+     * @throws CourseNotFoundException*
+     */
     @Override
     public Course getCourse(int id) {
         Course course = null;
@@ -78,11 +94,29 @@ public class CourseServiceImpl implements CourseService {
         return course;
     }
 
+    /**
+     * @return Collection containing all courses in DB
+     */
     @Override
     public Collection<Course> getAllCourses() {
         return courseDB.getAllCourses();
     }
 
+
+    /**
+     * @param packageName - root directory where mainClass located (and other dependencies too)
+     * @param className   - name of the class with tests
+     * @param methodName  - name of the method to run in className.class
+     * @param courseId    - id of the corresponding course
+     *                    <p>
+     *                    1. Getting path for course
+     *                    2. Get all .java files in projectPath folder
+     *                    3. Compile all .java files
+     *                    4. Get root directory with mainClass (packageName)
+     *                    5. Load this directory to ClassLoader
+     *                    6. Generate CheckResults (METHOD SHOULD RETURN LIST OF STRING)
+     * @return CheckResult model with all info and stats
+     */
     @Override
     public CheckResult runClass(String packageName, String className, String methodName, int courseId)
             throws NoSuchDirectoryException, CourseNotFoundException, ClassNotFoundException {
@@ -108,6 +142,14 @@ public class CourseServiceImpl implements CourseService {
         return checkResult;
     }
 
+    /**
+     * Same to runClass() method, but here we append solution to class at first,
+     * then run this class and collect
+     * CheckResult
+     * At the end we reset all changes in original class
+     *
+     * @see CourseServiceImpl#runClass(String, String, String, int)
+     */
     @Override
     public CheckResult sendSolution(String packageName,
                                     String className,
@@ -115,9 +157,6 @@ public class CourseServiceImpl implements CourseService {
                                     int courseId,
                                     SolutionModel solution)
             throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException {
-
-        // replace class body with <solution> (append), then call runClass() for it
-        // after this - reset changes (get back to original state)
 
         String projectPath;
         String sourceClassContentOriginal = null;
@@ -137,7 +176,7 @@ public class CourseServiceImpl implements CourseService {
                     .collect(Collectors.joining());
 
             // append our solution at the end of sourceClassContentOriginal string
-            String sourceClassContentWithSolution = StringUtils.addSoulution(sourceClassContentOriginal, solution);
+            String sourceClassContentWithSolution = StringUtils.addSolution(sourceClassContentOriginal, solution);
 
             // write sourceClassContentWithSolution to source class
             Files.write(sourceClassPath, sourceClassContentWithSolution.getBytes(), StandardOpenOption.CREATE);
