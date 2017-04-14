@@ -3,7 +3,21 @@ package ua.artcode.model;
 /**
  * Created by v21k on 11.04.17.
  */
-public enum GeneralResponse {
-    DONE,
-    FAILED;
+public class GeneralResponse {
+    private String message;
+
+    public GeneralResponse() {
+    }
+
+    public GeneralResponse(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
