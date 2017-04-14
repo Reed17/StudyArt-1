@@ -15,6 +15,7 @@ public class CheckUtils {
      * @param classLoader classloader to load our class
      *
      * @return CheckResult model
+     *
      * Check result model form:
      * overall tests (int)
      * passed tests (int)
@@ -22,13 +23,13 @@ public class CheckUtils {
      * tests info (String)
      * tests stats (String)
      *
+     * results (String) will be presented in next form:
+     * Result: true/false, expected: ..., actual: ...
+     *
      * @see StatsUtils#stats(String)
      * @see CheckResult
      * */
-    public static CheckResult runCheckMethod(String className, URLClassLoader classLoader) {
-        // todo should be passed as arg also
-        String methodName = "check";
-        // todo show how to results will be presented
+    public static CheckResult runCheckMethod(String className, URLClassLoader classLoader, String methodName) {
         String results = null;
         try {
             Class<?> cls = Class.forName(className, true, classLoader);
