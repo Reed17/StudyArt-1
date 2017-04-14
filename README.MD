@@ -1,7 +1,8 @@
 Hi there
 
 **To run app you need to have:**
-1. Git repo with appropriate test Classes
+1. Git repo with appropriate test сlasses
+
 Test class example:
 ```java
     public class Test{
