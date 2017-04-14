@@ -13,7 +13,7 @@ Test class example:
 
     
 How tests should look like:
-# "Result: <true/false>, expected: <expected value>, actual: <actual_value>";
+###### "Result: <true/false>, expected: <expected value>, actual: <actual_value>";
     
 You can use another structure, but method has to return List<String>
 and have <true/false> in text;
