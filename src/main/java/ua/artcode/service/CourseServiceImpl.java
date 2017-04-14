@@ -119,7 +119,6 @@ public class CourseServiceImpl implements CourseService {
         // replace class body with <solution> (append), then call runClass() for it
         // after this - reset changes (get back to original state)
 
-        // get path for project
         String projectPath;
         String sourceClassContentOriginal = null;
         Path sourceClassPath = null;
