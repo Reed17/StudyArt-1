@@ -1,5 +1,5 @@
 Hi there
-To run app you need to have:
+**To run app you need to have:**
 1. Git repo with appropriate test Classes
 Test class example:
 ```java
@@ -9,21 +9,19 @@ Test class example:
                 return list;
             }   
     }
-```
-
-    
+```    
 How tests should look like:
-###### "Result: <true/false>, expected: <expected value>, actual: <actual_value>";
+_"Result: <true/false>, expected: <expected value>, actual: <actual value>"_
     
 You can use another structure, but method has to return List<String>
 and have <true/false> in text;
 
 2. Postman or other app to send GET/POST requests
 
-Algorithm of using app:
+**Algorithm of using app:**
 1. Change path for saving Git projects in /resources/app.properties file.
 2. Run Application class in ua.artcode.controller
-3. Add course by sending POST request to localhost:8080/courses/add with JSON body like this:
+3. Add course by sending POST request to http://localhost:8080/courses/add with JSON body like this:
      * id - any number, will be generated on server side
      * gitURL - valid git repo
      * courseLocalPath - null, generated on server side
@@ -40,12 +38,12 @@ Algorithm of using app:
      ```
 4. If you want to run class with check() (method is hardcoded for now - you
 can pass any method, but it won't work) method - use next POST request:
-localhost:8080/run-class?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
+http://localhost:8080/run-class?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
 
 5. If you want to send your solution which has to be added to certain class - use next POST request:
-localhost:8080/send-solution?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
+http://localhost:8080/send-solution?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
     
-That's all for now!
+**That's all for now!**
   
 // add tests using "spring boot test" - 0%
     test created endpoints , send some data and check actual result
