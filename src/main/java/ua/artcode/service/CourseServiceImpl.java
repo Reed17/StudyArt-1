@@ -94,6 +94,7 @@ public class CourseServiceImpl implements CourseService {
             // get all .java files
             String[] sourceJavaFilesPaths = IOUtils.getSourceJavaFilesPaths(projectPath);
             // compile
+            // todo redirect sout to OS and save results (in case of compilation errors)
             COMPILER.run(null, null, null, sourceJavaFilesPaths);
             // get root directory (src)
             File rootDirectoryPath = IOUtils.getRootDirectory(projectPath, packageName);
