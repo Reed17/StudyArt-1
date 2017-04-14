@@ -12,11 +12,10 @@ public class StatsUtils {
      * Parsing info from input string with results
      *
      * @param testsInfo - information abouts tests in form:
-     * Result: true/false, expected: ..., actual: ...
-     *
+     *                  Result: true/false, expected: ..., actual: ...
      * @return CheckResult model with parsed information
      * @see CheckResult
-     * */
+     */
     public static CheckResult stats(String testsInfo) {
         int overallTests = StringUtils.countMatches(testsInfo, "Result");
         int failedTests = StringUtils.countMatches(testsInfo, "false");
@@ -26,7 +25,7 @@ public class StatsUtils {
                 overallTests,
                 passedTests,
                 failedTests,
-                failedTests == 0 ? GeneralResponse.DONE : GeneralResponse.FAILED);
+                failedTests == 0 ? new GeneralResponse("DONE") : new GeneralResponse("FAILED"));
 
 
         return new CheckResult(overallTests, passedTests, failedTests, testsInfo, testsStats);
