@@ -22,7 +22,7 @@ and have <true/false> in text;
 
 **Algorithm of using app:**
 1. Change path for saving Git projects in /resources/app.properties file.
-2. Run Application class in ua.artcode.controller
+2. Run Application class ua.artcode.controller.Application
 3. Add course by sending POST request to http://localhost:8080/courses/add with JSON body like this:
      * id - any number, will be generated on server side
      * gitURL - valid git repo
@@ -31,12 +31,12 @@ and have <true/false> in text;
      * lessons - doesn't work now, can be empty array
     ```json
     {
-          "id": 0, 
-          "gitURL": "https://github.com/v21k/TestGitProject", 
-          "courseLocalPath": null, 
-          "author": "VK", 
-          "lessons": [] 
-        }
+        "id": 0, 
+        "gitURL": "https://github.com/v21k/TestGitProject", 
+        "courseLocalPath": null, 
+        "author": "VK", 
+        "lessons": [] 
+     }
      ```
 4. If you want to run class with check() (method is hardcoded for now - you
 can pass any method, but it won't work) method - use next POST request:
