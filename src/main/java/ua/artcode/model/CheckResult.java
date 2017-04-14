@@ -1,6 +1,5 @@
 package ua.artcode.model;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -54,11 +53,11 @@ public class CheckResult {
         this.failedTests = failedTests;
     }
 
-    public List<String>  getTestsInfo() {
+    public List<String> getTestsInfo() {
         return testsInfo;
     }
 
-    public void setTestsInfo(List<String>  testsInfo) {
+    public void setTestsInfo(List<String> testsInfo) {
         this.testsInfo = testsInfo;
     }
 
