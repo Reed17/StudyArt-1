@@ -17,6 +17,7 @@ How tests should look like:
     
 You can use another structure, but method has to return List<String>
 and have <true/false> in text;
+
 2. Postman or other app to send GET/POST requests
 
 Algorithm of using app:
