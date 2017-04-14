@@ -1,7 +1,6 @@
-package ua.artcode.utils.check_utils;
+package ua.artcode.utils;
 
 import ua.artcode.model.CheckResult;
-import ua.artcode.utils.stats_utils.StatsUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,7 +10,21 @@ import java.net.URLClassLoader;
  * Created by v21k on 13.04.17.
  */
 public class CheckUtils {
-    // todo describe input and output variable
+    /**
+     * @param className name of class which we will run
+     * @param classLoader classloader to load our class
+     *
+     * @return CheckResult model
+     * Check result model form:
+     * overall tests (int)
+     * passed tests (int)
+     * failed tests (int)
+     * tests info (String)
+     * tests stats (String)
+     *
+     * @see StatsUtils#stats(String)
+     * @see CheckResult
+     * */
     public static CheckResult runCheckMethod(String className, URLClassLoader classLoader) {
         // todo should be passed as arg also
         String methodName = "check";
