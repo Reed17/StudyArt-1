@@ -31,7 +31,7 @@ public class IOUtils {
     public static File createCourseDirectory(Course course) throws IOException {
 
         File courseDir = new File(generatePath(course));
-        courseDir.mkdir(); // todo do not ignore of the result of method
+        courseDir.mkdirs(); // todo do not ignore of the result of method
         FileUtils.cleanDirectory(courseDir);
 
         return courseDir;
