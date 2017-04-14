@@ -6,9 +6,11 @@ import ua.artcode.model.Course;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +30,20 @@ public class IOUtils {
         FileUtils.cleanDirectory(courseDir);
 
         return courseDir;
+    }
+
+    public static boolean checkDirectoryIsEmpty(File directory){
+        File[] files = directory.listFiles();
+        return (files != null && files.length == 0);
+    }
+
+    public static void writeToFile(Writer writer, Path path, String content) throws IOException {
+        // reset changes - to original state
+        // write empty string to file
+        writer.write("");
+        writer.flush();
+        // write original content
+        Files.write(path, content.getBytes(), StandardOpenOption.CREATE);
     }
 
     public static String[] getSourceJavaFilesPaths(String projectPath) throws IOException {
