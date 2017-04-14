@@ -20,11 +20,15 @@ public interface CourseService {
 
     Course getCourse(int id) throws CourseNotFoundException;
 
-    CheckResult runClass(String packageName, String mainClass, int courseId)
+    CheckResult runClass(String packageName,
+                         String mainClass,
+                         String methodName,
+                         int courseId)
             throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException;
 
     CheckResult sendSolution(String packageName,
                              String mainClass,
+                             String methodName,
                              int courseId,
                              SolutionModel solution)
             throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException;

@@ -84,10 +84,10 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public CheckResult runClass(String packageName, String className, int courseId)
+    public CheckResult runClass(String packageName, String className, String methodName, int courseId)
             throws NoSuchDirectoryException, CourseNotFoundException, ClassNotFoundException {
         String projectPath;
-        CheckResult checkResult = new CheckResult(GeneralResponse.FAILED);
+        CheckResult checkResult = new CheckResult(new GeneralResponse("FAILED"));
         try {
             // getting path for course
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
@@ -100,7 +100,7 @@ public class CourseServiceImpl implements CourseService {
             // load all classes from root
             URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{rootDirectoryPath.toURI().toURL()});
             // run className and save results
-            checkResult = CheckUtils.runCheckMethod(className, classLoader, packageName);
+            checkResult = CheckUtils.runCheckMethod(className, classLoader, methodName);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -110,6 +110,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public CheckResult sendSolution(String packageName,
                                     String className,
+                                    String methodName,
                                     int courseId,
                                     SolutionModel solution)
             throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException {
@@ -121,7 +122,7 @@ public class CourseServiceImpl implements CourseService {
         String projectPath;
         String sourceClassContentOriginal = null;
         Path sourceClassPath = null;
-        CheckResult checkResult = new CheckResult(GeneralResponse.FAILED);
+        CheckResult checkResult = new CheckResult(new GeneralResponse("FAILED"));
         try {
             projectPath = courseDB.getCoursePath(courseDB.getCourseByID(courseId));
             // path for source class with tests (which we have to run)
@@ -142,7 +143,7 @@ public class CourseServiceImpl implements CourseService {
             Files.write(sourceClassPath, sourceClassContentWithSolution.getBytes(), StandardOpenOption.CREATE);
 
             // run task
-            checkResult = runClass(packageName, className, courseId);
+            checkResult = runClass(packageName, className, methodName, courseId);
 
         } catch (IOException e) {
             e.printStackTrace();
