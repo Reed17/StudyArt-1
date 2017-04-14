@@ -2,31 +2,36 @@ Hi there
 To run app you need to have:
 1. Git repo with appropriate test Classes
 Test class example:
-public class Test{
-    public static List<String> methodName(){
-            list.add("Result: <true/false>, expected: <expected value>, actual: <actual_value>")
-            return list;
-        }   
+```java
+    public class Test{
+        public static List<String> methodName(){
+                list.add("Result: <true/false>, expected: <expected value>, actual: <actual_value>");
+                return list;
+            }   
     }
+```
+
     
-    How tests should look like:
-    "Result: <true/false>, expected: <expected value>, actual: <actual_value>";
+How tests should look like:
+"Result: <true/false>, expected: <expected value>, actual: <actual_value>";
     
-    You can use another structure, but method has to return List<String>
-    and have <true/false> in text;
+You can use another structure, but method has to return List<String>
+and have <true/false> in text;
 2. Postman or other app to send GET/POST requests
 
 Algorithm of using app:
 1. Change path for saving Git projects in /resources/app.properties file.
 2. Run Application class in ua.artcode.controller
 3. Add course by sending POST request to localhost:8080/courses/add with JSON body like this:
+    ```json
     {
-      "id": 0, (CAN BE ANY NUMBER, IT WILL BE GENERATED ON THE SERVER SIDE)
-      "gitURL": "https://github.com/v21k/TestGitProject", (MUST BE VALID URL)
-      "courseLocalPath": null, (GENERATED ON THE SERVER SIDE)
-      "author": "VK", (MUST BE VALID STRING - 2 OR MORE LETTERS)
-      "lessons": [] (CAN BE EMPTY, DOESN'T WORK YET)
-    }
+          "id": 0, // (CAN BE ANY NUMBER, IT WILL BE GENERATED ON THE SERVER SIDE)
+          "gitURL": "https://github.com/v21k/TestGitProject", // (MUST BE VALID URL)
+          "courseLocalPath": null, // (GENERATED ON THE SERVER SIDE)
+          "author": "VK", // (MUST BE VALID STRING - 2 OR MORE LETTERS)
+          "lessons": [] // (CAN BE EMPTY, DOESN'T WORK YET)
+        }
+     ```
 4. If you want to run class with check() (method is hardcoded for now - you
 can pass any method, but it won't work) method - use next POST request:
 localhost:8080/run-class?packageName=PACKAGE_NAME&mainClass=CLASS_NAME&methodName=check&courseId=ID
