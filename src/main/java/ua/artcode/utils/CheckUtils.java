@@ -29,13 +29,14 @@ public class CheckUtils {
      * @see StatsUtils#stats(String)
      * @see CheckResult
      * */
-    public static CheckResult runCheckMethod(String className, URLClassLoader classLoader, String methodName) {
+    public static CheckResult runCheckMethod(String className, URLClassLoader classLoader, String methodName)
+            throws ClassNotFoundException {
         String results = null;
         try {
             Class<?> cls = Class.forName(className, true, classLoader);
             Method mainMethod = cls.getMethod(methodName);
             results = (String) mainMethod.invoke(null);
-        } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
         return StatsUtils.stats(results);
