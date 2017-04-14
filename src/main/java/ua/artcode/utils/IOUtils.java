@@ -1,7 +1,6 @@
 package ua.artcode.utils;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.model.Course;
@@ -22,11 +21,6 @@ import java.util.stream.Collectors;
 public class IOUtils {
 
     private static String pathForGitProjects;
-
-    @Value("${pathForGitProjects}")
-    public void setPathForGitProjects(String path) {
-        pathForGitProjects = path;
-    }
 
     public static File createCourseDirectory(Course course) throws IOException {
 
@@ -71,5 +65,10 @@ public class IOUtils {
 
     private static String generatePath(Course course) {
         return pathForGitProjects + "/" + course.getAuthor() + "/";
+    }
+
+    @Value("${pathForGitProjects}")
+    public void setPathForGitProjects(String path) {
+        pathForGitProjects = path;
     }
 }
