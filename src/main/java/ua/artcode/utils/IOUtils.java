@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @Component
 public class IOUtils {
 
-    public static String pathForGitProjects;
+    private static String pathForGitProjects;
 
     @Value("${pathForGitProjects}")
     public void setPathForGitProjects(String path) {
