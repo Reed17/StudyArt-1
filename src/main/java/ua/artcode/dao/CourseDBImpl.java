@@ -39,6 +39,10 @@ public class CourseDBImpl implements CourseDB {
 
     @Override
     public Course getCourseByID(int id) throws CourseNotFoundException {
+        if (id <= 0) {
+            throw new CourseNotFoundException("No course with id " + id + ". ID must be > 0.");
+        }
+
         return courses.values()
                 .stream()
                 .filter(course -> course.getId() == id)
