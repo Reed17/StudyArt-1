@@ -13,7 +13,7 @@ Test class example:
 
     
 How tests should look like:
-"Result: <true/false>, expected: <expected value>, actual: <actual_value>";
+# "Result: <true/false>, expected: <expected value>, actual: <actual_value>";
     
 You can use another structure, but method has to return List<String>
 and have <true/false> in text;
@@ -23,13 +23,18 @@ Algorithm of using app:
 1. Change path for saving Git projects in /resources/app.properties file.
 2. Run Application class in ua.artcode.controller
 3. Add course by sending POST request to localhost:8080/courses/add with JSON body like this:
+     * id - any number, will be generated on server side
+     * gitURL - valid git repo
+     * courseLocalPath - null, generated on server side
+     * author - valid name - 2 or more letters
+     * lessons - doesn't work now, can be empty array
     ```json
     {
-          "id": 0, // (CAN BE ANY NUMBER, IT WILL BE GENERATED ON THE SERVER SIDE)
-          "gitURL": "https://github.com/v21k/TestGitProject", // (MUST BE VALID URL)
-          "courseLocalPath": null, // (GENERATED ON THE SERVER SIDE)
-          "author": "VK", // (MUST BE VALID STRING - 2 OR MORE LETTERS)
-          "lessons": [] // (CAN BE EMPTY, DOESN'T WORK YET)
+          "id": 0, 
+          "gitURL": "https://github.com/v21k/TestGitProject", 
+          "courseLocalPath": null, 
+          "author": "VK", 
+          "lessons": [] 
         }
      ```
 4. If you want to run class with check() (method is hardcoded for now - you
