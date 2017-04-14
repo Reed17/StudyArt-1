@@ -1,4 +1,4 @@
-package ua.artcode.utils.IO_utils;
+package ua.artcode.utils;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.stereotype.Component;
