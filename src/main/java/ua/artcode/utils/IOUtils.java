@@ -32,7 +32,7 @@ public class IOUtils {
         return courseDir;
     }
 
-    public static boolean checkDirectoryIsEmpty(File directory){
+    public static boolean checkDirectoryIsEmpty(File directory) {
         File[] files = directory.listFiles();
         return (files != null && files.length == 0);
     }

@@ -11,24 +11,22 @@ import java.net.URLClassLoader;
  */
 public class CheckUtils {
     /**
-     * @param className name of class which we will run
+     * @param className   name of class which we will run
      * @param classLoader classloader to load our class
-     *
      * @return CheckResult model
-     *
+     * <p>
      * Check result model form:
      * overall tests (int)
      * passed tests (int)
      * failed tests (int)
      * tests info (String)
      * tests stats (String)
-     *
+     * <p>
      * results (String) will be presented in next form:
      * Result: true/false, expected: ..., actual: ...
-     *
      * @see StatsUtils#stats(String)
      * @see CheckResult
-     * */
+     */
     public static CheckResult runCheckMethod(String className, URLClassLoader classLoader, String methodName)
             throws ClassNotFoundException {
         String results = null;
