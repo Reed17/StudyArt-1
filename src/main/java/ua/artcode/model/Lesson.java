@@ -1,5 +1,6 @@
 package ua.artcode.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -7,20 +8,19 @@ import java.util.List;
  */
 public class Lesson {
     private String name;
-    private List<String> activeClasses;
-    private List<String> activeTests;
+    private String path;
+    private String[] classes;
 
     public Lesson() {
     }
 
-    public Lesson(String name, List<String> activeClasses, List<String> activeTests) {
+    public Lesson(String name, String path, String[] classes) {
         this.name = name;
-        this.activeClasses = activeClasses;
-        this.activeTests = activeTests;
+        this.path = path;
+        this.classes = classes;
     }
 
     public String getName() {
-
         return name;
     }
 
@@ -28,19 +28,50 @@ public class Lesson {
         this.name = name;
     }
 
-    public List<String> getActiveClasses() {
-        return activeClasses;
+    public String getPath() {
+        return path;
     }
 
-    public void setActiveClasses(List<String> activeClasses) {
-        this.activeClasses = activeClasses;
+    public void setPath(String path) {
+        this.path = path;
     }
 
-    public List<String> getActiveTests() {
-        return activeTests;
+    public String[] getClasses() {
+        return classes;
     }
 
-    public void setActiveTests(List<String> activeTests) {
-        this.activeTests = activeTests;
+    public void setClasses(String[] classes) {
+        this.classes = classes;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Lesson lesson = (Lesson) o;
+
+        if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
+        if (path != null ? !path.equals(lesson.path) : lesson.path != null) return false;
+        // Probably incorrect - comparing Object[] arrays with Arrays.equals
+        return Arrays.equals(classes, lesson.classes);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(classes);
+        return result;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Lesson{" +
+                "name='" + name + '\'' +
+                ", path='" + path + '\'' +
+                ", classes=" + Arrays.toString(classes) +
+                '}';
     }
 }
