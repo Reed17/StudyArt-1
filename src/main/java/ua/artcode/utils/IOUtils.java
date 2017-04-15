@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 public class IOUtils {
 
     private static String localPathForProjects;
+    private static String localPathForExternalCode;
 
     /**
      * Downloading project from Git and save it locally
@@ -85,6 +87,22 @@ public class IOUtils {
                 .collect(Collectors.toList());
     }
 
+    public static String saveExternalCodeLocally(String code) throws IOException {
+        String className = code.split(" ")[2];
+        Path classPathDirectory = Paths.get(localPathForExternalCode);
+
+        Files.createDirectories(classPathDirectory);
+        FileUtils.cleanDirectory(new File(localPathForExternalCode));
+
+        String javaClassName = className + ".java";
+        File sourceFile = new File(localPathForExternalCode, javaClassName);
+
+        Files.write(sourceFile.toPath(), code.getBytes(), StandardOpenOption.CREATE);
+
+        return localPathForExternalCode + "/" + javaClassName;
+    }
+
+
     private static String generatePath(Course course) {
         return localPathForProjects + "/" + course.getId() + course.getName() + "/";
     }
@@ -92,5 +110,10 @@ public class IOUtils {
     @Value("${pathForGitProjects}")
     public void setLocalPathForProjects(String path) {
         localPathForProjects = path;
+    }
+
+    @Value("${pathForExternalCodeCompiling}")
+    public void setLocalPathForExternalCode(String path) {
+        localPathForExternalCode = path;
     }
 }
