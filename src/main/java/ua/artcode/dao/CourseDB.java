@@ -2,6 +2,7 @@ package ua.artcode.dao;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.stereotype.Component;
+import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonsParsingException;
@@ -26,9 +27,12 @@ public class CourseDB implements StudyDB<Course> {
 
     @Override
     public boolean add(Course course) throws GitAPIException, DirectoryCreatingException, LessonsParsingException {
-        course.setId(courseMap.size() + 1);
-        course.setLocalPath(IOUtils.saveLocally(course));
+        if (contains(course)) {
+            return update(course);
+        }
         try {
+            course.setId(courseMap.size() + 1);
+            course.setLocalPath(IOUtils.saveLocally(course));
             course.setLessons(IOUtils.getLessons(course));
         } catch (IOException e) {
             throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
@@ -38,24 +42,39 @@ public class CourseDB implements StudyDB<Course> {
     }
 
     @Override
-    public boolean remove(int id) {
-        return false;
+    public boolean update(Course course) {
+        return courseMap.put(course.getId(), course) != null;
+    }
+
+    @Override
+    public boolean remove(int id) throws InvalidIDException {
+        checkID(id);
+        return courseMap.remove(id) != null;
+    }
+
+    @Override
+    public boolean contains(Course course) {
+        return courseMap.values().contains(course);
     }
 
     @Override
     public Collection<Course> getAll() {
-        return null;
+        return courseMap.values();
     }
 
     @Override
-    public Course getByID(int id) throws InvalidIDException {
-        if (id <= 0) {
-            throw new InvalidIDException("ID must be > 0");
-        }
+    public Course getByID(int id) throws InvalidIDException, CourseNotFoundException {
+        checkID(id);
         return courseMap.values()
                 .stream()
                 .filter(course -> course.getId() == id)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new CourseNotFoundException("No course found with id: " + id));
+    }
+
+    private void checkID(int id) throws InvalidIDException {
+        if (id <= 0) {
+            throw new InvalidIDException("ID must be > 0");
+        }
     }
 }
