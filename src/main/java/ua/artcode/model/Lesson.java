@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by v21k on 15.04.17.
  */
-public class Lesson {
+public class Lesson implements Comparable<Lesson> {
     private String name;
     private String localPath;
     private List<String> classPaths;
@@ -70,5 +70,10 @@ public class Lesson {
                 ", localPath='" + localPath + '\'' +
                 ", classPaths=" + classPaths +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Lesson o) {
+        return this.name.compareTo(o.name);
     }
 }
