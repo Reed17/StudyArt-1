@@ -44,7 +44,7 @@ public class IOUtils {
             Files.createDirectories(Paths.get(projectPath));
             Git.cloneRepository()
                     .setURI(course.getUrl())
-                    .setDirectory(new File(projectPath))
+                    .setDirectory(projectDirectory)
                     .call();
         } catch (IOException e) {
             throw new DirectoryCreatingException("Unable to create a directory for course: " + course.getName());
