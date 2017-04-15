@@ -4,6 +4,7 @@ import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.model.Course;
+import ua.artcode.model.Lesson;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -29,6 +32,29 @@ public class IOUtils {
         FileUtils.cleanDirectory(courseDir);
 
         return courseDir;
+    }
+
+    public static void addLessons(Course course) throws IOException {
+        List<String> lessonPaths = Files.walk(Paths.get(course.getCourseLocalPath()))
+                .map(Path::toString)
+                .filter(path -> path.endsWith("lesson"))
+                .collect(Collectors.toList());
+
+        lessonPaths
+                .forEach(lessonPath -> {
+                    try {
+                         String[] classes = Files.walk(Paths.get(lessonPath))
+                                .map(Path::toString)
+                                .filter(path -> path.endsWith(".java"))
+                                .toArray(String[]::new);
+
+                        String lessonName = lessonPath.substring(lessonPath.lastIndexOf("/")+1);
+                        course.getLessons().add(new Lesson(lessonName, lessonPath, classes));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+
     }
 
     public static boolean checkDirectoryIsEmpty(File directory) {
