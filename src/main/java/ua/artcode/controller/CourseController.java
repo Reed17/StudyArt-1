@@ -16,13 +16,13 @@ public class CourseController {
     @Autowired
     private StudyDB<Course> courseDB;
 
-    @RequestMapping("/сourses/get")
+    @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
     public Course getCourseByID(@RequestParam int id) throws InvalidIDException {
         return courseDB.getByID(id);
     }
 
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse add(@RequestBody Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException {
+    public GeneralResponse addCourse(@RequestBody Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException {
         return courseDB.add(course) ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
     }
 }
