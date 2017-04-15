@@ -13,9 +13,14 @@ import java.util.Collection;
  */
 public interface StudyDB<T> {
     boolean add(T value) throws GitAPIException, DirectoryCreatingException, LessonsParsingException;
+
     boolean update(T value);
+
     boolean remove(int id) throws InvalidIDException;
+
     boolean contains(T value);
+
     Collection<T> getAll();
+
     T getByID(int id) throws InvalidIDException, CourseNotFoundException;
 }

@@ -3,7 +3,6 @@ package ua.artcode.controller;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.dao.StudyDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -17,7 +16,6 @@ import ua.artcode.service.RunService;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 
 @RestController
 public class CourseController {

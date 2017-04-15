@@ -5,7 +5,6 @@ import ua.artcode.model.RunResults;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 
 /**
  * Created by v21k on 15.04.17.

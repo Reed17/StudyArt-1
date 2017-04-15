@@ -14,7 +14,9 @@ import java.util.Collection;
  */
 public interface CourseService {
     boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
+
     Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
+
     boolean removeCourse(int id) throws InvalidIDException;
 
     Collection<Course> getAll();

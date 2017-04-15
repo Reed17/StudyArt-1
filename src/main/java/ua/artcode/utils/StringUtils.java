@@ -9,6 +9,6 @@ public class StringUtils {
     }
 
     public static String getClassNameFromClassPath(String classPath) {
-        return classPath.substring(classPath.lastIndexOf("/")+1, classPath.lastIndexOf("."));
+        return classPath.substring(classPath.lastIndexOf("/") + 1, classPath.lastIndexOf("."));
     }
 }
