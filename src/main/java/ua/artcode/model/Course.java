@@ -86,7 +86,6 @@ public class Course {
 
         Course course = (Course) o;
 
-        if (id != course.id) return false;
         if (name != null ? !name.equals(course.name) : course.name != null) return false;
         if (author != null ? !author.equals(course.author) : course.author != null) return false;
         return url != null ? url.equals(course.url) : course.url == null;
@@ -94,8 +93,7 @@ public class Course {
 
     @Override
     public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (author != null ? author.hashCode() : 0);
         result = 31 * result + (url != null ? url.hashCode() : 0);
         return result;
