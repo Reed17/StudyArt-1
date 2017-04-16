@@ -1,44 +1,53 @@
 package ua.artcode.core;
 
+import ua.artcode.core.method_checkers.MethodChecker;
+import ua.artcode.core.method_runner.MethodRunner;
+import ua.artcode.core.results_processor.MethodRusultsProcessor;
+import ua.artcode.model.RunResults;
+import ua.artcode.utils.IOUtils;
+import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
 
-import javax.tools.JavaCompiler;
-import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
+import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 
 /**
  * Created by v21k on 15.04.17.
  */
 public class RunCore {
-    private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    public static String runMain(String classPath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
-        ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
+    public static RunResults runMethod(String classPath, MethodChecker checker, MethodRunner runner, MethodRusultsProcessor processor) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        // compile and save results (errors)
+        String compilationErrors = RunUtils.compile(classPath);
 
-        COMPILER.run(null, baosOut, baosErr, classPath);
-
-        String errors = baosErr.toString();
-        String out = baosOut.toString();
-
+        // parse class name and root package for this class
         String className = StringUtils.getClassNameFromClassPath(classPath);
         String classRoot = StringUtils.getClassRootFromClassPath(classPath);
 
-        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new File(classRoot).toURI().toURL()});
-        Class<?> cls = Class.forName(className, true, classLoader);
+        // getting class
+        Class<?> cls = RunUtils.getClass(className, classRoot);
 
-        Method method = cls.getMethod("main", String[].class);
-        String[] args = null;
-        method.invoke(null, (Object) args);
+        // checking method(s) needed
+        if(!checker.checkMethods(cls)){
+            return new RunResults("Can't find required method");
+        }
 
-        return errors.length() > 0 ? errors : out;
+        // redirecting s.out
+        ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream();
+        PrintStream systemOutOld = IOUtils.redirectSystemOut(redirectedSystemOut);
+
+        // run method
+        String methodOutput = runner.runMethod(cls);
+
+        // reset s.out to old and save results from previous
+        String systemOut = IOUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+
+        // return RunResult
+        return processor.process(runner, compilationErrors, systemOut, methodOutput);
     }
+
 
 
 }
