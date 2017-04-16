@@ -19,8 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 public class RunServiceImpl implements RunService {
 
     @Override
-    public RunResults runClass(ExternalCode code) throws ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+    public RunResults runMain(ExternalCode code) throws ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         String path = IOUtils.saveExternalCodeLocally(code.getSourceCode());
-        return RunCore.runMethod(path, Checkers.mainChecker, Runners.main, ResultsProcessors.mainProcessor);
+        return RunCore.runMethod(path, Checkers.main, Runners.main, ResultsProcessors.main);
     }
 }

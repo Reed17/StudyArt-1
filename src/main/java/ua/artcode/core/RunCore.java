@@ -31,7 +31,7 @@ public class RunCore {
 
         // checking method(s) needed
         if(!checker.checkMethods(cls)){
-            return new RunResults("Can't find required method");
+            return new RunResults("Can't find required method(s)");
         }
 
         // redirecting s.out

@@ -7,7 +7,7 @@ public class ResultsProcessors {
     public static int SYSTEM_OUT = 1;
     public static int METHOD_RESULTS = 2;
 
-    public static MethodRusultsProcessor mainProcessor = ((runner, args) -> {
+    public static MethodRusultsProcessor main = ((runner, args) -> {
         return args[ERORR].length() > 0 ? new RunResults(args[ERORR]) : new RunResults(args[SYSTEM_OUT]);
     });
 }

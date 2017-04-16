@@ -43,6 +43,6 @@ public class CourseController {
 
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
     public RunResults runClass(@RequestBody ExternalCode code) throws ClassNotFoundException, IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return runService.runClass(code);
+        return runService.runMain(code);
     }
 }
