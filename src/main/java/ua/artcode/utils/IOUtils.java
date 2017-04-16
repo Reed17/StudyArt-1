@@ -9,8 +9,10 @@ import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -102,6 +104,17 @@ public class IOUtils {
         return localPathForExternalCode + "/" + javaClassName;
     }
 
+    public static PrintStream redirectSystemOut(ByteArrayOutputStream baos){
+        PrintStream oldSystemOut = System.out;
+        System.setOut(new PrintStream(baos));
+        return oldSystemOut;
+    }
+
+    public static String resetSystemOut(ByteArrayOutputStream redirectedSystemOut, PrintStream systemOutOld) {
+        System.out.flush();
+        System.setOut(systemOutOld);
+        return redirectedSystemOut.toString();
+    }
 
     private static String generatePath(Course course) {
         return localPathForProjects + "/" + course.getId() + course.getName() + "/";
