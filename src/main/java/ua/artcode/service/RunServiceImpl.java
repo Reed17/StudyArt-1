@@ -19,6 +19,6 @@ public class RunServiceImpl implements RunService {
     @Override
     public RunResults runClass(ExternalCode code) throws ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         String path = IOUtils.saveExternalCodeLocally(code.getSourceCode());
-        return new RunResults(RunCore.runClassWithMain(path));
+        return new RunResults(RunCore.runMain(path));
     }
 }

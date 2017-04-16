@@ -18,7 +18,7 @@ import java.net.URLClassLoader;
 public class RunCore {
     private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
 
-    public static String runClassWithMain(String classPath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static String runMain(String classPath) throws MalformedURLException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         ByteArrayOutputStream baosOut = new ByteArrayOutputStream();
         ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
 
