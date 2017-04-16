@@ -1,4 +1,4 @@
-package ua.artcode.core;
+package ua.artcode.core.method_runner;
 
 import java.lang.reflect.Method;
 
