@@ -1,6 +1,9 @@
 package ua.artcode.service;
 
 import org.springframework.stereotype.Service;
+import ua.artcode.core.method_checkers.Checkers;
+import ua.artcode.core.results_processor.ResultsProcessors;
+import ua.artcode.core.method_runner.Methods;
 import ua.artcode.core.RunCore;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.RunResults;
@@ -15,10 +18,9 @@ import java.lang.reflect.InvocationTargetException;
 @Service
 public class RunServiceImpl implements RunService {
 
-
     @Override
     public RunResults runClass(ExternalCode code) throws ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException {
         String path = IOUtils.saveExternalCodeLocally(code.getSourceCode());
-        return new RunResults(RunCore.runMain(path));
+        return RunCore.runMethod(path, Checkers.mainChecker, Methods.main, ResultsProcessors.mainProcessor);
     }
 }
