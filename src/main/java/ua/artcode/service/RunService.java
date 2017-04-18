@@ -16,4 +16,6 @@ public interface RunService {
     RunResults runMain(ExternalCode code) throws ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 
     RunResults runLesson(int courseId, int lessonNumber) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+
+    RunResults runLessonWithSolution(int courseId, int lessonNumber, ExternalCode code) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 }
