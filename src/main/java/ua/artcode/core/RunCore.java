@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
  * Created by v21k on 15.04.17.
  */
 public class RunCore {
+    // constants with indexes for paths array (which contains className and root package).
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
@@ -24,7 +25,7 @@ public class RunCore {
                                        MethodRunnerPreProcessor preProcessor,
                                        MethodChecker checker,
                                        MethodRunner runner,
-                                       MethodResultsProcessor processor)
+                                       MethodResultsProcessor postProcessor)
             throws MalformedURLException,
             ClassNotFoundException,
             NoSuchMethodException,
@@ -56,7 +57,7 @@ public class RunCore {
         String systemOut = IOUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
 
         // return RunResult
-        return processor.process(runner, compilationErrors, systemOut, methodOutput);
+        return postProcessor.process(runner, compilationErrors, systemOut, methodOutput);
     }
 
 

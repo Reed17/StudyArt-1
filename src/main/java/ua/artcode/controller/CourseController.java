@@ -40,18 +40,53 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
-    public RunResults runClass(@RequestBody ExternalCode code)
-            throws ClassNotFoundException,
-            IOException,
-            NoSuchMethodException,
-            IllegalAccessException,
-            InvocationTargetException {
-        return runService.runMain(code);
+    public RunResults runClass(@RequestBody ExternalCode code) {
+        try {
+            return runService.runMain(code);
+        } catch (ClassNotFoundException |
+                IOException |
+                InvocationTargetException |
+                IllegalAccessException |
+                NoSuchMethodException e) {
+            e.printStackTrace();
+            return new RunResults(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/courses/lessons/run")
     public RunResults runLesson(@RequestParam int courseId,
-                                @RequestParam int lessonNumber) throws IllegalAccessException, InvocationTargetException, IOException, ClassNotFoundException, NoSuchMethodException, LessonNotFoundException, InvalidIDException, CourseNotFoundException {
-        return runService.runLesson(courseId, lessonNumber);
+                                @RequestParam int lessonNumber) {
+        try {
+            return runService.runLesson(courseId, lessonNumber);
+        } catch (InvalidIDException |
+                CourseNotFoundException |
+                ClassNotFoundException |
+                LessonNotFoundException |
+                InvocationTargetException |
+                IOException |
+                IllegalAccessException |
+                NoSuchMethodException e) {
+            e.printStackTrace();
+            return new RunResults(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "courses/lessons/send-solution-and-run", method = RequestMethod.POST)
+    public RunResults runLessonWithSolution(@RequestParam int courseId,
+                                            @RequestParam int lessonNumber,
+                                            @RequestBody ExternalCode code) {
+        try {
+            return runService.runLessonWithSolution(courseId, lessonNumber, code);
+        } catch (InvalidIDException |
+                CourseNotFoundException |
+                ClassNotFoundException |
+                LessonNotFoundException |
+                InvocationTargetException |
+                IOException |
+                NoSuchMethodException |
+                IllegalAccessException e) {
+            e.printStackTrace();
+            return new RunResults(e.getMessage());
+        }
     }
 }

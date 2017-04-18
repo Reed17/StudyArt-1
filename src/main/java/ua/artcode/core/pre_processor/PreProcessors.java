@@ -12,11 +12,11 @@ public class PreProcessors {
     });
 
     public static MethodRunnerPreProcessor lessons = (classPaths -> {
-        String classPath = StringUtils.getClassPath(classPaths, "main");
+        String classPath = StringUtils.getClassPathByClassName(classPaths, "main");
 
         // todo extract to StringUtils
-        String className = classPath.substring(classPath.lastIndexOf("src/")+4, classPath.lastIndexOf(".")).replace("/", ".");
+        String className = classPath.substring(classPath.lastIndexOf("src/") + 4, classPath.lastIndexOf(".")).replace("/", ".");
         String rootPath = classPath.substring(0, classPath.lastIndexOf("src/")) + "src/";
-        return new String[] {className, rootPath};
+        return new String[]{className, rootPath};
     });
 }
