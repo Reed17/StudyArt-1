@@ -8,7 +8,7 @@ import ua.artcode.model.RunResults;
  */
 
 @FunctionalInterface
-public interface MethodRusultsProcessor {
+public interface MethodResultsProcessor {
     /**
      * Processing results from MethodRunner(string)
      *
