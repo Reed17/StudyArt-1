@@ -1,14 +1,14 @@
 Hi there
 
 **First of all you have to**
-1. Set path for git project and for external code (if you want to send a class)
+1. Set path for git project and for external code (if you want to send a class) in resources/app.properties
 2. Create git repository if you want to run "lessons" or send solutions. You can use my test repo https://github.com/v21k/TestGitProject.git
 3. Install Postman or another app to send GET/POST requests
 
 **Git repo**
 
 If you want to test all features with your own repo, here are few conventions:
-1. root package - src/
+1. sources root package - src/
 2. lessons MUST be located in src/_LESSON-NUMBER_lesson. Example - src/_01_lesson/
 3. in order to run lesson you need Main class in it. Class must contain word "main". Example: mainclass, MAIN, class_main
 4. in order to run lesson with solution you need Solution class. Class name must contain word "solution". Same to previous example
@@ -28,8 +28,10 @@ See my example to understand - https://github.com/v21k/TestGitProject.git
 	"lessons" : null
 }
 ```
+<br> id, localPath and lessons will be generated on server side
+
 3. You can check if everything is ok by sending GET requests: 
-*localhost:8080/courses/get?id=1
+* localhost:8080/courses/get?id=1
 
 4. After this you have 3 ways to use app:
 * send any class and run it (it must contain "main" method) <br>
@@ -41,7 +43,8 @@ example for request body
 }
 ```
 * run main class from any lesson you want <br>
-GET localhost:8080/courses/lessons/run?courseId=COURSE_ID&lessonNumber=LESSON_NUMBER
+GET localhost:8080/courses/lessons/run?courseId=COURSE_ID&lessonNumber=LESSON_NUMBER <br>
+for example, if you want use my repo - use this localhost:8080/courses/lessons/run?courseId=1&lessonNumber=3
 * run lesson with solution <br>
 POST localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 <br>
 request body example: 
@@ -50,8 +53,16 @@ request body example:
 	"sourceCode" : "public static int sum(int a, int b){return a+2;}"
 }
 ```
+<br> or example, if you want use my repo - use this localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 
+<br> and request body from above
 
 
+
+
+
+
+
+TODO: 
   
 // add tests using "spring boot test" - 0%
     test created endpoints , send some data and check actual result
