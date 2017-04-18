@@ -1,4 +1,4 @@
-package ua.artcode.core.results_processor;
+package ua.artcode.core.post_processor;
 
 import ua.artcode.model.RunResults;
 
