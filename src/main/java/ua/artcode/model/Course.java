@@ -1,5 +1,6 @@
 package ua.artcode.model;
 
+import javax.validation.constraints.Pattern;
 import java.util.List;
 
 /**
@@ -7,8 +8,11 @@ import java.util.List;
  */
 public class Course {
     private int id;
+    @Pattern(regexp = "\\w{2,}", message = "Invalid course name")
     private String name;
+    @Pattern(regexp = "\\w{2,}", message = "Invalid author name")
     private String author;
+    @Pattern(regexp = "^http(s?)://github\\.com/\\w+/\\w+\\.?\\w+$", message = "Invalid git URL")
     private String url;
     private String localPath;
     private List<Lesson> lessons;

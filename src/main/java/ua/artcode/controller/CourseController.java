@@ -11,6 +11,7 @@ import ua.artcode.model.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
@@ -29,7 +30,7 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody Course course) {
+    public GeneralResponse addCourse(@RequestBody @Valid Course course) {
         try {
             return courseService.addCourse(course) ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
