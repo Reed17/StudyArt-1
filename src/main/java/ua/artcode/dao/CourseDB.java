@@ -1,6 +1,7 @@
 package ua.artcode.dao;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
@@ -21,6 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CourseDB implements StudyDB<Course> {
     private Map<Integer, Course> courseMap;
 
+    @Autowired
+    private IOUtils ioUtils;
+
     public CourseDB() {
         this.courseMap = new ConcurrentHashMap<>();
     }
@@ -32,8 +36,8 @@ public class CourseDB implements StudyDB<Course> {
         }
         try {
             course.setId(courseMap.size() + 1);
-            course.setLocalPath(IOUtils.saveLocally(course));
-            course.setLessons(IOUtils.getLessons(course));
+            course.setLocalPath(ioUtils.saveLocally(course));
+            course.setLessons(ioUtils.getLessons(course));
         } catch (IOException e) {
             throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
         }

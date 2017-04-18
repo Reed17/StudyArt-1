@@ -8,6 +8,7 @@ import java.lang.reflect.Method;
 public class Checkers {
     public static MethodChecker main = ((cls) -> {
         Method[] methods = cls.getDeclaredMethods();
+        // todo use streams
         for (Method method : methods) {
             if (method.getName().equals("main")) {
                 return true;

@@ -1,6 +1,8 @@
 package ua.artcode.controller;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.*;
@@ -18,6 +20,8 @@ import java.lang.reflect.InvocationTargetException;
 @RestController
 public class CourseController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
+
     @Autowired
     private CourseService courseService;
 
@@ -34,7 +38,8 @@ public class CourseController {
         try {
             return courseService.addCourse(course) ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
-            e.printStackTrace();
+            // todo use logger
+            LOGGER.error("error", e);
             return new GeneralResponse(e.getMessage());
         }
     }
@@ -48,7 +53,7 @@ public class CourseController {
                 InvocationTargetException |
                 IllegalAccessException |
                 NoSuchMethodException e) {
-            e.printStackTrace();
+            LOGGER.error("error", e);
             return new RunResults(e.getMessage());
         }
     }

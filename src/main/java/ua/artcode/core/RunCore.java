@@ -1,5 +1,7 @@
 package ua.artcode.core;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import ua.artcode.core.method_checkers.MethodChecker;
 import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
@@ -16,12 +18,16 @@ import java.net.MalformedURLException;
 /**
  * Created by v21k on 15.04.17.
  */
+@Component
 public class RunCore {
     // constants with indexes for paths array (which contains className and root package).
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
-    public static RunResults runMethod(String[] classPaths,
+    @Autowired
+    private IOUtils ioUtils;
+
+    public RunResults runMethod(String[] classPaths,
                                        MethodRunnerPreProcessor preProcessor,
                                        MethodChecker checker,
                                        MethodRunner runner,
@@ -51,13 +57,14 @@ public class RunCore {
 
         // redirecting s.out
         ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream();
-        PrintStream systemOutOld = IOUtils.redirectSystemOut(redirectedSystemOut);
+        PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
         // run method
         String methodOutput = runner.runMethod(cls);
+        // todo how to process runtime errors...
 
         // reset s.out to old and save results from previous
-        String systemOut = IOUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+        String systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
 
         // return RunResult
         return postProcessor.process(runner, compilationErrors, systemOut, methodOutput);

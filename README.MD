@@ -9,7 +9,7 @@ Hi there
 
 If you want to test all features with your own repo, here are few conventions:
 1. sources root package - src/
-2. lessons MUST be located in src/_LESSON-NUMBER_lesson. Example - src/_01_lesson/
+2. lessons MUST be located in ```src/_LESSON-NUMBER_lesson. Example - src/_01_lesson/```
 3. in order to run lesson you need Main class in it. Class must contain word "main". Example: mainclass, MAIN, class_main
 4. in order to run lesson with solution you need Solution class. Class name must contain word "solution". Same to previous example
 

@@ -32,6 +32,12 @@ public class RunServiceImpl implements RunService {
     @Autowired
     private StudyDB<Course> courseDB;
 
+    @Autowired
+    private IOUtils ioUtils;
+
+    @Autowired
+    private RunCore runCore;
+
     @Override
     public RunResults runMain(ExternalCode code)
             throws ClassNotFoundException,
@@ -39,9 +45,9 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String path = IOUtils.saveExternalCodeLocally(code.getSourceCode());
+        String path = ioUtils.saveExternalCodeLocally(code.getSourceCode());
         String[] classes = {path};
-        return RunCore.runMethod(classes, PreProcessors.singleClass, Checkers.main, Runners.main, ResultsProcessors.main);
+        return runCore.runMethod(classes, PreProcessors.singleClass, Checkers.main, Runners.main, ResultsProcessors.main);
     }
 
     @Override
@@ -54,8 +60,8 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = IOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
-        return RunCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main, ResultsProcessors.main);
+        String[] classPaths = ioUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
+        return runCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main, ResultsProcessors.main);
     }
 
 
@@ -69,8 +75,10 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = IOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
+        String[] classPaths = ioUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
 
+        //
+        //  Should be discussed!!!! use Annotation instead of className @Solution on className
         // find class which contains "solution" in class name
         String solutionClassPath = StringUtils.getClassPathByClassName(classPaths, "solution");
 
@@ -83,13 +91,14 @@ public class RunServiceImpl implements RunService {
         String originalWithSolution = StringUtils.appendSolution(code, originalContent);
 
         // delete old content and write new (with solution)
-        IOUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
+        ioUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
 
         // run main (tests in psvm)
-        RunResults results = RunCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main, ResultsProcessors.main);
+        RunResults results = runCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main,
+                ResultsProcessors.main);
 
         // rewrite original content again (reset to original state)
-        IOUtils.deleteAndWrite(solutionClassPath, originalContent);
+        ioUtils.deleteAndWrite(solutionClassPath, originalContent);
 
         return results;
     }

@@ -12,6 +12,7 @@ public class Course {
     private String name;
     @Pattern(regexp = "\\w{2,}", message = "Invalid author name")
     private String author;
+    // todo we can use gitlub or bitbucket, do not hardcode
     @Pattern(regexp = "^http(s?)://github\\.com/\\w+/\\w+\\.?\\w+$", message = "Invalid git URL")
     private String url;
     private String localPath;

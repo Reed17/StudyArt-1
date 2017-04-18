@@ -27,10 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class CourseControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
+
+    // TODO create temp folders before all tests, then remove them in the end (after all tests)
+    // TODO extract GitHub URL to properties
 
     @Test
     public void testAddPositive() throws Exception {

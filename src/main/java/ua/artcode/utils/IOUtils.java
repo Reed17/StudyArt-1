@@ -27,8 +27,10 @@ import java.util.stream.Collectors;
 @Component
 public class IOUtils {
 
-    private static String localPathForProjects;
-    private static String localPathForExternalCode;
+    @Value("${pathForGitProjects}")
+    private String localPathForProjects;
+    @Value("${pathForExternalCodeCompiling}")
+    private String localPathForExternalCode;
 
     /**
      * Downloading project from Git and save it locally
@@ -39,7 +41,7 @@ public class IOUtils {
      *
      * @return path where project has been saved
      */
-    public static String saveLocally(Course course) throws DirectoryCreatingException, GitAPIException {
+    public String saveLocally(Course course) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(course);
         File projectDirectory = new File(projectPath);
         try {
@@ -67,7 +69,7 @@ public class IOUtils {
      * @return List of lessons
      **/
 
-    public static List<Lesson> getLessons(Course course) throws IOException {
+    public  List<Lesson> getLessons(Course course) throws IOException {
         String courseLocalPath = course.getLocalPath();
 
         return Files.walk(Paths.get(courseLocalPath))
@@ -89,7 +91,7 @@ public class IOUtils {
      *
      * @return path for created .java file as String
      */
-    public static String saveExternalCodeLocally(String code) throws IOException {
+    public  String saveExternalCodeLocally(String code) throws IOException {
         String className = code.split(" ")[2];
         Path classPathDirectory = Paths.get(localPathForExternalCode);
 
@@ -104,32 +106,34 @@ public class IOUtils {
         return localPathForExternalCode + "/" + javaClassName;
     }
 
-    public static PrintStream redirectSystemOut(ByteArrayOutputStream baos) {
+    public  PrintStream redirectSystemOut(ByteArrayOutputStream baos) {
         PrintStream oldSystemOut = System.out;
         System.setOut(new PrintStream(baos));
         return oldSystemOut;
     }
 
-    public static String resetSystemOut(ByteArrayOutputStream redirectedSystemOut, PrintStream systemOutOld) {
+    public  String resetSystemOut(ByteArrayOutputStream redirectedSystemOut, PrintStream systemOutOld) {
         System.out.flush();
         System.setOut(systemOutOld);
         return redirectedSystemOut.toString();
     }
 
-    public static String[] parseJavaFiles(String path) throws IOException {
+    public  String[] parseJavaFiles(String path) throws IOException {
         return Files.walk(Paths.get(path))
                 .map(Path::toString)
                 .filter(filePath -> filePath.endsWith(".java"))
                 .toArray(String[]::new);
     }
 
-    public static String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, IOException {
+    public  String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException,
+            CourseNotFoundException, LessonNotFoundException, IOException {
         Course course = db.getByID(courseId);
         Lesson lesson = RunUtils.getLesson(lessonNumber, course);
-        return IOUtils.parseJavaFiles(lesson.getLocalPath());
+        return parseJavaFiles(lesson.getLocalPath());
     }
 
-    public static void deleteAndWrite(String path, String content) throws FileNotFoundException {
+    // todo close PW correctly (try with resources)
+    public  void deleteAndWrite(String path, String content) throws FileNotFoundException {
         PrintWriter pw = new PrintWriter(path);
         pw.write("");
         pw.write(content);
@@ -137,18 +141,8 @@ public class IOUtils {
         pw.close();
     }
 
-    private static String generatePath(Course course) {
+    private  String generatePath(Course course) {
         return localPathForProjects + "/" + course.getId() + course.getName() + "/";
-    }
-
-    @Value("${pathForGitProjects}")
-    public void setLocalPathForProjects(String path) {
-        localPathForProjects = path;
-    }
-
-    @Value("${pathForExternalCodeCompiling}")
-    public void setLocalPathForExternalCode(String path) {
-        localPathForExternalCode = path;
     }
 
 

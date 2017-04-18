@@ -22,11 +22,13 @@ public class StringUtils {
 
     public static String getClassPathByClassName(String[] classPaths, String className) throws ClassNotFoundException {
         return Arrays.stream(classPaths)
-                .filter(classPath -> classPath.toLowerCase().contains(className.toLowerCase()) && classPath.contains(".java"))
+                .filter(classPath -> classPath.toLowerCase().contains(className.toLowerCase())
+                        && classPath.contains(".java"))
                 .findFirst()
                 .orElseThrow(() -> new ClassNotFoundException("No Main class found"));
     }
 
+    // todo replace by some template engine
     public static String appendSolution(ExternalCode code, String originalContent) {
         return originalContent.substring(0, originalContent.lastIndexOf("}")) + code.getSourceCode() + "}";
     }

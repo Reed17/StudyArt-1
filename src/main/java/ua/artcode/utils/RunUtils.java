@@ -17,19 +17,27 @@ import java.net.URLClassLoader;
  */
 public class RunUtils {
 
-    private static final JavaCompiler COMPILER = ToolProvider.getSystemJavaCompiler();
+    private static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
+    // todo use logger
+    private static JavaCompiler getSystemJavaCompiler() {
+        return ToolProvider.getSystemJavaCompiler();
+    }
+
+    // todo close output streams correctrly
     public static String compile(String[] classPaths) {
         ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
         COMPILER.run(null, null, baosErr, classPaths);
         return baosErr.toString();
     }
 
-    public static Class<?> getClass(String className, String classRoot) throws MalformedURLException, ClassNotFoundException {
+    public static Class<?> getClass(String className, String classRoot) throws MalformedURLException,
+            ClassNotFoundException {
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new File(classRoot).toURI().toURL()});
         return Class.forName(className, true, classLoader);
     }
 
+    // todo extract to correspond place
     public static Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException {
         return course.getLessons()
                 .stream()
