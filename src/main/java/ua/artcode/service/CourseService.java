@@ -12,7 +12,7 @@ import java.util.Collection;
 /**
  * Created by v21k on 15.04.17.
  */
-public interface ICourseService {
+public interface CourseService {
     boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
 
     Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
