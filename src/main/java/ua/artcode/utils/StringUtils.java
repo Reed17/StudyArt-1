@@ -18,9 +18,9 @@ public class StringUtils {
         return new String[]{getClassNameFromClassPath(classPath), getClassRootFromClassPath(classPath)};
     }
 
-    public static String getMainClassPath(String[] classPaths) throws ClassNotFoundException {
+    public static String getClassPath(String[] classPaths, String className) throws ClassNotFoundException {
         return Arrays.stream(classPaths)
-                .filter(classPath -> classPath.toLowerCase().contains("main"))
+                .filter(classPath -> classPath.toLowerCase().contains(className.toLowerCase()))
                 .findFirst()
                 .orElseThrow(() -> new ClassNotFoundException("No Main class found"));
     }
