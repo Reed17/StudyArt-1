@@ -87,7 +87,8 @@ public class IOUtils {
      * 2. Create directories or delete everything from them if there are already something
      * 3. Write code into .java file
      *
-     * @return path for created .java file as String*/
+     * @return path for created .java file as String
+     */
     public static String saveExternalCodeLocally(String code) throws IOException {
         String className = code.split(" ")[2];
         Path classPathDirectory = Paths.get(localPathForExternalCode);
