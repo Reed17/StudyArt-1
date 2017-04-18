@@ -3,10 +3,7 @@ package ua.artcode.controller;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.GeneralResponse;
@@ -42,7 +39,18 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
-    public RunResults runClass(@RequestBody ExternalCode code) throws ClassNotFoundException, IOException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public RunResults runClass(@RequestBody ExternalCode code)
+            throws ClassNotFoundException,
+            IOException,
+            NoSuchMethodException,
+            IllegalAccessException,
+            InvocationTargetException {
         return runService.runMain(code);
+    }
+
+    @RequestMapping(value = "/courses/lessons/run")
+    public RunResults runLesson(@RequestParam int courseId,
+                                @RequestParam int lessonNumber) throws IllegalAccessException, InvocationTargetException, IOException, ClassNotFoundException, NoSuchMethodException, LessonNotFoundException, InvalidIDException, CourseNotFoundException {
+        return runService.runLesson(courseId, lessonNumber);
     }
 }
