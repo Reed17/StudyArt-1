@@ -35,6 +35,9 @@ public class RunCore {
         // compile and save results (errors)
         String compilationErrors = RunUtils.compile(classPaths);
 
+        if(compilationErrors.length() > 0){
+            return new RunResults(compilationErrors);
+        }
         // prepare array with main class path and it's root package
         String[] paths = preProcessor.getPaths(classPaths);
 
