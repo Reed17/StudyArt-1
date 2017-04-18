@@ -5,14 +5,15 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import ua.artcode.dao.StudyDB;
+import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
+import ua.artcode.exceptions.InvalidIDException;
+import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -80,6 +81,13 @@ public class IOUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Save code locally
+     * 1. Parse className from code (3rd word - public class NAME {...}
+     * 2. Create directories or delete everything from them if there are already something
+     * 3. Write code into .java file
+     *
+     * @return path for created .java file as String*/
     public static String saveExternalCodeLocally(String code) throws IOException {
         String className = code.split(" ")[2];
         Path classPathDirectory = Paths.get(localPathForExternalCode);
@@ -112,6 +120,20 @@ public class IOUtils {
                 .map(Path::toString)
                 .filter(filePath -> filePath.endsWith(".java"))
                 .toArray(String[]::new);
+    }
+
+    public static String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, IOException {
+        Course course = db.getByID(courseId);
+        Lesson lesson = RunUtils.getLesson(lessonNumber, course);
+        return IOUtils.parseJavaFiles(lesson.getLocalPath());
+    }
+
+    public static void deleteAndWrite(String path, String content) throws FileNotFoundException {
+        PrintWriter pw = new PrintWriter(path);
+        pw.write("");
+        pw.write(content);
+        pw.flush();
+        pw.close();
     }
 
     private static String generatePath(Course course) {
