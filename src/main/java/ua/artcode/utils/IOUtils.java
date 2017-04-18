@@ -65,6 +65,7 @@ public class IOUtils {
      *
      * @return List of lessons
      **/
+
     public static List<Lesson> getLessons(Course course) throws IOException {
         String courseLocalPath = course.getLocalPath();
 
@@ -73,17 +74,7 @@ public class IOUtils {
                 .filter(path -> path.endsWith("lesson"))
                 .map(path -> {
                     String lessonName = path.substring(path.lastIndexOf("/") + 1);
-                    List<String> classPaths = null;
-                    try {
-                        classPaths = Files.walk(Paths.get(path))
-                                .map(Path::toString)
-                                .sorted(String::compareTo)
-                                .filter(classPath -> classPath.endsWith(".java"))
-                                .collect(Collectors.toList());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return new Lesson(lessonName, path, classPaths);
+                    return new Lesson(lessonName, path);
                 })
                 .sorted()
                 .collect(Collectors.toList());
@@ -104,7 +95,7 @@ public class IOUtils {
         return localPathForExternalCode + "/" + javaClassName;
     }
 
-    public static PrintStream redirectSystemOut(ByteArrayOutputStream baos){
+    public static PrintStream redirectSystemOut(ByteArrayOutputStream baos) {
         PrintStream oldSystemOut = System.out;
         System.setOut(new PrintStream(baos));
         return oldSystemOut;
@@ -114,6 +105,13 @@ public class IOUtils {
         System.out.flush();
         System.setOut(systemOutOld);
         return redirectedSystemOut.toString();
+    }
+
+    public static String[] parseJavaFiles(String path) throws IOException {
+        return Files.walk(Paths.get(path))
+                .map(Path::toString)
+                .filter(filePath -> filePath.endsWith(".java"))
+                .toArray(String[]::new);
     }
 
     private static String generatePath(Course course) {
@@ -129,4 +127,6 @@ public class IOUtils {
     public void setLocalPathForExternalCode(String path) {
         localPathForExternalCode = path;
     }
+
+
 }
