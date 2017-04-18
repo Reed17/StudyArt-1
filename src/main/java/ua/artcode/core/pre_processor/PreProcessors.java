@@ -12,7 +12,7 @@ public class PreProcessors {
     });
 
     public static MethodRunnerPreProcessor lessons = (classPaths -> {
-        String classPath = StringUtils.getMainClassPath(classPaths);
+        String classPath = StringUtils.getClassPath(classPaths, "main");
 
         // todo extract to StringUtils
         String className = classPath.substring(classPath.lastIndexOf("src/")+4, classPath.lastIndexOf(".")).replace("/", ".");
