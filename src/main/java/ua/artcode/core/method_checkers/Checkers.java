@@ -9,7 +9,7 @@ public class Checkers {
     public static MethodChecker main = ((cls) -> {
         Method[] methods = cls.getDeclaredMethods();
         for (Method method : methods) {
-            if (method.getName().equals("main")){
+            if (method.getName().equals("main")) {
                 return true;
             }
         }
