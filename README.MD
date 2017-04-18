@@ -69,7 +69,7 @@ request body example:
 
 TODO: 
   
-// add tests using "spring boot test" - 0%
+// add tests using "spring boot test" - 50% --- need to test exceptions
     test created endpoints , send some data and check actual result
     look at the example src/test/java/ua/artcode/controller/GreetingControllerTests.java
     
