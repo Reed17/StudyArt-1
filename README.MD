@@ -17,7 +17,7 @@ See my example to understand - https://github.com/v21k/TestGitProject.git
 
 **Algorithm of using app**
 1. Run ua.artcode.controller.Application class
-2. Add git repo by using POST request to localhost:8080/courses/add with next content:
+2. Add git repo by using POST request to http://localhost:8080/courses/add with next content:
 ```json
 {
 	"id" : 0,
@@ -31,11 +31,11 @@ See my example to understand - https://github.com/v21k/TestGitProject.git
 <br> id, localPath and lessons will be generated on server side
 
 3. You can check if everything is ok by sending GET requests: 
-* localhost:8080/courses/get?id=1
+* http://localhost:8080/courses/get?id=1
 
 4. After this you have 3 ways to use app:
 * send any class and run it (it must contain "main" method) <br>
-POST localhost:8080/run-class <br>
+POST http://localhost:8080/run-class <br>
 example for request body
 ```json
 {
@@ -43,17 +43,17 @@ example for request body
 }
 ```
 * run main class from any lesson you want <br>
-GET localhost:8080/courses/lessons/run?courseId=COURSE_ID&lessonNumber=LESSON_NUMBER <br>
+GET http://localhost:8080/courses/lessons/run?courseId=COURSE_ID&lessonNumber=LESSON_NUMBER <br>
 for example, if you want use my repo - use this localhost:8080/courses/lessons/run?courseId=1&lessonNumber=3
 * run lesson with solution <br>
-POST localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 <br>
+POST http://localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 <br>
 request body example: 
 ```json
 {
 	"sourceCode" : "public static int sum(int a, int b){return a+2;}"
 }
 ```
-<br> or example, if you want use my repo - use this localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 
+<br> or example, if you want use my repo - use this http://localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 
 <br> and request body from above
 
 
