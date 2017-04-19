@@ -1,16 +1,24 @@
 package ua.artcode.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Test;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -32,15 +40,23 @@ public class CourseControllerTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @Value("${GitURL}")
+    private String GitURL;
+
+    @Value("${pathForGitProjects}")
+    private String tempPathForGitProjects;
+
+    @Value("${pathForExternalCodeCompiling}")
+    private String tempPathForExternalCodeCompiling;
+
     // TODO create temp folders before all tests, then remove them in the end (after all tests)
-    // TODO extract GitHub URL to properties
 
     @Test
     public void testAddPositive() throws Exception {
         Course course = new Course(0,
                 "someCourse",
                 "VK",
-                "https://github.com/v21k/TestGitProject.git",
+                GitURL,
                 null,
                 null);
         mockMvc.perform(post("/courses/add")
@@ -74,7 +90,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("someCourse"))
                 .andExpect(jsonPath("$.author").value("VK"))
-                .andExpect(jsonPath("$.url").value("https://github.com/v21k/TestGitProject.git"));
+                .andExpect(jsonPath("$.url").value(GitURL));
     }
 
     @Test
@@ -161,7 +177,7 @@ public class CourseControllerTest {
         Course course = new Course(0,
                 "someCourse",
                 "VK",
-                "https://github.com/v21k/TestGitProject.git",
+                GitURL,
                 null,
                 null);
         mockMvc.perform(post("/courses/add")
