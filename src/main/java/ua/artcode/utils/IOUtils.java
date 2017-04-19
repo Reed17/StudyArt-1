@@ -132,13 +132,13 @@ public class IOUtils {
         return parseJavaFiles(lesson.getLocalPath());
     }
 
-    // todo close PW correctly (try with resources)
     public  void deleteAndWrite(String path, String content) throws FileNotFoundException {
-        PrintWriter pw = new PrintWriter(path);
-        pw.write("");
-        pw.write(content);
-        pw.flush();
-        pw.close();
+        try(PrintWriter pw = new PrintWriter(path)) {
+            pw.write("");
+            pw.write(content);
+            pw.flush();
+            pw.close();
+        }
     }
 
     private  String generatePath(Course course) {
