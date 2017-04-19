@@ -1,0 +1,11 @@
+pathForGitProjects: /home/v21k/Java/dev/courses
+pathForExternalCodeCompiling: /home/v21k/Java/dev/temp
+
+
+logging:
+  level:
+    org.springframework.web : ERROR
+    ua.artcode: DEBUG
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file: /home/v21k/logs/logggg.log
