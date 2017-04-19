@@ -8,6 +8,7 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -24,11 +25,11 @@ public class RunUtils {
         return ToolProvider.getSystemJavaCompiler();
     }
 
-    // todo close output streams correctrly
-    public static String compile(String[] classPaths) {
-        ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
-        COMPILER.run(null, null, baosErr, classPaths);
-        return baosErr.toString();
+    public static String compile(String[] classPaths) throws IOException {
+        try(ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
+            COMPILER.run(null, null, baosErr, classPaths);
+            return baosErr.toString();
+        }
     }
 
     public static Class<?> getClass(String className, String classRoot) throws MalformedURLException,
