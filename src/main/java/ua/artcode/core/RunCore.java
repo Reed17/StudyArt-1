@@ -11,6 +11,7 @@ import ua.artcode.utils.IOUtils;
 import ua.artcode.utils.RunUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -32,7 +33,7 @@ public class RunCore {
                                        MethodChecker checker,
                                        MethodRunner runner,
                                        MethodResultsProcessor postProcessor)
-            throws MalformedURLException,
+            throws IOException,
             ClassNotFoundException,
             NoSuchMethodException,
             InvocationTargetException,
