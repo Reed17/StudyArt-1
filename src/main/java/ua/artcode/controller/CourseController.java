@@ -36,10 +36,15 @@ public class CourseController {
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
         try {
-            return courseService.addCourse(course) ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
+            boolean result = courseService.addCourse(course);
+
+            LOGGER.info(String.format("Course (name - %s, author - %s, url - %s) successfully added",
+                    course.getName(), course.getAuthor(), course.getUrl()));
+
+            return result ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
             // todo use logger
-            LOGGER.error("error", e);
+            LOGGER.error("can't add the course", e);
             return new GeneralResponse(e.getMessage());
         }
     }
@@ -53,7 +58,7 @@ public class CourseController {
                 InvocationTargetException |
                 IllegalAccessException |
                 NoSuchMethodException e) {
-            LOGGER.error("error", e);
+            LOGGER.error("Error at /run-class", e);
             return new RunResults(e.getMessage());
         }
     }
@@ -71,7 +76,7 @@ public class CourseController {
                 IOException |
                 IllegalAccessException |
                 NoSuchMethodException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at courses/lessons/run", e);
             return new RunResults(e.getMessage());
         }
     }
@@ -90,7 +95,7 @@ public class CourseController {
                 IOException |
                 NoSuchMethodException |
                 IllegalAccessException e) {
-            e.printStackTrace();
+            LOGGER.error("Error at courses/lessons/send-solution-and-run", e);
             return new RunResults(e.getMessage());
         }
     }
