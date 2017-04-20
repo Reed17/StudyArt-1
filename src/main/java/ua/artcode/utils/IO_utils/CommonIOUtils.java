@@ -26,6 +26,18 @@ public class CommonIOUtils {
         return redirectedSystemOut.toString();
     }
 
+    public PrintStream redirectSystemErr(ByteArrayOutputStream baos) {
+        PrintStream oldSystemOut = System.out;
+        System.setOut(new PrintStream(baos));
+        return oldSystemOut;
+    }
+
+    public String resetSystemErr(ByteArrayOutputStream redirectedSystemOut, PrintStream systemOutOld) {
+        System.out.flush();
+        System.setOut(systemOutOld);
+        return redirectedSystemOut.toString();
+    }
+
     public String[] parseFilePaths(String path, String endsWith) throws IOException {
         return Files.walk(Paths.get(path))
                 .map(Path::toString)
