@@ -11,6 +11,7 @@ import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
 import ua.artcode.model.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.RunUtils;
+import ua.artcode.utils.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,12 +42,12 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
-        // compile and save results (errors)
+        // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
-
         if (compilationErrors.length() > 0) {
             return new RunResults(compilationErrors);
         }
+
         // prepare array with main class path and it's root package
         String[] paths = preProcessor.getPaths(classPaths);
 
@@ -58,28 +59,25 @@ public class RunCore {
             return new RunResults("Can't find required method(s)");
         }
 
-        // redirecting s.out
-        ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream();
-        PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
-
-        // run method
-        String methodOutput = null;
         String runtimeError = null;
+        String systemOut = null;
+        String methodOutput = null;
 
-        try {
-            methodOutput = runner.runMethod(cls);
-        } catch (InvocationTargetException e) {
-            // save exceptions
-            runtimeError = "Runtime exception: " + e.getTargetException().getMessage();
-            //redirecting s.out so we can use logger
-            ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+        // redirecting s.out
+        try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
+            PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
-            LOGGER.error("Runtime exception", e);
+            // run method
+            try {
+                methodOutput = runner.runMethod(cls);
+            } catch (InvocationTargetException e) {
+                // save exception message
+                runtimeError = StringUtils.getInvocationTargetExceptionInfo(e);
+                //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
+                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                LOGGER.error("Runtime exception", e);
+            }
         }
-
-        // reset s.out to old and save results from previous
-        String systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-
         // return RunResult
         return postProcessor.process(runtimeError, systemOut, methodOutput);
     }
