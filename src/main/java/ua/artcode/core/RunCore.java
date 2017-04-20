@@ -46,10 +46,10 @@ public class RunCore {
         // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
         if (compilationErrors.length() > 0) {
-            LOGGER.error(String.format("Compilation failed, errors: %s", compilationErrors));
+            LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
             return new RunResults(compilationErrors);
         }
-        LOGGER.info("Successful compilation");
+        LOGGER.info("Compilation - OK");
 
         // prepare array with main class path and it's root package
         String[] paths = preProcessor.getPaths(classPaths);
@@ -59,10 +59,12 @@ public class RunCore {
 
         // checking method(s) needed
         if (!checker.checkMethods(cls)) {
+            LOGGER.error("Method check - FAILED. Can't fine required method in class " + cls.getName());
             return new RunResults("Can't find required method(s)");
         }
+        LOGGER.info("Method check - OK");
 
-        String runtimeError = null;
+        String runtimeException = null;
         String systemOut = null;
         String methodOutput = null;
 
@@ -73,16 +75,17 @@ public class RunCore {
             // run method
             try {
                 methodOutput = runner.runMethod(cls);
+                LOGGER.info("Method call - OK");
             } catch (InvocationTargetException e) {
                 // save exception message
-                runtimeError = StringUtils.getInvocationTargetExceptionInfo(e);
+                runtimeException = StringUtils.getInvocationTargetExceptionInfo(e);
                 //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
                 systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.error("Runtime exception", e);
+                LOGGER.error("Method call - FAILED. " + runtimeException, e);
             }
         }
         // return RunResult
-        return postProcessor.process(runtimeError, systemOut, methodOutput);
+        return postProcessor.process(runtimeException, systemOut, methodOutput);
     }
 
 
