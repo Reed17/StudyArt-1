@@ -1,5 +1,7 @@
 package ua.artcode.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
@@ -18,6 +20,8 @@ import java.net.URLClassLoader;
  */
 public class RunUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
+
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
     // todo use logger
@@ -28,6 +32,7 @@ public class RunUtils {
     public static String compile(String[] classPaths) throws IOException {
         try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
             COMPILER.run(null, null, baosErr, classPaths);
+            LOGGER.info("Compiling ended, errors : %s", baosErr.toString());
             return baosErr.toString();
         }
     }
