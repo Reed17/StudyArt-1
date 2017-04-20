@@ -8,4 +8,4 @@ logging:
     ua.artcode: DEBUG
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file: /home/v21k/logs/logggg.log
+  file: logs/logs.log
