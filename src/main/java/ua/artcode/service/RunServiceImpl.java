@@ -14,7 +14,8 @@ import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.RunResults;
-import ua.artcode.utils.IOUtils;
+import ua.artcode.utils.IO_utils.CommonIOUtils;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.StringUtils;
 
 import java.io.IOException;
@@ -30,11 +31,11 @@ import java.util.stream.Collectors;
 public class RunServiceImpl implements RunService {
 
     @Autowired
-    private StudyDB<Course> courseDB;
-
+    CommonIOUtils commonIOUtils;
     @Autowired
-    private IOUtils ioUtils;
-
+    private StudyDB<Course> courseDB;
+    @Autowired
+    private CourseIOUtils courseIOUtils;
     @Autowired
     private RunCore runCore;
 
@@ -45,7 +46,7 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String path = ioUtils.saveExternalCodeLocally(code.getSourceCode());
+        String path = courseIOUtils.saveExternalCodeLocally(code.getSourceCode());
         String[] classes = {path};
         return runCore.runMethod(classes, PreProcessors.singleClass, Checkers.main, Runners.main, ResultsProcessors.main);
     }
@@ -60,7 +61,7 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = ioUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
+        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
         return runCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main, ResultsProcessors.main);
     }
 
@@ -75,7 +76,7 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = ioUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
+        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
 
         //
         //  Should be discussed!!!! use Annotation instead of className @Solution on className
@@ -91,14 +92,14 @@ public class RunServiceImpl implements RunService {
         String originalWithSolution = StringUtils.appendSolution(code, originalContent);
 
         // delete old content and write new (with solution)
-        ioUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
+        commonIOUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
 
         // run main (tests in psvm)
         RunResults results = runCore.runMethod(classPaths, PreProcessors.lessons, Checkers.main, Runners.main,
                 ResultsProcessors.main);
 
         // rewrite original content again (reset to original state)
-        ioUtils.deleteAndWrite(solutionClassPath, originalContent);
+        commonIOUtils.deleteAndWrite(solutionClassPath, originalContent);
 
         return results;
     }

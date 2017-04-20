@@ -8,7 +8,7 @@ import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
-import ua.artcode.utils.IOUtils;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -23,7 +23,7 @@ public class CourseDB implements StudyDB<Course> {
     private Map<Integer, Course> courseMap;
 
     @Autowired
-    private IOUtils ioUtils;
+    private CourseIOUtils courseIOUtils;
 
     public CourseDB() {
         this.courseMap = new ConcurrentHashMap<>();
@@ -36,8 +36,8 @@ public class CourseDB implements StudyDB<Course> {
         }
         try {
             course.setId(courseMap.size() + 1);
-            course.setLocalPath(ioUtils.saveLocally(course));
-            course.setLessons(ioUtils.getLessons(course));
+            course.setLocalPath(courseIOUtils.saveLocally(course));
+            course.setLessons(courseIOUtils.getLessons(course));
         } catch (IOException e) {
             throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
         }

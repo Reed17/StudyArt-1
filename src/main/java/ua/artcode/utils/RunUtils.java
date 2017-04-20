@@ -26,7 +26,7 @@ public class RunUtils {
     }
 
     public static String compile(String[] classPaths) throws IOException {
-        try(ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
+        try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
             COMPILER.run(null, null, baosErr, classPaths);
             return baosErr.toString();
         }

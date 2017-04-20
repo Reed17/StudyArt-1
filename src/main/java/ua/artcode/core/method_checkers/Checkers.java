@@ -1,6 +1,5 @@
 package ua.artcode.core.method_checkers;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /**

@@ -1,8 +1,9 @@
-package ua.artcode.utils;
+package ua.artcode.utils.IO_utils;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.StudyDB;
@@ -12,8 +13,10 @@ import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.utils.RunUtils;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -22,15 +25,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by v21k on 15.04.17.
+ * Created by v21k on 20.04.17.
  */
 @Component
-public class IOUtils {
+public class CourseIOUtils {
 
     @Value("${pathForGitProjects}")
     private String localPathForProjects;
     @Value("${pathForExternalCodeCompiling}")
     private String localPathForExternalCode;
+
+    @Autowired
+    private CommonIOUtils commonIOUtils;
 
     /**
      * Downloading project from Git and save it locally
@@ -69,7 +75,7 @@ public class IOUtils {
      * @return List of lessons
      **/
 
-    public  List<Lesson> getLessons(Course course) throws IOException {
+    public List<Lesson> getLessons(Course course) throws IOException {
         String courseLocalPath = course.getLocalPath();
 
         return Files.walk(Paths.get(courseLocalPath))
@@ -91,7 +97,7 @@ public class IOUtils {
      *
      * @return path for created .java file as String
      */
-    public  String saveExternalCodeLocally(String code) throws IOException {
+    public String saveExternalCodeLocally(String code) throws IOException {
         String className = code.split(" ")[2];
         Path classPathDirectory = Paths.get(localPathForExternalCode);
 
@@ -106,44 +112,15 @@ public class IOUtils {
         return localPathForExternalCode + "/" + javaClassName;
     }
 
-    public  PrintStream redirectSystemOut(ByteArrayOutputStream baos) {
-        PrintStream oldSystemOut = System.out;
-        System.setOut(new PrintStream(baos));
-        return oldSystemOut;
-    }
-
-    public  String resetSystemOut(ByteArrayOutputStream redirectedSystemOut, PrintStream systemOutOld) {
-        System.out.flush();
-        System.setOut(systemOutOld);
-        return redirectedSystemOut.toString();
-    }
-
-    public  String[] parseJavaFiles(String path) throws IOException {
-        return Files.walk(Paths.get(path))
-                .map(Path::toString)
-                .filter(filePath -> filePath.endsWith(".java"))
-                .toArray(String[]::new);
-    }
-
-    public  String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException,
+    public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
         Course course = db.getByID(courseId);
         Lesson lesson = RunUtils.getLesson(lessonNumber, course);
-        return parseJavaFiles(lesson.getLocalPath());
+        return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 
-    public  void deleteAndWrite(String path, String content) throws FileNotFoundException {
-        try(PrintWriter pw = new PrintWriter(path)) {
-            pw.write("");
-            pw.write(content);
-            pw.flush();
-            pw.close();
-        }
-    }
-
-    private  String generatePath(Course course) {
+    private String generatePath(Course course) {
         return localPathForProjects + "/" + course.getId() + course.getName() + "/";
     }
-
 
 }

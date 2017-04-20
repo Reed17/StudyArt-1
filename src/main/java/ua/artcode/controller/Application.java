@@ -2,7 +2,6 @@ package ua.artcode.controller;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.PropertySource;
 
 @SpringBootApplication(scanBasePackages = {"ua.artcode"})
 public class Application {

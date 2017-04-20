@@ -7,14 +7,13 @@ import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
 import ua.artcode.model.RunResults;
-import ua.artcode.utils.IOUtils;
+import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.RunUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 
 /**
  * Created by v21k on 15.04.17.
@@ -26,13 +25,13 @@ public class RunCore {
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
     @Autowired
-    private IOUtils ioUtils;
+    private CommonIOUtils ioUtils;
 
     public RunResults runMethod(String[] classPaths,
-                                       MethodRunnerPreProcessor preProcessor,
-                                       MethodChecker checker,
-                                       MethodRunner runner,
-                                       MethodResultsProcessor postProcessor)
+                                MethodRunnerPreProcessor preProcessor,
+                                MethodChecker checker,
+                                MethodRunner runner,
+                                MethodResultsProcessor postProcessor)
             throws IOException,
             ClassNotFoundException,
             NoSuchMethodException,
