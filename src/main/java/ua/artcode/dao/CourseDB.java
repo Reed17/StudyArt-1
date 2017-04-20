@@ -3,10 +3,7 @@ package ua.artcode.dao;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
@@ -77,9 +74,19 @@ public class CourseDB implements StudyArtDB {
                 .orElseThrow(() -> new CourseNotFoundException("No course found with id: " + id));
     }
 
+    /**
+     * Lesson packages starts with "_[number]_"
+     * For numbers < 10 it looks like "_02_lesson" etc, so if lesson number is < 10,
+     * we need to addCourse "0" to it's String.valueOf()
+     * Otherwise - do not addCourse anything.
+     * */
     @Override
-    public Lesson getLesson(int courseId, int lessonNumber) {
-        return null;
+    public Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException {
+        return course.getLessons()
+                .stream()
+                .filter(lsn -> lsn.getName().contains(lessonNumber < 10 ? "0" + lessonNumber : String.valueOf(lessonNumber)))
+                .findFirst()
+                .orElseThrow(() -> new LessonNotFoundException("No lesson found with number :" + lessonNumber));
     }
 
     private void checkID(int id) throws InvalidIDException {

@@ -1,10 +1,7 @@
 package ua.artcode.dao;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 
@@ -26,5 +23,5 @@ public interface StudyArtDB {
 
     Course getCourseByID(int id) throws InvalidIDException, CourseNotFoundException;
 
-    Lesson getLesson(int courseId, int lessonNumber);
+    Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException;
 }

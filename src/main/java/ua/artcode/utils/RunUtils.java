@@ -37,19 +37,4 @@ public class RunUtils {
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new File(classRoot).toURI().toURL()});
         return Class.forName(className, true, classLoader);
     }
-
-    // todo extract to correspond place
-    /**
-     * Lesson packages starts with "_number_"
-     * For numbers < 10 it looks like "_02_lesson" etc, so if lesson number is < 10,
-     * we need to addCourse "0" to it's String.valueOf()
-     * Otherwise - do not addCourse anything.
-     * */
-    public static Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException {
-        return course.getLessons()
-                .stream()
-                .filter(lsn -> lsn.getName().contains(lessonNumber < 10 ? "0" + lessonNumber : String.valueOf(lessonNumber)))
-                .findFirst()
-                .orElseThrow(() -> new LessonNotFoundException("No lesson found with number :" + lessonNumber));
-    }
 }
