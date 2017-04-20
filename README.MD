@@ -1,5 +1,9 @@
 Hi there
 
+**TODO:**
+1. Dependencies
+2. Picture with lifecycle of app
+
 **First of all you have to**
 1. Set path for git project and for external code (if you want to send a class) in resources/app.properties
 2. Create git repository if you want to run "lessons" or send solutions. You can use my test repo https://github.com/v21k/TestGitProject.git
