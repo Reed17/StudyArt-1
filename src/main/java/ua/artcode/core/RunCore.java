@@ -72,18 +72,20 @@ public class RunCore {
         try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
             PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
-            // run method
+            // call method
             try {
                 methodOutput = runner.runMethod(cls);
-                LOGGER.info("Method call - OK");
             } catch (InvocationTargetException e) {
                 // save exception message
                 runtimeException = StringUtils.getInvocationTargetExceptionInfo(e);
                 //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
-                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
                 LOGGER.error("Method call - FAILED. " + runtimeException, e);
+            } finally {
+                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
             }
         }
+        LOGGER.info("Method call - OK");
         // return RunResult
         return postProcessor.process(runtimeException, systemOut, methodOutput);
     }
