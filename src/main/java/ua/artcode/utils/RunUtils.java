@@ -39,6 +39,12 @@ public class RunUtils {
     }
 
     // todo extract to correspond place
+    /**
+     * Lesson packages starts with "_number_"
+     * For numbers < 10 it looks like "_02_lesson" etc, so if lesson number is < 10,
+     * we need to add "0" to it's String.valueOf()
+     * Otherwise - do not add anything.
+     * */
     public static Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException {
         return course.getLessons()
                 .stream()
