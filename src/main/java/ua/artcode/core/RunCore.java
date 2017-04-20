@@ -27,6 +27,7 @@ public class RunCore {
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
+    // todo finish logging
     private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
 
     @Autowired

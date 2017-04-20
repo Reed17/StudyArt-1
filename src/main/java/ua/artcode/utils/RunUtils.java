@@ -32,7 +32,6 @@ public class RunUtils {
     public static String compile(String[] classPaths) throws IOException {
         try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
             COMPILER.run(null, null, baosErr, classPaths);
-            LOGGER.info(String.format("Compiling ended, errors : %s", baosErr.toString()));
             return baosErr.toString();
         }
     }
