@@ -38,6 +38,9 @@ public class CourseIOUtils {
     @Autowired
     private CommonIOUtils commonIOUtils;
 
+    @Autowired
+    StudyArtDB courseDB;
+
     /**
      * Downloading project from Git and save it locally
      * <p>
@@ -115,7 +118,7 @@ public class CourseIOUtils {
     public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
         Course course = db.getCourseByID(courseId);
-        Lesson lesson = RunUtils.getLesson(lessonNumber, course);
+        Lesson lesson = courseDB.getLesson(lessonNumber, course);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 

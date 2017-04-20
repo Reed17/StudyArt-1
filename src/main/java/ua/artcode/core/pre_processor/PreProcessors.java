@@ -8,15 +8,13 @@ import ua.artcode.utils.StringUtils;
 public class PreProcessors {
     public static MethodRunnerPreProcessor singleClass = (classPaths -> {
         String classPath = classPaths[0];
-        return StringUtils.getClassNameAndRootFolder(classPath);
+        return StringUtils.getClassNameAndRootFolder(classPath, "/");
     });
 
     public static MethodRunnerPreProcessor lessons = (classPaths -> {
         String classPath = StringUtils.getClassPathByClassName(classPaths, "main");
-
-        // todo extract to StringUtils
-        String className = classPath.substring(classPath.lastIndexOf("src/") + 4, classPath.lastIndexOf(".")).replace("/", ".");
-        String rootPath = classPath.substring(0, classPath.lastIndexOf("src/")) + "src/";
-        return new String[]{className, rootPath};
+        return StringUtils.getClassNameAndRootFolder(classPath, "src/");
     });
+
+
 }
