@@ -12,7 +12,7 @@ public class Course {
     private String name;
     @Pattern(regexp = "\\w{2,}", message = "Invalid author name")
     private String author;
-    @Pattern(regexp = "^http(s?):.+\\.git$", message =git  "Invalid git URL")
+    @Pattern(regexp = "^http(s?):.+\\.git$", message = "Invalid git URL")
     private String url;
     private String localPath;
     private List<Lesson> lessons;
