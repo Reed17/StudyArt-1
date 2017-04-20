@@ -2,6 +2,7 @@ package ua.artcode.utils;
 
 import ua.artcode.model.ExternalCode;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
 /**
@@ -28,6 +29,12 @@ public class StringUtils {
                         && classPath.contains(".java"))
                 .findFirst()
                 .orElseThrow(() -> new ClassNotFoundException("No Main class found"));
+    }
+
+    public static String getInvocationTargetExceptionInfo(InvocationTargetException e) {
+        return String.format("Runtime exception: name: %s, message: %s",
+                e.getTargetException().getClass().getName(),
+                e.getTargetException().getMessage());
     }
 
     // todo replace by some template engine
