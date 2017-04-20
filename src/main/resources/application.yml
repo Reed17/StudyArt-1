@@ -4,7 +4,7 @@ pathForExternalCodeCompiling: /home/v21k/Java/dev/temp
 
 logging:
   level:
-    org.springframework.web : ERROR
+    org.springframework.web : INFO
     ua.artcode: DEBUG
   pattern:
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
