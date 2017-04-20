@@ -1,5 +1,7 @@
 package ua.artcode.core;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.artcode.core.method_checkers.MethodChecker;
@@ -24,6 +26,8 @@ public class RunCore {
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
+
     @Autowired
     private CommonIOUtils ioUtils;
 
@@ -35,7 +39,6 @@ public class RunCore {
             throws IOException,
             ClassNotFoundException,
             NoSuchMethodException,
-            InvocationTargetException,
             IllegalAccessException {
 
         // compile and save results (errors)
@@ -60,14 +63,25 @@ public class RunCore {
         PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
         // run method
-        String methodOutput = runner.runMethod(cls);
-        // todo how to process runtime errors...
+        String methodOutput = null;
+        String runtimeError = null;
+
+        try {
+            methodOutput = runner.runMethod(cls);
+        } catch (InvocationTargetException e) {
+            // save exceptions
+            runtimeError = "Runtime exception: " + e.getTargetException().getMessage();
+            //redirecting s.out so we can use logger
+            ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+
+            LOGGER.error("Runtime exception", e);
+        }
 
         // reset s.out to old and save results from previous
         String systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
 
         // return RunResult
-        return postProcessor.process(runner, compilationErrors, systemOut, methodOutput);
+        return postProcessor.process(runtimeError, systemOut, methodOutput);
     }
 
 

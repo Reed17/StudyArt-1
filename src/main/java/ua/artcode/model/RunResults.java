@@ -8,6 +8,7 @@ public class RunResults {
     private int passedTests;
     private int failedTests;
     private String outputInfo;
+    private String systemOut;
     private String stats;
 
     public RunResults() {
@@ -17,11 +18,17 @@ public class RunResults {
         this.outputInfo = outputInfo;
     }
 
-    public RunResults(int overallTests, int passedTests, int failedTests, String outputInfo, String stats) {
+    public RunResults(String outputInfo, String systemOut) {
+        this.outputInfo = outputInfo;
+        this.systemOut = systemOut;
+    }
+
+    public RunResults(int overallTests, int passedTests, int failedTests, String outputInfo, String systemOut, String stats) {
         this.overallTests = overallTests;
         this.passedTests = passedTests;
         this.failedTests = failedTests;
         this.outputInfo = outputInfo;
+        this.systemOut = systemOut;
         this.stats = stats;
     }
 
@@ -63,5 +70,13 @@ public class RunResults {
 
     public void setStats(String stats) {
         this.stats = stats;
+    }
+
+    public String getSystemOut() {
+        return systemOut;
+    }
+
+    public void setSystemOut(String systemOut) {
+        this.systemOut = systemOut;
     }
 }

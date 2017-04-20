@@ -7,15 +7,12 @@ import ua.artcode.model.RunResults;
  * Created by v21k on 16.04.17.
  */
 
-@FunctionalInterface
 public interface MethodResultsProcessor {
     /**
      * Processing results from MethodRunner(string)
      *
-     * @param runner MethodRunner with logic for running certain method
-     * @param args   - String args in next order: compilation errors, systemOut, methodResult
      * @return RunResult model with all info
      * @see MethodRunner
      */
-    RunResults process(MethodRunner runner, String... args);
+    RunResults process(String runtimeExceptions, String systemOut, String methodOutput);
 }
