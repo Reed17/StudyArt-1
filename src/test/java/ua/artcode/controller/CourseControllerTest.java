@@ -50,21 +50,6 @@ public class CourseControllerTest {
     private String tempPathForExternalCodeCompiling;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
-/*
-    @After
-    public void tearDown() throws Exception {
-        File git = new File(tempPathForGitProjects);
-        File temp = new File(tempPathForExternalCodeCompiling);
-
-        if(git.exists() && git.isDirectory()){
-            FileUtils.deleteDirectory(git);
-        }
-
-        if(temp.exists() && temp.isDirectory()){
-            FileUtils.deleteDirectory(temp);
-        }
-    }
-*/
 
     @Test
     public void testAddPositive() throws Exception {
@@ -80,7 +65,7 @@ public class CourseControllerTest {
                 "https://github.com/v21k/fake-path/TestGitProject.gif",
                 null,
                 null);
-        mockMvc.perform(post("/courses/addCourse")
+        mockMvc.perform(post("/courses/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
@@ -119,7 +104,7 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(code))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.outputInfo").value("4\n"));
+                .andExpect(jsonPath("$.systemOut").value("4\n"));
     }
 
     @Test
@@ -140,14 +125,14 @@ public class CourseControllerTest {
 
         mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.outputInfo").value("SOME INFO\n"));
+                .andExpect(jsonPath("$.systemOut").value("SOME INFO\n"));
     }
 
     @Test
     public void testRunLessonNegative() throws Exception {
         addCourse();
 
-        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=2"))
+        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=1"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("error")));
     }
@@ -185,7 +170,7 @@ public class CourseControllerTest {
                 GitURL,
                 null,
                 null);
-        mockMvc.perform(post("/courses/addCourse")
+        mockMvc.perform(post("/courses/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
