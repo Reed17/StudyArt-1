@@ -45,8 +45,10 @@ public class RunCore {
         // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
         if (compilationErrors.length() > 0) {
+            LOGGER.error(String.format("Compilation failed, errors: %s", compilationErrors));
             return new RunResults(compilationErrors);
         }
+        LOGGER.info("Successful compilation");
 
         // prepare array with main class path and it's root package
         String[] paths = preProcessor.getPaths(classPaths);
