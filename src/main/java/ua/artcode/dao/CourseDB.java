@@ -79,7 +79,7 @@ public class CourseDB implements StudyArtDB {
      * For numbers < 10 it looks like "_02_lesson" etc, so if lesson number is < 10,
      * we need to addCourse "0" to it's String.valueOf()
      * Otherwise - do not addCourse anything.
-     * */
+     */
     @Override
     public Lesson getLesson(int lessonNumber, Course course) throws LessonNotFoundException {
         return course.getLessons()

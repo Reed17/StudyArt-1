@@ -5,5 +5,5 @@ import ua.artcode.model.RunResults;
 public class ResultsProcessors {
     public static MethodResultsProcessor main = ((exceptions, sysOut, methodOutput) ->
             exceptions != null && exceptions.length() > 0 ?
-            new RunResults(exceptions) : new RunResults(methodOutput, sysOut));
+                    new RunResults(exceptions) : new RunResults(methodOutput, sysOut));
 }

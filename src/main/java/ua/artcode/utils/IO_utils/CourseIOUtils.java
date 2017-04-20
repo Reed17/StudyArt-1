@@ -13,7 +13,6 @@ import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
-import ua.artcode.utils.RunUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,7 +38,7 @@ public class CourseIOUtils {
     private CommonIOUtils commonIOUtils;
 
     @Autowired
-    StudyArtDB courseDB;
+    private StudyArtDB courseDB;
 
     /**
      * Downloading project from Git and save it locally
@@ -101,6 +100,7 @@ public class CourseIOUtils {
      * @return path for created .java file as String
      */
     public String saveExternalCodeLocally(String code) throws IOException {
+        // todo better parsing here
         String className = code.split(" ")[2];
         Path classPathDirectory = Paths.get(localPathForExternalCode);
 

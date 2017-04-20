@@ -48,10 +48,7 @@ public class CommonIOUtils {
 
     public void deleteAndWrite(String path, String content) throws FileNotFoundException {
         try (PrintWriter pw = new PrintWriter(path)) {
-            pw.write("");
             pw.write(content);
-            pw.flush();
-            pw.close();
         }
     }
 

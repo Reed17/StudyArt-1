@@ -11,7 +11,6 @@ import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
-import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;

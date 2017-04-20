@@ -8,7 +8,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 public interface MethodRunner {
     /**
-     * Functional interface to make various logic for running methods
+     * Functional interface to make various logic for calling methods
      *
      * @param cls
      * @return String - results

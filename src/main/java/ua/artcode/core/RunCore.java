@@ -68,6 +68,7 @@ public class RunCore {
         String systemOut = null;
         String methodOutput = null;
 
+        // todo try to extract this to method
         // redirecting s.out
         try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
             PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);

@@ -2,9 +2,6 @@ package ua.artcode.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ua.artcode.exceptions.LessonNotFoundException;
-import ua.artcode.model.Course;
-import ua.artcode.model.Lesson;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -29,6 +26,7 @@ public class RunUtils {
         return ToolProvider.getSystemJavaCompiler();
     }
 
+    // todo get s.out too
     public static String compile(String[] classPaths) throws IOException {
         try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
             COMPILER.run(null, null, baosErr, classPaths);
