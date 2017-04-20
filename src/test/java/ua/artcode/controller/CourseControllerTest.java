@@ -49,21 +49,26 @@ public class CourseControllerTest {
     @Value("${pathForExternalCodeCompiling}")
     private String tempPathForExternalCodeCompiling;
 
-    // TODO create temp folders before all tests, then remove them in the end (after all tests)
+    // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
+/*
+    @After
+    public void tearDown() throws Exception {
+        File git = new File(tempPathForGitProjects);
+        File temp = new File(tempPathForExternalCodeCompiling);
+
+        if(git.exists() && git.isDirectory()){
+            FileUtils.deleteDirectory(git);
+        }
+
+        if(temp.exists() && temp.isDirectory()){
+            FileUtils.deleteDirectory(temp);
+        }
+    }
+*/
 
     @Test
     public void testAddPositive() throws Exception {
-        Course course = new Course(0,
-                "someCourse",
-                "VK",
-                GitURL,
-                null,
-                null);
-        mockMvc.perform(post("/courses/add")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(course))
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        addCourse();
     }
 
     // validation check
@@ -75,7 +80,7 @@ public class CourseControllerTest {
                 "https://github.com/v21k/fake-path/TestGitProject.gif",
                 null,
                 null);
-        mockMvc.perform(post("/courses/add")
+        mockMvc.perform(post("/courses/addCourse")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
@@ -180,9 +185,10 @@ public class CourseControllerTest {
                 GitURL,
                 null,
                 null);
-        mockMvc.perform(post("/courses/add")
+        mockMvc.perform(post("/courses/addCourse")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
-                .accept(MediaType.APPLICATION_JSON));
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 }

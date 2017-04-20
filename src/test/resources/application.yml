@@ -1,3 +1,3 @@
-pathForGitProjects=courses
-pathForExternalCodeCompiling=temp
-GitURL=https://github.com/v21k/TestGitProject.git
+pathForGitProjects: course
+pathForExternalCodeCompiling: ext
+GitURL: https://github.com/v21k/TestGitProject.git
