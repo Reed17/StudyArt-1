@@ -3,7 +3,7 @@ package ua.artcode.service;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.artcode.dao.StudyDB;
+import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -19,25 +19,25 @@ import java.util.Collection;
 public class CourseServiceImpl implements CourseService {
 
     @Autowired
-    private StudyDB<Course> courseDB;
+    private StudyArtDB courseDB;
 
     @Override
     public boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException {
-        return courseDB.add(course);
+        return courseDB.addCourse(course);
     }
 
     @Override
     public Course getByID(int id) throws InvalidIDException, CourseNotFoundException {
-        return courseDB.getByID(id);
+        return courseDB.getCourseByID(id);
     }
 
     @Override
     public boolean removeCourse(int id) throws InvalidIDException {
-        return courseDB.remove(id);
+        return courseDB.removeCourse(id);
     }
 
     @Override
     public Collection<Course> getAll() {
-        return courseDB.getAll();
+        return courseDB.getAllCourses();
     }
 }

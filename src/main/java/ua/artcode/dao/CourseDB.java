@@ -8,6 +8,7 @@ import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
+import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.IOException;
@@ -19,7 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by v21k on 15.04.17.
  */
 @Component
-public class CourseDB implements StudyDB<Course> {
+public class CourseDB implements StudyArtDB {
     private Map<Integer, Course> courseMap;
 
     @Autowired
@@ -30,9 +31,9 @@ public class CourseDB implements StudyDB<Course> {
     }
 
     @Override
-    public boolean add(Course course) throws GitAPIException, DirectoryCreatingException, LessonsParsingException {
-        if (contains(course)) {
-            return update(course);
+    public boolean addCourse(Course course) throws GitAPIException, DirectoryCreatingException, LessonsParsingException {
+        if (containsCourse(course)) {
+            return updateCourse(course);
         }
         try {
             course.setId(courseMap.size() + 1);
@@ -46,34 +47,39 @@ public class CourseDB implements StudyDB<Course> {
     }
 
     @Override
-    public boolean update(Course course) {
+    public boolean updateCourse(Course course) {
         return courseMap.put(course.getId(), course) != null;
     }
 
     @Override
-    public boolean remove(int id) throws InvalidIDException {
+    public boolean removeCourse(int id) throws InvalidIDException {
         checkID(id);
         return courseMap.remove(id) != null;
     }
 
     @Override
-    public boolean contains(Course course) {
+    public boolean containsCourse(Course course) {
         return courseMap.values().contains(course);
     }
 
     @Override
-    public Collection<Course> getAll() {
+    public Collection<Course> getAllCourses() {
         return courseMap.values();
     }
 
     @Override
-    public Course getByID(int id) throws InvalidIDException, CourseNotFoundException {
+    public Course getCourseByID(int id) throws InvalidIDException, CourseNotFoundException {
         checkID(id);
         return courseMap.values()
                 .stream()
                 .filter(course -> course.getId() == id)
                 .findFirst()
                 .orElseThrow(() -> new CourseNotFoundException("No course found with id: " + id));
+    }
+
+    @Override
+    public Lesson getLesson(int courseId, int lessonNumber) {
+        return null;
     }
 
     private void checkID(int id) throws InvalidIDException {

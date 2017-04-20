@@ -6,7 +6,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.StudyDB;
+import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -68,7 +68,7 @@ public class CourseIOUtils {
     /**
      * Parse lessons from project folder and save them in corresponding course field (as List)
      * <p>
-     * 1.Walk through project directory and look for folders contains "lesson"
+     * 1.Walk through project directory and look for folders containsCourse "lesson"
      * 3.Generate lessons from results (parse name and all .java files)
      * 2.Save lessons as list
      *
@@ -112,9 +112,9 @@ public class CourseIOUtils {
         return localPathForExternalCode + "/" + javaClassName;
     }
 
-    public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyDB<Course> db) throws InvalidIDException,
+    public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
-        Course course = db.getByID(courseId);
+        Course course = db.getCourseByID(courseId);
         Lesson lesson = RunUtils.getLesson(lessonNumber, course);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }

@@ -7,7 +7,7 @@ import ua.artcode.core.method_checkers.Checkers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
-import ua.artcode.dao.StudyDB;
+import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
@@ -33,7 +33,7 @@ public class RunServiceImpl implements RunService {
     @Autowired
     CommonIOUtils commonIOUtils;
     @Autowired
-    private StudyDB<Course> courseDB;
+    private StudyArtDB courseDB;
     @Autowired
     private CourseIOUtils courseIOUtils;
     @Autowired
@@ -80,7 +80,7 @@ public class RunServiceImpl implements RunService {
 
         //
         //  Should be discussed!!!! use Annotation instead of className @Solution on className
-        // find class which contains "solution" in class name
+        // find class which containsCourse "solution" in class name
         String solutionClassPath = StringUtils.getClassPathByClassName(classPaths, "solution");
 
         // saving original content for this class

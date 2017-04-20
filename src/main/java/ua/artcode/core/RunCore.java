@@ -20,7 +20,7 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Component
 public class RunCore {
-    // constants with indexes for paths array (which contains className and root package).
+    // constants with indexes for paths array (which containsCourse className and root package).
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 

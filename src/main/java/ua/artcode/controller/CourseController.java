@@ -44,7 +44,7 @@ public class CourseController {
             return result ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
             // todo use logger
-            LOGGER.error("can't add the course", e);
+            LOGGER.error("can't addCourse the course", e);
             return new GeneralResponse(e.getMessage());
         }
     }
