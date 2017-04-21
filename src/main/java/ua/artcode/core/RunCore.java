@@ -8,7 +8,8 @@ import ua.artcode.core.method_checkers.MethodChecker;
 import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
-import ua.artcode.model.RunResults;
+import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
@@ -47,7 +48,7 @@ public class RunCore {
         String compilationErrors = RunUtils.compile(classPaths);
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
-            return new RunResults(compilationErrors);
+            return new RunResults(new GeneralResponse(compilationErrors));
         }
         LOGGER.info("Compilation - OK");
 
@@ -60,7 +61,7 @@ public class RunCore {
         // checking method(s) needed
         if (!checker.checkMethods(cls)) {
             LOGGER.error("Method check - FAILED. Can't fine required method in class " + cls.getName());
-            return new RunResults("Can't find required method(s)");
+            return new RunResults(new GeneralResponse("Can't find required method(s)"));
         }
         LOGGER.info("Method check - OK");
 

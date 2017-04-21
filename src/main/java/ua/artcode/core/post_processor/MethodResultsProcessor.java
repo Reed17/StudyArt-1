@@ -1,7 +1,7 @@
 package ua.artcode.core.post_processor;
 
 import ua.artcode.core.method_runner.MethodRunner;
-import ua.artcode.model.RunResults;
+import ua.artcode.model.response.RunResults;
 
 /**
  * Created by v21k on 16.04.17.

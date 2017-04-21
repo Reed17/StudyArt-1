@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
-import ua.artcode.model.GeneralResponse;
-import ua.artcode.model.RunResults;
+import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
@@ -65,7 +65,7 @@ public class CourseController {
                 IllegalAccessException |
                 NoSuchMethodException e) {
             LOGGER.error("Run class (external source code) - FAILED.", e);
-            return new RunResults(e.getMessage());
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 
@@ -85,7 +85,7 @@ public class CourseController {
                 IllegalAccessException |
                 NoSuchMethodException e) {
             LOGGER.error("Run class from lesson - FAILED", e);
-            return new RunResults(e.getMessage());
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 
@@ -106,7 +106,7 @@ public class CourseController {
                 NoSuchMethodException |
                 IllegalAccessException e) {
             LOGGER.error("Run class from lesson with solution - FAILED", e);
-            return new RunResults(e.getMessage());
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 }
