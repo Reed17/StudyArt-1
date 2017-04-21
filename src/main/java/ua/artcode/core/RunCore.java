@@ -24,11 +24,10 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Component
 public class RunCore {
-    // constants with indexes for paths array (which containsCourse className and root package).
+    // constants with indexes for paths array (which contains Course className and root package).
     private static final int MAIN_CLASS_PATH = 0;
     private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
 
-    // todo finish logging
     private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
 
     @Autowired
@@ -46,6 +45,7 @@ public class RunCore {
 
         // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
+
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
             return new RunResults(new GeneralResponse(compilationErrors));
@@ -81,8 +81,8 @@ public class RunCore {
     private String[] callRunner(MethodRunner runner, Class<?> cls)
             throws IOException, NoSuchMethodException, IllegalAccessException {
 
-        String runtimeException = null;
-        String systemOut;
+        String systemError = null;
+        String systemOut = null;
         String methodOutput = null;
 
         try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
@@ -91,20 +91,18 @@ public class RunCore {
             // call method
             try {
                 methodOutput = runner.runMethod(cls);
+                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                LOGGER.info("Method call - OK");
             } catch (InvocationTargetException e) {
                 // save exception message
-                runtimeException = StringUtils.getInvocationTargetExceptionInfo(e);
+                systemError = StringUtils.getInvocationTargetExceptionInfo(e);
                 //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
                 ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.error("Method call - FAILED. " + runtimeException, e);
-            } finally {
-                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
             }
+
+
+            return new String[]{systemError, systemOut, methodOutput};
         }
-        LOGGER.info("Method call - OK");
-
-        return new String[]{runtimeException, systemOut, methodOutput};
     }
-
-
 }
