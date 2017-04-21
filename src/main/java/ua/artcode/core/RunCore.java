@@ -71,6 +71,12 @@ public class RunCore {
         return postProcessor.process(methodOutput);
     }
 
+    /**
+     * @return String array with next info:
+     * 1. index 0 - runtime exceptions
+     * 2. index 1 - system.out
+     * 3. index 2 - methodOutput
+     */
     private String[] callRunner(MethodRunner runner, Class<?> cls)
             throws IOException, NoSuchMethodException, IllegalAccessException {
 
