@@ -64,12 +64,20 @@ public class RunCore {
         }
         LOGGER.info("Method check - OK");
 
+        // call runner
+        String[] methodOutput = callRunner(runner, cls);
+
+        // return RunResult
+        return postProcessor.process(methodOutput);
+    }
+
+    private String[] callRunner(MethodRunner runner, Class<?> cls)
+            throws IOException, NoSuchMethodException, IllegalAccessException {
+
         String runtimeException = null;
-        String systemOut = null;
+        String systemOut;
         String methodOutput = null;
 
-        // todo try to extract this to method
-        // redirecting s.out
         try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
             PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
@@ -87,8 +95,8 @@ public class RunCore {
             }
         }
         LOGGER.info("Method call - OK");
-        // return RunResult
-        return postProcessor.process(runtimeException, systemOut, methodOutput);
+
+        return new String[]{runtimeException, systemOut, methodOutput};
     }
 
 
