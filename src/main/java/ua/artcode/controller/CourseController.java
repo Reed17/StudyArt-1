@@ -1,61 +1,102 @@
 package ua.artcode.controller;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.exception.CourseDirectoryCreatingExcpetion;
-import ua.artcode.exception.CourseNotFoundException;
-import ua.artcode.exception.NoSuchDirectoryException;
-import ua.artcode.model.CheckResult;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
+import ua.artcode.model.ExternalCode;
 import ua.artcode.model.GeneralResponse;
-import ua.artcode.model.SolutionModel;
+import ua.artcode.model.RunResults;
 import ua.artcode.service.CourseService;
+import ua.artcode.service.RunService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 @RestController
 public class CourseController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
+
     @Autowired
     private CourseService courseService;
 
-    @RequestMapping("/courses/get")
-    public Course getCourse(@RequestParam int id) throws CourseNotFoundException {
-        return courseService.getCourse(id);
+    @Autowired
+    private RunService runService;
+
+    @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
+    public Course getCourseByID(@RequestParam int id) throws InvalidIDException, CourseNotFoundException {
+        return courseService.getByID(id);
     }
 
-    @RequestMapping("courses/getAll")
-    public Collection<Course> getAllCourses() {
-        return courseService.getAllCourses();
+    @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
+    public GeneralResponse addCourse(@RequestBody @Valid Course course) {
+        try {
+            boolean result = courseService.addCourse(course);
+
+            LOGGER.info(String.format("Course (name - %s, author - %s, url - %s) successfully added",
+                    course.getName(), course.getAuthor(), course.getUrl()));
+
+            return result ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
+        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
+            // todo use logger
+            LOGGER.error("can't addCourse the course", e);
+            return new GeneralResponse(e.getMessage());
+        }
     }
 
-    @RequestMapping(path = {"/courses/add"}, method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course)
-            throws CourseDirectoryCreatingExcpetion, GitAPIException {
-
-        return courseService.addCourseFromGit(course) ? new GeneralResponse("DONE") : new GeneralResponse("FAILED");
+    @RequestMapping(value = "/run-class", method = RequestMethod.POST)
+    public RunResults runClass(@RequestBody ExternalCode code) {
+        try {
+            return runService.runMain(code);
+        } catch (ClassNotFoundException |
+                IOException |
+                InvocationTargetException |
+                IllegalAccessException |
+                NoSuchMethodException e) {
+            LOGGER.error("Error at /run-class", e);
+            return new RunResults(e.getMessage());
+        }
     }
 
-    @RequestMapping(path = {"/run-task"})
-    public CheckResult runTask(@RequestParam String packageName,
-                               @RequestParam String mainClass,
-                               @RequestParam String methodName,
-                               @RequestParam int courseId)
-            throws NoSuchDirectoryException, CourseNotFoundException, ClassNotFoundException {
-
-        return courseService.runClass(packageName, mainClass, methodName, courseId);
+    @RequestMapping(value = "/courses/lessons/run")
+    public RunResults runLesson(@RequestParam int courseId,
+                                @RequestParam int lessonNumber) {
+        try {
+            return runService.runLesson(courseId, lessonNumber);
+        } catch (InvalidIDException |
+                CourseNotFoundException |
+                ClassNotFoundException |
+                LessonNotFoundException |
+                InvocationTargetException |
+                IOException |
+                IllegalAccessException |
+                NoSuchMethodException e) {
+            LOGGER.error("Error at courses/lessons/run", e);
+            return new RunResults(e.getMessage());
+        }
     }
 
-    @RequestMapping(value = "/send-solution", method = RequestMethod.POST)
-    public CheckResult sendSolution(@RequestBody SolutionModel solution,
-                                    @RequestParam String packageName,
-                                    @RequestParam String mainClass,
-                                    @RequestParam String methodName,
-                                    @RequestParam int courseId)
-            throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException {
-
-        return courseService.sendSolution(packageName, mainClass, methodName, courseId, solution);
+    @RequestMapping(value = "courses/lessons/send-solution-and-run", method = RequestMethod.POST)
+    public RunResults runLessonWithSolution(@RequestParam int courseId,
+                                            @RequestParam int lessonNumber,
+                                            @RequestBody ExternalCode code) {
+        try {
+            return runService.runLessonWithSolution(courseId, lessonNumber, code);
+        } catch (InvalidIDException |
+                CourseNotFoundException |
+                ClassNotFoundException |
+                LessonNotFoundException |
+                InvocationTargetException |
+                IOException |
+                NoSuchMethodException |
+                IllegalAccessException e) {
+            LOGGER.error("Error at courses/lessons/send-solution-and-run", e);
+            return new RunResults(e.getMessage());
+        }
     }
 }

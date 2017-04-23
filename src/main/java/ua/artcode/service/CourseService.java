@@ -1,37 +1,23 @@
 package ua.artcode.service;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import ua.artcode.exception.CourseDirectoryCreatingExcpetion;
-import ua.artcode.exception.CourseNotFoundException;
-import ua.artcode.exception.NoSuchDirectoryException;
-import ua.artcode.model.CheckResult;
+import ua.artcode.exceptions.CourseNotFoundException;
+import ua.artcode.exceptions.DirectoryCreatingException;
+import ua.artcode.exceptions.InvalidIDException;
+import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
-import ua.artcode.model.SolutionModel;
 
 import java.util.Collection;
 
 /**
- * Created by v21k on 09.04.17.
+ * Created by v21k on 15.04.17.
  */
-
 public interface CourseService {
+    boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
 
-    boolean addCourseFromGit(Course course) throws CourseDirectoryCreatingExcpetion, GitAPIException;
+    Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
 
-    Course getCourse(int id) throws CourseNotFoundException;
+    boolean removeCourse(int id) throws InvalidIDException;
 
-    CheckResult runClass(String packageName,
-                         String mainClass,
-                         String methodName,
-                         int courseId)
-            throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException;
-
-    CheckResult sendSolution(String packageName,
-                             String mainClass,
-                             String methodName,
-                             int courseId,
-                             SolutionModel solution)
-            throws NoSuchDirectoryException, ClassNotFoundException, CourseNotFoundException;
-
-    Collection<Course> getAllCourses();
+    Collection<Course> getAll();
 }

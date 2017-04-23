@@ -1,23 +1,18 @@
 package ua.artcode.model;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * Created by v21k on 09.04.17.
+ * Created by v21k on 15.04.17.
  */
-public class Lesson {
+public class Lesson implements Comparable<Lesson> {
     private String name;
-    private String path;
-    private String[] classes;
+    private String localPath;
 
     public Lesson() {
     }
 
-    public Lesson(String name, String path, String[] classes) {
+    public Lesson(String name, String localPath) {
         this.name = name;
-        this.path = path;
-        this.classes = classes;
+        this.localPath = localPath;
     }
 
     public String getName() {
@@ -28,20 +23,12 @@ public class Lesson {
         this.name = name;
     }
 
-    public String getPath() {
-        return path;
+    public String getLocalPath() {
+        return localPath;
     }
 
-    public void setPath(String path) {
-        this.path = path;
-    }
-
-    public String[] getClasses() {
-        return classes;
-    }
-
-    public void setClasses(String[] classes) {
-        this.classes = classes;
+    public void setLocalPath(String localPath) {
+        this.localPath = localPath;
     }
 
     @Override
@@ -52,26 +39,18 @@ public class Lesson {
         Lesson lesson = (Lesson) o;
 
         if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
-        if (path != null ? !path.equals(lesson.path) : lesson.path != null) return false;
-        // Probably incorrect - comparing Object[] arrays with Arrays.equals
-        return Arrays.equals(classes, lesson.classes);
+        return localPath != null ? localPath.equals(lesson.localPath) : lesson.localPath == null;
     }
 
     @Override
     public int hashCode() {
         int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        result = 31 * result + Arrays.hashCode(classes);
+        result = 31 * result + (localPath != null ? localPath.hashCode() : 0);
         return result;
     }
 
-
     @Override
-    public String toString() {
-        return "Lesson{" +
-                "name='" + name + '\'' +
-                ", path='" + path + '\'' +
-                ", classes=" + Arrays.toString(classes) +
-                '}';
+    public int compareTo(Lesson o) {
+        return this.name.compareTo(o.name);
     }
 }

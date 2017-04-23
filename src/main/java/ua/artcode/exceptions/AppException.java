@@ -1,7 +1,7 @@
-package ua.artcode.exception;
+package ua.artcode.exceptions;
 
 /**
- * Created by v21k on 11.04.17.
+ * Created by v21k on 15.04.17.
  */
 public class AppException extends Exception {
     public AppException(String message) {
