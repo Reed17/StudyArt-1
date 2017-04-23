@@ -43,13 +43,21 @@ public class CourseControllerTest {
     @Value("${GitURL}")
     private String GitURL;
 
-    @Value("${pathForGitProjects}")
-    private String tempPathForGitProjects;
+    private static String tempPathForGitProjects;
 
-    @Value("${pathForExternalCodeCompiling}")
-    private String tempPathForExternalCodeCompiling;
+    private static String tempPathForExternalCodeCompiling;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
+
+    @Value("${pathForGitProjects}")
+    public void setPathForGitProjects(String path) {
+        tempPathForGitProjects = path;
+    }
+
+    @Value("${pathForExternalCodeCompiling}")
+    public void setPathForExternalCodeCompiling(String path) {
+        tempPathForExternalCodeCompiling = path;
+    }
 
     @Test
     public void testAddPositive() throws Exception {
@@ -177,5 +185,22 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @AfterClass
+    public static void removeTempDir() throws IOException {
+        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
+        removeDir(externalCodeCompiling);
+        File gitProjects = new File(tempPathForGitProjects);
+        removeDir(gitProjects);
+    }
+
+    private static void removeDir(File dir) throws IOException {
+        for (File file : dir.listFiles()) {
+            if (file.isDirectory()) removeDir(file);
+            file.setWritable(true);
+            Files.deleteIfExists(Paths.get(file.getAbsolutePath()));
+        }
+        Files.deleteIfExists(Paths.get(dir.getAbsolutePath()));;
     }
 }
