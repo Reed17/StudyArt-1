@@ -1,6 +1,5 @@
-pathForGitProjects: /home/v21k/Java/dev/courses
-pathForExternalCodeCompiling: /home/v21k/Java/dev/temp
-
+pathForGitProjects: courses
+pathForExternalCodeCompiling: temp
 
 logging:
   level:
