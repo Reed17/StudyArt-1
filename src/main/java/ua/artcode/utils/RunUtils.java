@@ -1,8 +1,5 @@
 package ua.artcode.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import java.io.ByteArrayOutputStream;
@@ -17,16 +14,12 @@ import java.net.URLClassLoader;
  */
 public class RunUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
-
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
-    // todo use logger
     private static JavaCompiler getSystemJavaCompiler() {
         return ToolProvider.getSystemJavaCompiler();
     }
 
-    // todo get s.out too
     public static String compile(String[] classPaths) throws IOException {
         try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
             COMPILER.run(null, null, baosErr, classPaths);

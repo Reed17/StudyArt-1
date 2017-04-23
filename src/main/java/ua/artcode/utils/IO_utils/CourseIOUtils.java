@@ -13,6 +13,7 @@ import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,8 +101,7 @@ public class CourseIOUtils {
      * @return path for created .java file as String
      */
     public String saveExternalCodeLocally(String code) throws IOException {
-        // todo better parsing here
-        String className = code.split(" ")[2];
+        String className = StringUtils.parseString(code, "class", "{").trim();
         Path classPathDirectory = Paths.get(localPathForExternalCode);
 
         Files.createDirectories(classPathDirectory);

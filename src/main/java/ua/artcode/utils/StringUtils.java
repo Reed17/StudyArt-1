@@ -37,6 +37,11 @@ public class StringUtils {
                 e.getTargetException().getMessage());
     }
 
+    public static String parseString(String source, String before, String after) {
+        return source.substring(source.indexOf(before) + before.length(),
+                source.indexOf(after) - after.length()).trim();
+    }
+
     // todo replace by some template engine
     public static String appendSolution(ExternalCode code, String originalContent) {
         return originalContent.substring(0, originalContent.lastIndexOf("}")) + code.getSourceCode() + "}";

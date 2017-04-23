@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
-import ua.artcode.model.GeneralResponse;
-import ua.artcode.model.RunResults;
+import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
@@ -30,7 +30,9 @@ public class CourseController {
 
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
     public Course getCourseByID(@RequestParam int id) throws InvalidIDException, CourseNotFoundException {
-        return courseService.getByID(id);
+        Course course = courseService.getByID(id);
+        LOGGER.info("Course get - OK, id {}", id);
+        return course;
     }
 
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
@@ -38,13 +40,15 @@ public class CourseController {
         try {
             boolean result = courseService.addCourse(course);
 
-            LOGGER.info(String.format("Course (name - %s, author - %s, url - %s) successfully added",
-                    course.getName(), course.getAuthor(), course.getUrl()));
+            LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
+                    course.getName(), course.getAuthor(), course.getUrl());
 
             return result ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
+
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
-            // todo use logger
-            LOGGER.error("can't addCourse the course", e);
+
+            LOGGER.error("Course add - FAILED", e);
+
             return new GeneralResponse(e.getMessage());
         }
     }
@@ -52,14 +56,16 @@ public class CourseController {
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
     public RunResults runClass(@RequestBody ExternalCode code) {
         try {
-            return runService.runMain(code);
+            RunResults results = runService.runMain(code);
+            LOGGER.info("Run class (external source code) - OK");
+            return results;
         } catch (ClassNotFoundException |
                 IOException |
                 InvocationTargetException |
                 IllegalAccessException |
                 NoSuchMethodException e) {
-            LOGGER.error("Error at /run-class", e);
-            return new RunResults(e.getMessage());
+            LOGGER.error("Run class (external source code) - FAILED.", e);
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 
@@ -67,7 +73,9 @@ public class CourseController {
     public RunResults runLesson(@RequestParam int courseId,
                                 @RequestParam int lessonNumber) {
         try {
-            return runService.runLesson(courseId, lessonNumber);
+            RunResults results = runService.runLesson(courseId, lessonNumber);
+            LOGGER.info("Run class (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
+            return results;
         } catch (InvalidIDException |
                 CourseNotFoundException |
                 ClassNotFoundException |
@@ -76,8 +84,8 @@ public class CourseController {
                 IOException |
                 IllegalAccessException |
                 NoSuchMethodException e) {
-            LOGGER.error("Error at courses/lessons/run", e);
-            return new RunResults(e.getMessage());
+            LOGGER.error("Run class from lesson - FAILED", e);
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 
@@ -86,7 +94,9 @@ public class CourseController {
                                             @RequestParam int lessonNumber,
                                             @RequestBody ExternalCode code) {
         try {
-            return runService.runLessonWithSolution(courseId, lessonNumber, code);
+            RunResults results = runService.runLessonWithSolution(courseId, lessonNumber, code);
+            LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
+            return results;
         } catch (InvalidIDException |
                 CourseNotFoundException |
                 ClassNotFoundException |
@@ -95,8 +105,8 @@ public class CourseController {
                 IOException |
                 NoSuchMethodException |
                 IllegalAccessException e) {
-            LOGGER.error("Error at courses/lessons/send-solution-and-run", e);
-            return new RunResults(e.getMessage());
+            LOGGER.error("Run class from lesson with solution - FAILED", e);
+            return new RunResults(new GeneralResponse(e.getMessage()));
         }
     }
 }
