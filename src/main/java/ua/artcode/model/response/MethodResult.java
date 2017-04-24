@@ -6,15 +6,13 @@ package ua.artcode.model.response;
 public class MethodResult {
     String systemOut;
     String systemErr;
-    String returnedValue;
 
     public MethodResult() {
     }
 
-    public MethodResult(String systemOut, String systemErr, String returnedValue) {
+    public MethodResult(String systemOut, String systemErr) {
         this.systemOut = systemOut;
         this.systemErr = systemErr;
-        this.returnedValue = returnedValue;
     }
 
     public String getSystemOut() {
@@ -33,20 +31,12 @@ public class MethodResult {
         this.systemErr = systemErr;
     }
 
-    public String getReturnedValue() {
-        return returnedValue;
-    }
-
-    public void setReturnedValue(String returnedValue) {
-        this.returnedValue = returnedValue;
-    }
 
     @Override
     public String toString() {
         return "MethodResult{" +
                 "systemOut='" + systemOut + '\'' +
                 ", systemErr='" + systemErr + '\'' +
-                ", returnedValue='" + returnedValue + '\'' +
                 '}';
     }
 }
