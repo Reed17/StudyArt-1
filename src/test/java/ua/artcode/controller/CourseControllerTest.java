@@ -2,13 +2,14 @@ package ua.artcode.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +18,6 @@ import ua.artcode.model.ExternalCode;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -190,17 +189,10 @@ public class CourseControllerTest {
     @AfterClass
     public static void removeTempDir() throws IOException {
         File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
-        removeDir(externalCodeCompiling);
+        if (externalCodeCompiling.exists()&&externalCodeCompiling.isDirectory())
+            FileUtils.deleteDirectory(externalCodeCompiling);
         File gitProjects = new File(tempPathForGitProjects);
-        removeDir(gitProjects);
-    }
-
-    private static void removeDir(File dir) throws IOException {
-        for (File file : dir.listFiles()) {
-            if (file.isDirectory()) removeDir(file);
-            file.setWritable(true);
-            Files.deleteIfExists(Paths.get(file.getAbsolutePath()));
-        }
-        Files.deleteIfExists(Paths.get(dir.getAbsolutePath()));;
+        if (gitProjects.exists()&&gitProjects.isDirectory())
+            FileUtils.deleteDirectory(gitProjects);
     }
 }
