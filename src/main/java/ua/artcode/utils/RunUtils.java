@@ -33,13 +33,4 @@ public class RunUtils {
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{new File(classRoot).toURI().toURL()});
         return Class.forName(className, true, classLoader);
     }
-
-    public static boolean checkMethods(Class<?>[] classes, String methodName){
-        return Arrays.stream(classes)
-                .map(Class::getDeclaredMethods)
-                .allMatch(methods -> Arrays.stream(methods)
-                        .anyMatch(method -> method.getName()
-                                .toLowerCase()
-                                .contains(methodName)));
-    }
 }
