@@ -11,8 +11,5 @@ import java.net.MalformedURLException;
  * class and it's root folders
  **/
 public interface MethodRunnerPreProcessor {
-    /**
-     * @return String[] - 1st element - path for runnable class, 2nd - root folder for project
-     */
-    Class<?>[] getClasses(String[] classPaths, String methodName) throws ClassNotFoundException, MalformedURLException;
+    Class<?>[] getClasses(String[] classPaths) throws ClassNotFoundException, MalformedURLException;
 }
