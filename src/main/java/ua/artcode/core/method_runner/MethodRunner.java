@@ -1,6 +1,8 @@
 package ua.artcode.core.method_runner;
 
 
+import ua.artcode.model.response.MethodStats;
+
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -13,5 +15,5 @@ public interface MethodRunner {
      * @param cls
      * @return String - results
      */
-    String runMethod(Class<?>[] cls) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+    MethodStats runMethod(Class<?>[] cls) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 }

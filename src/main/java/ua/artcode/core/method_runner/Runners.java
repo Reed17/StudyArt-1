@@ -1,7 +1,10 @@
 package ua.artcode.core.method_runner;
 
+import org.junit.runner.JUnitCore;
+import org.junit.runner.Result;
+import ua.artcode.model.response.MethodStats;
+
 import java.lang.reflect.Method;
-import java.util.Arrays;
 
 /**
  * Created by v21k on 16.04.17.
@@ -14,9 +17,16 @@ public class Runners {
             // todo test this place with a negative test
             method.invoke(null, (Object) argumentsForMain);
         }
-        return "";
+        return null;
     });
 
     // todo get JUnitCore.class and method run() and pass classes there
 
+    public static MethodRunner test = (classes -> {
+        Result result = JUnitCore.runClasses(classes);
+        int overallTests = result.getRunCount();
+        int failedTests = result.getFailureCount();
+        int passedTests = overallTests - failedTests;
+        return new MethodStats(overallTests, passedTests, failedTests, result.getFailures());
+    });
 }
