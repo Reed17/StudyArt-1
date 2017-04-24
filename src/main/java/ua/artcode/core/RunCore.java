@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.artcode.core.method_checkers.MethodChecker;
 import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
@@ -35,7 +34,7 @@ public class RunCore {
 
     public RunResults runMethod(String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
-                                MethodChecker checker,
+                                String methodName,
                                 MethodRunner runner,
                                 MethodResultsProcessor postProcessor)
             throws IOException,
@@ -46,27 +45,25 @@ public class RunCore {
         // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
 
+        // checking for compilation errors
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
             return new RunResults(new GeneralResponse(compilationErrors));
         }
         LOGGER.info("Compilation - OK");
 
-        // prepare array with main class path and it's root package
-        String[] paths = preProcessor.getPaths(classPaths);
-
-        // getting a class
-        Class<?> cls = RunUtils.getClass(paths[MAIN_CLASS_PATH], paths[MAIN_CLASS_ROOT_PACKAGE]);
+        // prepare array with classes
+        Class<?>[] classes = preProcessor.getClasses(classPaths, methodName);
 
         // checking method(s) needed
-        if (!checker.checkMethods(cls)) {
-            LOGGER.error("Method check - FAILED. Can't fine required method in class " + cls.getName());
+        if (!RunUtils.checkMethods(classes, methodName)) {
+            LOGGER.error("Method check - FAILED. Can't fine method {}", methodName);
             return new RunResults(new GeneralResponse("Can't find required method(s)"));
         }
         LOGGER.info("Method check - OK");
 
         // call runner
-        String[] methodOutput = callRunner(runner, cls);
+        String[] methodOutput = callRunner(runner, classes);
 
         // return RunResult
         return postProcessor.process(methodOutput);
@@ -78,7 +75,7 @@ public class RunCore {
      * 2. index 1 - system.out
      * 3. index 2 - methodOutput
      */
-    private String[] callRunner(MethodRunner runner, Class<?> cls)
+    private String[] callRunner(MethodRunner runner, Class<?>[] cls)
             throws IOException, NoSuchMethodException, IllegalAccessException {
 
         String systemError = null;
