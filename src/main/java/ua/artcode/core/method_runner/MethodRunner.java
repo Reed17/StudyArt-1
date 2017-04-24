@@ -13,5 +13,5 @@ public interface MethodRunner {
      * @param cls
      * @return String - results
      */
-    String runMethod(Class<?> cls) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+    String runMethod(Class<?>[] cls) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 }
