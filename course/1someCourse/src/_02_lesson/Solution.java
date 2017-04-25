@@ -1,0 +1,1 @@
+package _02_lesson;/** * Created by v21k on 18.04.17. */public class Solution {}

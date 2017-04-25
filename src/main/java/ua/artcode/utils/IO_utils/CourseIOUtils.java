@@ -85,7 +85,7 @@ public class CourseIOUtils {
                 .map(Path::toString)
                 .filter(path -> path.endsWith("lesson"))
                 .map(path -> {
-                    String lessonName = path.substring(path.lastIndexOf("/") + 1);
+                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
                     return new Lesson(lessonName, path);
                 })
                 .sorted()
@@ -112,7 +112,7 @@ public class CourseIOUtils {
 
         Files.write(sourceFile.toPath(), code.getBytes(), StandardOpenOption.CREATE);
 
-        return localPathForExternalCode + "/" + javaClassName;
+        return localPathForExternalCode + File.separator + javaClassName;
     }
 
     public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
@@ -123,7 +123,7 @@ public class CourseIOUtils {
     }
 
     private String generatePath(Course course) {
-        return localPathForProjects + "/" + course.getId() + course.getName() + "/";
+        return localPathForProjects + File.separator + course.getId() + course.getName() + File.separator;
     }
 
 }
