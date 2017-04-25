@@ -10,7 +10,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(scanBasePackages = {"ua.artcode"})
-@EnableSwagger2
+@EnableSwagger2 // http://localhost:8080/swagger-ui.html
 public class Application {
 
     public static void main(String[] args) {
