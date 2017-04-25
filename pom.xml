@@ -65,6 +65,19 @@
             <artifactId>maven-invoker</artifactId>
             <version>${maven-invoker.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${springfox-swagger-ui.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${springfox-swagger2.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
 
     </dependencies>
 
@@ -76,6 +89,8 @@
         <hamcrest-all.version>1.3</hamcrest-all.version>
         <junit.version>4.12</junit.version>
         <maven-invoker.version>3.0.0</maven-invoker.version>
+        <springfox-swagger-ui.version>2.2.2</springfox-swagger-ui.version>
+        <springfox-swagger2.version>2.2.2</springfox-swagger2.version>
     </properties>
 
     <build>
