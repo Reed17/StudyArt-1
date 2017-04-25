@@ -2,13 +2,14 @@ package ua.artcode.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.junit.*;
+import org.junit.AfterClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -17,8 +18,6 @@ import ua.artcode.model.ExternalCode;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -43,13 +42,21 @@ public class CourseControllerTest {
     @Value("${GitURL}")
     private String GitURL;
 
-    @Value("${pathForGitProjects}")
-    private String tempPathForGitProjects;
+    private static String tempPathForGitProjects;
 
-    @Value("${pathForExternalCodeCompiling}")
-    private String tempPathForExternalCodeCompiling;
+    private static String tempPathForExternalCodeCompiling;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
+
+    @Value("${pathForGitProjects}")
+    public void setPathForGitProjects(String path) {
+        tempPathForGitProjects = path;
+    }
+
+    @Value("${pathForExternalCodeCompiling}")
+    public void setPathForExternalCodeCompiling(String path) {
+        tempPathForExternalCodeCompiling = path;
+    }
 
     @Test
     public void testAddPositive() throws Exception {
@@ -177,5 +184,15 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @AfterClass
+    public static void removeTempDir() throws IOException {
+        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
+        if (externalCodeCompiling.exists()&&externalCodeCompiling.isDirectory())
+            FileUtils.deleteDirectory(externalCodeCompiling);
+        File gitProjects = new File(tempPathForGitProjects);
+        if (gitProjects.exists()&&gitProjects.isDirectory())
+            FileUtils.deleteDirectory(gitProjects);
     }
 }
