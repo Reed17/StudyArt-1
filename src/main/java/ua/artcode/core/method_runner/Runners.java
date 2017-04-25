@@ -20,8 +20,6 @@ public class Runners {
         return null;
     });
 
-    // todo get JUnitCore.class and method run() and pass classes there
-
     public static MethodRunner test = (classes -> {
         Result result = JUnitCore.runClasses(classes);
         int overallTests = result.getRunCount();
