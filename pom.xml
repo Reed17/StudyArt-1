@@ -88,7 +88,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
-            <version>4.2.2.RELEASE</version>
+            <version>${spring-context-support.version}</version>
         </dependency>
     </dependencies>
 
@@ -103,6 +103,7 @@
         <maven-invoker.version>3.0.0</maven-invoker.version>
         <springfox-swagger-ui.version>2.2.2</springfox-swagger-ui.version>
         <springfox-swagger2.version>2.2.2</springfox-swagger2.version>
+        <spring-context-support.version>4.2.2.RELEASE</spring-context-support.version>
     </properties>
 
     <build>
