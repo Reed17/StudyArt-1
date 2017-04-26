@@ -54,10 +54,7 @@ public class RunCore {
         Class<?>[] classes = preProcessor.getClasses(classPaths);
 
         // checking method(s) needed
-        if (!checker.checkClasses(classes)) {
-            LOGGER.error("Check classes for methods/annotations - FAILED");
-            return new RunResults(new GeneralResponse("Can't find required method(s)"));
-        }
+        checker.checkClasses(classes);
 
         LOGGER.info("Check classes for methods/annotations - OK");
 
