@@ -4,8 +4,8 @@ package ua.artcode.model.response;
  * Created by v21k on 21.04.17.
  */
 public class MethodResult {
-    String systemOut;
-    String systemErr;
+    private String systemOut;
+    private String systemErr;
 
     public MethodResult() {
     }
