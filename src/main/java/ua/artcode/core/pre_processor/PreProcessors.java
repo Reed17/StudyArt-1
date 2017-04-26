@@ -20,17 +20,17 @@ public class PreProcessors {
         return new Class[]{RunUtils.getClass(classPath, root)};
     });
 
-    public static MethodRunnerPreProcessor lessonsMain = (classPaths -> {
+    public static MethodRunnerPreProcessor lessonsMain = (classPaths) -> {
         String mainClassPath = Arrays.stream(classPaths)
                 .filter(path -> path.toLowerCase().contains("main"))
                 .findFirst()
                 .orElseThrow(() -> new ClassNotFoundException("Main class not found!"));
 
-        String className = StringUtils.getClassNameFromClassPath(mainClassPath, "src/");
-        String root = StringUtils.getClassRootFromClassPath(mainClassPath, "src/");
+        String className = StringUtils.getClassNameFromClassPath(mainClassPath, "src/main/java/");
+        String root = StringUtils.getClassRootFromClassPath(mainClassPath, "src/main/java/");
 
         return new Class<?>[]{RunUtils.getClass(className, root)};
-    });
+    };
 
     public static MethodRunnerPreProcessor lessonsTests = ((classPaths) -> {
         String root = StringUtils.getClassRootFromClassPath(classPaths[0], "src/");

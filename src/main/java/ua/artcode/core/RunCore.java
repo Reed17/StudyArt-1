@@ -29,7 +29,7 @@ public class RunCore {
 
     @Autowired
     private CommonIOUtils ioUtils;
-
+// todo add course root and sources root to signature
     public RunResults runMethod(String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
                                 MethodChecker checker,
@@ -39,6 +39,7 @@ public class RunCore {
             ClassNotFoundException,
             NoSuchMethodException,
             IllegalAccessException {
+
 
         // compile, save results and return it if there are any errors
         String compilationErrors = RunUtils.compile(classPaths);
