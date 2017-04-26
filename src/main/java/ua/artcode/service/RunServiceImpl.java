@@ -3,7 +3,7 @@ package ua.artcode.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.core.RunCore;
-import ua.artcode.core.checker.Checkers;
+import ua.artcode.core.method_checker.MethodCheckers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
@@ -47,7 +47,7 @@ public class RunServiceImpl implements RunService {
             NoSuchMethodException {
         String path = courseIOUtils.saveExternalCodeLocally(code.getSourceCode());
         String[] classes = {path};
-        return runCore.runMethod(classes, PreProcessors.singleClass, Checkers.main, Runners.main, ResultsProcessors.main);
+        return runCore.runMethod(classes, PreProcessors.singleClass, MethodCheckers.main, Runners.main, ResultsProcessors.main);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class RunServiceImpl implements RunService {
             IllegalAccessException,
             NoSuchMethodException {
         String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
-        return runCore.runMethod(classPaths, PreProcessors.lessonsMain, Checkers.main, Runners.main, ResultsProcessors.main);
+        return runCore.runMethod(classPaths, PreProcessors.lessonsMain, MethodCheckers.main, Runners.main, ResultsProcessors.main);
     }
 
 
@@ -94,7 +94,7 @@ public class RunServiceImpl implements RunService {
         commonIOUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
 
         // run main (tests in psvm)
-        RunResults results = runCore.runMethod(classPaths, PreProcessors.lessonsMain, Checkers.main, Runners.main,
+        RunResults results = runCore.runMethod(classPaths, PreProcessors.lessonsMain, MethodCheckers.main, Runners.main,
                 ResultsProcessors.main);
 
         // rewrite original content again (reset to original state)

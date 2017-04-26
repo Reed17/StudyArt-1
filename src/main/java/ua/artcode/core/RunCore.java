@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.artcode.core.checker.ClassChecker;
+import ua.artcode.core.method_checker.MethodChecker;
 import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
@@ -32,7 +32,7 @@ public class RunCore {
 
     public RunResults runMethod(String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
-                                ClassChecker checker,
+                                MethodChecker checker,
                                 MethodRunner runner,
                                 MethodResultsProcessor postProcessor)
             throws IOException,
