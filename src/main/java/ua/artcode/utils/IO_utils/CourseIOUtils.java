@@ -61,7 +61,10 @@ public class CourseIOUtils {
             Git.cloneRepository()
                     .setURI(course.getUrl())
                     .setDirectory(projectDirectory)
-                    .call();
+                    .call()
+                    .getRepository()
+                    .close();
+//            clone.getRepository().close()
         } catch (IOException e) {
             throw new DirectoryCreatingException("Unable to create a directory for course: " + course.getName());
         }
