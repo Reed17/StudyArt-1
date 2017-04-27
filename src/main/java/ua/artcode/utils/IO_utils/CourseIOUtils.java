@@ -36,12 +36,19 @@ public class CourseIOUtils {
     private String localPathForProjects;
     @Value("${pathForExternalCodeCompiling}")
     private String localPathForExternalCode;
+    @Value("${maven.dependenciesPath}")
+    private String mvnDependencyDownloadPath;
+    @Value("${maven.goals.copyToDirectory}")
+    private String mvnCopyToDirectory;
+    @Value("${maven.home}")
+    private String mvnHome;
 
     @Autowired
     private CommonIOUtils commonIOUtils;
 
     @Autowired
     private StudyArtDB courseDB;
+
 
     /**
      * Downloading project from Git and save it locally
@@ -128,15 +135,16 @@ public class CourseIOUtils {
     }
 
     public boolean saveMavenDependenciesLocally(String projectRoot, String targetDirectory) {
+        // todo declare beans for both
         InvocationRequest request = new DefaultInvocationRequest();
         Invoker invoker = new DefaultInvoker();
 
-        String pomPath = projectRoot + "pom.xml";
-        String mavenGoal = "dependency:copy-dependencies -DoutputDirectory=" + targetDirectory;
+        String pomPath = generatePomPath(projectRoot);
+        String mavenGoal = generateMavenGoal(projectRoot);
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-        invoker.setMavenHome(new File(System.getenv("MAVEN_HOME"))); // path to maven directory! e.g. /usr/share/maven
+        invoker.setMavenHome(new File(mvnHome));
 
         try {
             invoker.execute(request);
@@ -148,8 +156,18 @@ public class CourseIOUtils {
         return true;
     }
 
+    private String generatePomPath(String projectRoot) {
+        return projectRoot + File.separator + "pom.xml";
+    }
+
+    private String generateMavenGoal(String projectRoot) {
+        return mvnCopyToDirectory
+                    + projectRoot
+                    + File.separator
+                    + mvnDependencyDownloadPath;
+    }
+
     private String generatePath(Course course) {
         return localPathForProjects + File.separator + course.getId() + course.getName() + File.separator;
     }
-
 }
