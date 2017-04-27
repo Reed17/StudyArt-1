@@ -73,7 +73,7 @@ public class RunServiceImpl implements RunService {
         Course course = courseDB.getCourseByID(courseId);
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         return runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java/"),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -115,7 +115,7 @@ public class RunServiceImpl implements RunService {
         // run main (tests in psvm)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java/"),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
