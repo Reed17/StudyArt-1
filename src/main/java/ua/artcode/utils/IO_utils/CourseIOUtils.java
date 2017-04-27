@@ -134,7 +134,14 @@ public class CourseIOUtils {
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 
-    public boolean saveMavenDependenciesLocally(String projectRoot, String targetDirectory) {
+    /**
+     * Saving locally all dependencies from pom.xml locally
+     *
+     * @param projectRoot root folder for project (not src/ or java/, just regular project folder
+     * @return true if saved successfully, false otherwise
+     * @throws MavenInvocationException
+     */
+    public boolean saveMavenDependenciesLocally(String projectRoot) {
         // todo declare beans for both
         InvocationRequest request = new DefaultInvocationRequest();
         Invoker invoker = new DefaultInvoker();
@@ -162,9 +169,9 @@ public class CourseIOUtils {
 
     private String generateMavenGoal(String projectRoot) {
         return mvnCopyToDirectory
-                    + projectRoot
-                    + File.separator
-                    + mvnDependencyDownloadPath;
+                + projectRoot
+                + File.separator
+                + mvnDependencyDownloadPath;
     }
 
     private String generatePath(Course course) {
