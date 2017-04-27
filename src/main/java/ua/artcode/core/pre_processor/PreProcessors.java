@@ -1,53 +1,50 @@
 package ua.artcode.core.pre_processor;
 
 import ua.artcode.utils.RunUtils;
-import ua.artcode.utils.StringUtils;
 
 import java.util.Arrays;
+
+import static ua.artcode.utils.StringUtils.getClassNameFromClassPath;
 
 /**
  * Created by v21k on 17.04.17.
  */
 public class PreProcessors {
-    // todo mvn go offline (pre-processor to match maven)
 
-    public static MethodRunnerPreProcessor singleClass = ((classPaths) -> {
-        String singleClassPath = classPaths[0];
+    public static MethodRunnerPreProcessor singleClass = ((projectRoot, sourcesRoot, classPaths) -> {
+        String[] classNames = new String[]{getClassNameFromClassPath(classPaths[0], "/")};
 
-        String classPath = StringUtils.getClassNameFromClassPath(singleClassPath, "/");
-        String root = StringUtils.getClassRootFromClassPath(singleClassPath, "/");
+        checkIfEmpty(classNames);
 
-        return new Class[]{RunUtils.getClass(classPath, root)};
+        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
     });
 
-    public static MethodRunnerPreProcessor lessonsMain = (classPaths) -> {
-        String mainClassPath = Arrays.stream(classPaths)
+    public static MethodRunnerPreProcessor lessonsMain = ((projectRoot, sourcesRoot, classPaths) -> {
+        String classNames[] = Arrays.stream(classPaths)
+                .map(path -> getClassNameFromClassPath(path, "java/"))
                 .filter(path -> path.toLowerCase().contains("main"))
-                .findFirst()
-                .orElseThrow(() -> new ClassNotFoundException("Main class not found!"));
-
-        String className = StringUtils.getClassNameFromClassPath(mainClassPath, "src/main/java/");
-        String root = StringUtils.getClassRootFromClassPath(mainClassPath, "src/main/java/");
-
-        return new Class<?>[]{RunUtils.getClass(className, root)};
-    };
-
-    public static MethodRunnerPreProcessor lessonsTests = ((classPaths) -> {
-        String root = StringUtils.getClassRootFromClassPath(classPaths[0], "src/");
-
-        String[] classNames = Arrays.stream(classPaths)
-                .filter(path -> path.toLowerCase().contains("test"))
-                .map(path -> StringUtils.getClassNameFromClassPath(path, "src/"))
                 .toArray(String[]::new);
 
-        Class<?>[] classes = new Class[classNames.length];
+        checkIfEmpty(classNames);
 
-        for (int i = 0; i < classes.length; i++) {
-            classes[i] = RunUtils.getClass(classNames[i], root);
-        }
-
-        return classes;
+        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
     });
 
+    public static MethodRunnerPreProcessor lessonsTests = ((projectRoot, sourcesRoot, classPaths) -> {
 
+        String[] classNames = Arrays.stream(classPaths)
+                .map(path -> getClassNameFromClassPath(path, "java/"))
+                .filter(path -> path.toLowerCase().contains("test"))
+                .toArray(String[]::new);
+
+        checkIfEmpty(classNames);
+
+        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
+    });
+
+    private static void checkIfEmpty(String[] classNames) throws ClassNotFoundException {
+        if (classNames.length == 0) {
+            throw new ClassNotFoundException("Main class not found!");
+        }
+    }
 }
