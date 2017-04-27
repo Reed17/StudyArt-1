@@ -34,12 +34,8 @@ public class RunCore {
     @Autowired
     private CourseIOUtils courseIOUtils;
 
-    @Autowired
-    private RunUtils runUtils;
-
-    // todo add course root and sources root to signature
-    public RunResults runMethod(String projectRootPath,
-                                String projectSourcesRootPath,
+    public RunResults runMethod(String projectRoot,
+                                String sourcesRoot,
                                 String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
                                 MethodChecker checker,
@@ -50,18 +46,18 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
-        // todo this step must be extracted somewhere else (to improve performance) --- should be discussed
+        // todo this step must be extracted somewhere else - it reduces performance dramatically
         // download and save maven dependencies
-        if(!courseIOUtils.saveMavenDependenciesLocally(projectRootPath)){
+        if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
             LOGGER.error("Maven dependencies download - FAILED");
             return new RunResults(
-                    new GeneralResponse("Maven dependencies download - FAILED. Please, check your pom.xml"));
+                    new GeneralResponse("Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
         }
         LOGGER.info("Maven dependencies download - OK.");
 
 
         // compile, save results and return it if there are any errors
-        String compilationErrors = runUtils.compile(projectRootPath, classPaths);
+        String compilationErrors = RunUtils.compile(projectRoot, classPaths);
 
         // checking for compilation errors
         if (compilationErrors.length() > 0) {
@@ -71,9 +67,9 @@ public class RunCore {
         LOGGER.info("Compilation - OK");
 
         // prepare array with classes
-        Class<?>[] classes = preProcessor.getClasses(classPaths);
+        Class<?>[] classes = preProcessor.getClasses(projectRoot, sourcesRoot, classPaths);
 
-        // checking method(s) needed
+        // checking methods/annotations needed
         checker.checkClasses(classes);
 
         LOGGER.info("Check classes for methods/annotations - OK");
