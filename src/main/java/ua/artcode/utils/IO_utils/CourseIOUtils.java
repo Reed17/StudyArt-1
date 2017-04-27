@@ -144,7 +144,6 @@ public class CourseIOUtils {
      *
      * @param projectRoot root folder for project (not src/ or java/, just regular project folder
      * @return true if saved successfully, false otherwise
-     * @throws MavenInvocationException
      */
     public boolean saveMavenDependenciesLocally(String projectRoot) {
         // todo declare beans for both
