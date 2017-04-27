@@ -4,6 +4,7 @@ package ua.artcode.model.response;
  * Created by v21k on 15.04.17.
  */
 public class GeneralResponse {
+    // todo add message type
     private String message;
 
     public GeneralResponse() {
