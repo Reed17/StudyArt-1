@@ -49,6 +49,7 @@ public class RunServiceImpl implements RunService {
             NoSuchMethodException {
         String path = courseIOUtils.saveExternalCodeLocally(code.getSourceCode());
         String[] classes = {path};
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         return runCore.runMethod(StringUtils.getClassRootFromClassPath(classes[0], File.separator),
                 StringUtils.getClassRootFromClassPath(classes[0], File.separator),
                 classes,
@@ -70,8 +71,9 @@ public class RunServiceImpl implements RunService {
             NoSuchMethodException {
         String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
         Course course = courseDB.getCourseByID(courseId);
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         return runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "src/main/java/"),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java/"),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -111,8 +113,9 @@ public class RunServiceImpl implements RunService {
         Course course = courseDB.getCourseByID(courseId);
 
         // run main (tests in psvm)
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "src/main/java/"),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java/"),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
