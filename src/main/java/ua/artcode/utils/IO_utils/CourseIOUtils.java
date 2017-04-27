@@ -49,7 +49,6 @@ public class CourseIOUtils {
     @Autowired
     private StudyArtDB courseDB;
 
-
     /**
      * Downloading project from Git and save it locally
      * <p>
@@ -150,6 +149,8 @@ public class CourseIOUtils {
         InvocationRequest request = new DefaultInvocationRequest();
         Invoker invoker = new DefaultInvoker();
 
+        projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
+
         String pomPath = generatePomPath(projectRoot);
         String mavenGoal = generateMavenGoal(projectRoot);
 
@@ -168,14 +169,20 @@ public class CourseIOUtils {
     }
 
     private String generatePomPath(String projectRoot) {
-        return projectRoot + File.separator + "pom.xml";
+        projectRoot = checkEndsWithSeparator(projectRoot);
+        return projectRoot + "pom.xml";
+
     }
 
     private String generateMavenGoal(String projectRoot) {
+        projectRoot = checkEndsWithSeparator(projectRoot);
         return mvnCopyToDirectory
                 + projectRoot
-                + File.separator
                 + mvnDependencyDownloadPath;
+    }
+
+    private String checkEndsWithSeparator(String path) {
+        return path.endsWith(File.separator) ? path : path + File.separator;
     }
 
     private String generatePath(Course course) {

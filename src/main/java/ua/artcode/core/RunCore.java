@@ -12,6 +12,7 @@ import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.MethodStats;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
 
@@ -29,8 +30,17 @@ public class RunCore {
 
     @Autowired
     private CommonIOUtils ioUtils;
-// todo add course root and sources root to signature
-    public RunResults runMethod(String[] classPaths,
+
+    @Autowired
+    private CourseIOUtils courseIOUtils;
+
+    @Autowired
+    private RunUtils runUtils;
+
+    // todo add course root and sources root to signature
+    public RunResults runMethod(String projectRootPath,
+                                String projectSourcesRootPath,
+                                String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
                                 MethodChecker checker,
                                 MethodRunner runner,
@@ -40,9 +50,18 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
+        // todo this step must be extracted somewhere else (to improve performance) --- should be discussed
+        // download and save maven dependencies
+        if(!courseIOUtils.saveMavenDependenciesLocally(projectRootPath)){
+            LOGGER.error("Maven dependencies download - FAILED");
+            return new RunResults(
+                    new GeneralResponse("Maven dependencies download - FAILED. Please, check your pom.xml"));
+        }
+        LOGGER.info("Maven dependencies download - OK.");
+
 
         // compile, save results and return it if there are any errors
-        String compilationErrors = RunUtils.compile(classPaths);
+        String compilationErrors = runUtils.compile(projectRootPath, classPaths);
 
         // checking for compilation errors
         if (compilationErrors.length() > 0) {

@@ -1,5 +1,9 @@
 package ua.artcode.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import ua.artcode.utils.IO_utils.CommonIOUtils;
+
 import javax.tools.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,11 +15,15 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by v21k on 16.04.17.
  */
+@Component
 public class RunUtils {
+    @Autowired
+    CommonIOUtils ioUtils;
 
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
@@ -23,18 +31,22 @@ public class RunUtils {
         return ToolProvider.getSystemJavaCompiler();
     }
 
-    public static String compile(String[] classPaths) throws IOException {
+    public String compile(String projectRoot, String[] classPaths) throws IOException {
         // todo 1. Download maven dependencies to Course folder
         // todo 2. parse all .jar files
         // todo 3. understand how it works
         try (ByteArrayOutputStream baosErr = new ByteArrayOutputStream()) {
-            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
+
+            DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
             StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
 
+/*            List<String> jars = Arrays.stream(ioUtils.parseFilePaths(projectRoot, ".jar"))
+                    .map(path -> new File(path).getAbsolutePath())
+                    .collect(Collectors.toList());*/
 
             List<String> optionList = new ArrayList<>();
-            optionList.add("-classpath");
-            optionList.add("/home/v21k/.m2/repository/args4j/args4j/2.33/args4j-2.33.jar");
+            optionList.add("-cp");
+            optionList.add("/home/v21k/IdeaProjects/StudyArtTeam/courses/1Primitives/dependencies/gson-2.8.0.jar");
 
             JavaCompiler.CompilationTask task = COMPILER.getTask(new PrintWriter(baosErr),
                     fileManager,
