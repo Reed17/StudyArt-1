@@ -136,6 +136,11 @@ public class CourseIOUtils {
 
     /**
      * Saving locally all dependencies from pom.xml locally
+     * Uses 3 values from application.properties:
+     * 1. maven.home
+     * 2. maven.dependenciesPath - where files will be saved
+     * 3. maven.goals.copyToDirectory - maven goal (copy and save files locally)
+     * So you need to specify these 3 values before using application.
      *
      * @param projectRoot root folder for project (not src/ or java/, just regular project folder
      * @return true if saved successfully, false otherwise
