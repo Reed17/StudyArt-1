@@ -3,7 +3,6 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Ignore
 public class CourseControllerTest {
 
     @Autowired
@@ -115,9 +113,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.methodResult.systemOut").value("4\n"));
     }
 
-    @Ignore
     @Test
-    //todo how to process compile exceptions
     public void testRunClassNegative() throws Exception {
         ExternalCode code = new ExternalCode("public class test " +
                 "{\npublic static void main(String[] args) " +
@@ -126,7 +122,7 @@ public class CourseControllerTest {
         mockMvc.perform(post("/run-class")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(code)))
-                .andExpect(jsonPath("$.methodResult.systemErr").value(not(4)));
+                .andExpect(jsonPath("$.generalResponse.message").value(containsString("error")));
     }
 
     @Test
@@ -190,10 +186,10 @@ public class CourseControllerTest {
     @AfterClass
     public static void removeTempDir() throws IOException {
         File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
-        if (externalCodeCompiling.exists()&&externalCodeCompiling.isDirectory())
+        if (externalCodeCompiling.exists() && externalCodeCompiling.isDirectory())
             FileUtils.deleteDirectory(externalCodeCompiling);
         File gitProjects = new File(tempPathForGitProjects);
-        if (gitProjects.exists()&&gitProjects.isDirectory())
+        if (gitProjects.exists() && gitProjects.isDirectory())
             FileUtils.deleteDirectory(gitProjects);
     }
 }
