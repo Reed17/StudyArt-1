@@ -1,3 +1,4 @@
 pathForGitProjects: course
 pathForExternalCodeCompiling: ext
 GitURL: https://github.com/v21k/TestGitProject.git
+coreTestDir: coreTest
