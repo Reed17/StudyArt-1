@@ -35,6 +35,7 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
     public Course getCourseByID(@RequestParam int id) throws AppException {
+
         Course course = courseService.getByID(id);
         LOGGER.info("Course get - OK, id {}", id);
         return course;
@@ -48,17 +49,17 @@ public class CourseController {
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
         try {
+
             boolean result = courseService.addCourse(course);
-
             LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
-                    course.getName(), course.getAuthor(), course.getUrl());
-
-            return result ? new GeneralResponse("OK") : new GeneralResponse("FAIL");
+                    course.getName(),
+                    course.getAuthor(),
+                    course.getUrl());
+            return new GeneralResponse("OK");
 
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
 
             LOGGER.error("Course add - FAILED", e);
-
             return new GeneralResponse(e.getMessage());
         }
     }
@@ -71,10 +72,13 @@ public class CourseController {
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
     public RunResults runClass(@RequestBody ExternalCode code) {
         try {
+
             RunResults results = runService.runMain(code);
             LOGGER.info("Run class (external source code) - OK");
             return results;
+
         } catch (Exception e) {
+
             LOGGER.error("Run class (external source code) - FAILED.", e);
             return new RunResults(new GeneralResponse(e.getMessage()));
         }
@@ -89,10 +93,13 @@ public class CourseController {
     public RunResults runLesson(@RequestParam int courseId,
                                 @RequestParam int lessonNumber) {
         try {
+
             RunResults results = runService.runLesson(courseId, lessonNumber);
             LOGGER.info("Run class (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
             return results;
+
         } catch (Exception e) {
+
             LOGGER.error("Run class from lesson - FAILED", e);
             return new RunResults(new GeneralResponse(e.getMessage()));
         }
@@ -108,10 +115,13 @@ public class CourseController {
                                             @RequestParam int lessonNumber,
                                             @RequestBody ExternalCode code) {
         try {
+
             RunResults results = runService.runLessonWithSolution(courseId, lessonNumber, code);
             LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
             return results;
+
         } catch (Exception e) {
+
             LOGGER.error("Run class from lesson with solution - FAILED", e);
             return new RunResults(new GeneralResponse(e.getMessage()));
         }
