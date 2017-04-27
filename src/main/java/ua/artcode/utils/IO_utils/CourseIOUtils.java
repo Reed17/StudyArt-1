@@ -1,5 +1,6 @@
 package ua.artcode.utils.IO_utils;
 
+import org.apache.maven.shared.invoker.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +125,27 @@ public class CourseIOUtils {
         Course course = db.getCourseByID(courseId);
         Lesson lesson = courseDB.getLesson(lessonNumber, course);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
+    }
+
+    public boolean saveMavenDependenciesLocally(String projectRoot, String targetDirectory) {
+        InvocationRequest request = new DefaultInvocationRequest();
+        Invoker invoker = new DefaultInvoker();
+
+        String pomPath = projectRoot + "pom.xml";
+        String mavenGoal = "dependency:copy-dependencies -DoutputDirectory=" + targetDirectory;
+
+        request.setPomFile(new File(pomPath));
+        request.setGoals(Collections.singletonList(mavenGoal));
+        invoker.setMavenHome(new File(System.getenv("MAVEN_HOME"))); // path to maven directory! e.g. /usr/share/maven
+
+        try {
+            invoker.execute(request);
+        } catch (MavenInvocationException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
     private String generatePath(Course course) {
