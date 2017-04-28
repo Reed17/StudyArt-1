@@ -1,5 +1,7 @@
 package ua.artcode.utils;
 
+import org.springframework.stereotype.Component;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,6 +9,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Created by zhenia on 23.04.17.
  */
+@Component
 public class SecurityUtils {
     public String encryptPass(String pass) {
         try {
