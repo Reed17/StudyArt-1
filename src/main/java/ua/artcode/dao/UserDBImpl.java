@@ -1,5 +1,6 @@
 package ua.artcode.dao;
 
+import org.springframework.stereotype.Component;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.model.User;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by zhenia on 23.04.17.
  */
+@Component
 public class UserDBImpl <T extends User> implements UserDB <T> {
     private Map<Integer, T> users;
 
@@ -19,7 +21,8 @@ public class UserDBImpl <T extends User> implements UserDB <T> {
 
     @Override
     public T add(T user) {
-        return users.put(user.getId(), user);
+        users.put(user.getId(), user);
+        return user;
     }
 
     @Override

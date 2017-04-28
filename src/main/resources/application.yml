@@ -9,6 +9,7 @@ maven:
   home: /usr/share/maven
 
 serverLink: "http://localhost:8080"
+  # create account and stop using my)
 emailUsername: "42004200zhenia@gmail.com"
 emailPass: "1029384756vasa"
 
