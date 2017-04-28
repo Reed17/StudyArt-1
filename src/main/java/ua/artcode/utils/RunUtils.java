@@ -38,16 +38,18 @@ public class RunUtils {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
 
-        // .jar files (will be added to classpath)
-        List<String> jarPaths = getJarPaths(projectRoot);
+        // .jar files (will be added to classpath) - must be concatenated with ":" delimiter
+        String jarPathsAsString = getJarPaths(projectRoot).stream()
+                .map(path -> path + ":")
+                .collect(Collectors.joining());
 
         // option list ---> "javac [options...]"
         List<String> optionList = new ArrayList<>();
 
-        // -cp command cant be executed without args, so we make sure that there is at least 1
-        if (jarPaths.size() > 0) {
+        // -cp command cant be executed without args, so we make sure that jarPaths not empty
+        if (!jarPathsAsString.isEmpty()) {
             optionList.add("-cp");
-            optionList.addAll(jarPaths);
+            optionList.add(jarPathsAsString + ".");
         }
 
         // task for compiler
