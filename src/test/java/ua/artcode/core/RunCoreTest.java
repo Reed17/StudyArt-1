@@ -215,7 +215,7 @@ public class RunCoreTest {
     }
 
     @Test(expected = NoSuchMethodException.class)
-    public void testRunNonExistsingTests() throws Exception {
+    public void testRunNonExistingTests() throws Exception {
         String tests = "";
 
         String imports = "import org.junit.Test;\n" +
