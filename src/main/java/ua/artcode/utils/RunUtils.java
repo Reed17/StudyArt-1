@@ -1,5 +1,7 @@
 package ua.artcode.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import javax.tools.*;
@@ -24,6 +26,8 @@ public class RunUtils {
 
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
+
     private static JavaCompiler getSystemJavaCompiler() {
         return ToolProvider.getSystemJavaCompiler();
     }
@@ -47,12 +51,18 @@ public class RunUtils {
         }
 
         // task for compiler
-        JavaCompiler.CompilationTask task = COMPILER.getTask(null,
-                fileManager,
-                diagnostics,
-                optionList,
-                null,
-                fileManager.getJavaFileObjectsFromStrings(Arrays.asList(classPaths)));
+        JavaCompiler.CompilationTask task = null;
+        try {
+            task = COMPILER.getTask(null,
+                    fileManager,
+                    diagnostics,
+                    optionList,
+                    null,
+                    fileManager.getJavaFileObjectsFromStrings(Arrays.asList(classPaths)));
+        } catch (Exception e) {
+            LOGGER.error("Compilation task building - FAILED.", e);
+            return e.getMessage();
+        }
 
         // task call
         task.call();
