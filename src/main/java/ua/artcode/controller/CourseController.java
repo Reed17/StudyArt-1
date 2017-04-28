@@ -12,6 +12,7 @@ import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
@@ -55,12 +56,12 @@ public class CourseController {
                     course.getName(),
                     course.getAuthor(),
                     course.getUrl());
-            return new GeneralResponse("OK");
+            return new GeneralResponse(ResponseType.INFO, "Course add - OK");
 
         } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
 
             LOGGER.error("Course add - FAILED", e);
-            return new GeneralResponse(e.getMessage());
+            return new GeneralResponse(ResponseType.ERROR, e.getMessage());
         }
     }
 
@@ -80,7 +81,7 @@ public class CourseController {
         } catch (Exception e) {
 
             LOGGER.error("Run class (external source code) - FAILED.", e);
-            return new RunResults(new GeneralResponse(e.getMessage()));
+            return new RunResults(new GeneralResponse(ResponseType.INFO, e.getMessage()));
         }
     }
 
@@ -101,7 +102,7 @@ public class CourseController {
         } catch (Exception e) {
 
             LOGGER.error("Run class from lesson - FAILED", e);
-            return new RunResults(new GeneralResponse(e.getMessage()));
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
     }
 
@@ -123,7 +124,7 @@ public class CourseController {
         } catch (Exception e) {
 
             LOGGER.error("Run class from lesson with solution - FAILED", e);
-            return new RunResults(new GeneralResponse(e.getMessage()));
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
     }
 }

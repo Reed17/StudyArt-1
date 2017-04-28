@@ -10,6 +10,7 @@ import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.MethodStats;
+import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
@@ -51,7 +52,7 @@ public class RunCore {
         if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
             LOGGER.error("Maven dependencies download - FAILED");
             return new RunResults(
-                    new GeneralResponse("Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
+                    new GeneralResponse(ResponseType.ERROR,"Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
         }
         LOGGER.info("Maven dependencies download - OK.");
 
@@ -62,7 +63,7 @@ public class RunCore {
         // checking for compilation errors
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
-            return new RunResults(new GeneralResponse(compilationErrors));
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, compilationErrors));
         }
         LOGGER.info("Compilation - OK");
 
