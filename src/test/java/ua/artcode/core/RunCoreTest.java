@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by v21k on 27.04.17.
@@ -78,19 +79,12 @@ public class RunCoreTest {
 
     @Test
     public void testRunClassWithMainPositive() throws Exception {
-        String classContent = "package _01_lesson;" +
-                "public class Main {\n" +
-                "    public static void main(String[] args) {\n" +
-                "        System.out.println(\"Some text\");\n" +
-                "    }\n" +
-                "}";
-
-        File classFile = generateJavaFile(1, "Main");
-        Files.write(Paths.get(classFile.getAbsolutePath()), classContent.getBytes(), StandardOpenOption.CREATE);
+        String mainMethodBody = "System.out.println(\"Some text\");";
+        String classPath = generateAndSaveClassWithMainMethod(1, "Main", mainMethodBody);
 
         RunResults results = core.runMethod(projectRoot,
                 sourcesRoot,
-                new String[]{classFile.getAbsolutePath()},
+                new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -99,13 +93,76 @@ public class RunCoreTest {
         assertEquals("Some text\n", results.getMethodResult().getSystemOut());
     }
 
-    private File generateJavaFile(int lessonNumber, String className) {
+    @Test
+    public void testRunClassWithMainCompilationError() throws Exception {
+        String mainMethodBody = "System.out.println(\"Some text\";";
+        String classPath = generateAndSaveClassWithMainMethod(1, "Main", mainMethodBody);
+
+        RunResults results = core.runMethod(projectRoot,
+                sourcesRoot,
+                new String[]{classPath},
+                PreProcessors.lessonsMain,
+                MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
+
+        assertTrue(results.getGeneralResponse().getMessage().contains("error"));
+    }
+
+    @Test
+    public void testRunClassWithMainRuntimeError() throws Exception {
+        String mainMethodBody = "System.out.println(2/0);";
+        String classPath = generateAndSaveClassWithMainMethod(1, "Main", mainMethodBody);
+
+        RunResults results = core.runMethod(projectRoot,
+                sourcesRoot,
+                new String[]{classPath},
+                PreProcessors.lessonsMain,
+                MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
+
+        assertTrue(results.getMethodResult().getSystemErr().contains("/ by zero"));
+    }
+
+    @Test
+    public void testRunClassWithMainNoClass() throws Exception {
+        String classPath = sourcesRoot + File.separator + "_01_lesson";
+
+        RunResults results = core.runMethod(projectRoot,
+                sourcesRoot,
+                new String[]{classPath},
+                PreProcessors.lessonsMain,
+                MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
+
+        System.out.println(results.getGeneralResponse().getMessage());
+        assertTrue(results.getGeneralResponse().getMessage().length() > 0);
+    }
+
+
+    private String generateAndSaveClassWithMainMethod(int lessonNumber, String className, String mainMethodBody) throws IOException {
+        String classContent = String.format("package _0%d_lesson;" +
+                        "public class %s{" +
+                        "public static void main(String[] args){" +
+                        "%s}" +
+                        "}",
+                lessonNumber,
+                className,
+                mainMethodBody);
+
         String fileName = String.format("%s/_0%d_lesson/%s.java",
                 sourcesRoot,
                 lessonNumber,
                 className)
                 .replace("/", File.separator);
-        return new File(fileName);
+
+        File classFile = new File(fileName);
+
+        Files.write(Paths.get(classFile.getAbsolutePath()), classContent.getBytes(), StandardOpenOption.CREATE);
+
+        return classFile.getPath();
     }
 }
 
