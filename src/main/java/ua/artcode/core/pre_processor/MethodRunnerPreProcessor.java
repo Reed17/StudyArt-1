@@ -10,6 +10,7 @@ import java.io.IOException;
  * This functional interface is using for getting paths for
  * class and it's root folders
  **/
+@FunctionalInterface
 public interface MethodRunnerPreProcessor {
     Class<?>[] getClasses(String projectRoot, String sourcesRoot, String[] classPaths)
             throws ClassNotFoundException, IOException;
