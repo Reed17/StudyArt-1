@@ -108,6 +108,7 @@ public class CourseController {
         }
     }
 
+    @Deprecated
     @ApiOperation(httpMethod = "POST",
             value = "Resource to run class from lesson with solution (need to add solution before)",
             notes = "Runs a class in certain lesson (class must have main method) which depends on Solution class",

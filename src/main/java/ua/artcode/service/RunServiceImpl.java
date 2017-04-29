@@ -16,6 +16,7 @@ import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
+import ua.artcode.model.Lesson;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -149,21 +151,20 @@ public class RunServiceImpl implements RunService {
 
         Course course = courseDB.getCourseByID(courseId);
 
+        Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
 
-        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(courseId, lessonNumber, courseDB);
+        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getLocalPath());
 
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
-        RunResults results = runCore.runMethod(projectLocalPath,
+        RunResults results = runCore.runMethodWithTests(projectLocalPath,
                 StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
+                StringUtils.getClassRootFromClassPath(classPaths[classPaths.length], "java" + File.separator),
                 classPaths,
-                PreProcessors.lessonsMain,
+                PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
-                Runners.main,
+                Runners.test,
                 ResultsProcessors.main);
-
-        // rewrite original content again (reset to original state)
-        commonIOUtils.deleteAndWrite(solutionClassPath, originalContent);
 
         return results;
     }

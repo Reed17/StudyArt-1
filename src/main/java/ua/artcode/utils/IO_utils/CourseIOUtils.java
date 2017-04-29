@@ -22,9 +22,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -59,7 +61,7 @@ public class CourseIOUtils {
      * @return path where project has been saved
      */
     public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
-        String projectPath = generatePath(courseName,courseID);
+        String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
             if (projectDirectory.exists()) {
@@ -103,6 +105,21 @@ public class CourseIOUtils {
                 .collect(Collectors.toList());
     }
 
+    public Lesson getLessonByID(String courseLocalPath, int id) throws IOException {
+
+        return Files.walk(Paths.get(courseLocalPath))
+                .map(Path::toString)
+                .filter(path -> path.endsWith("lesson"))
+                .filter(path -> path.contains(String.valueOf(id)))
+                .map(path -> {
+                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
+                    return new Lesson(lessonName, path);
+                })
+                .findFirst()
+                .get();
+
+    }
+
     /**
      * Save code locally
      * 1. Parse className from code (3rd word - public class NAME {...}
@@ -135,7 +152,10 @@ public class CourseIOUtils {
     }
 
     public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
-        return commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
+        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
+        String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
+        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
+                .toArray(String[]::new);
     }
 
     /**
@@ -161,7 +181,7 @@ public class CourseIOUtils {
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-        invoker.setMavenHome(new File(mvnHome));
+//        invoker.setMavenHome(new File(mvnHome));
 
         try {
             invoker.execute(request);

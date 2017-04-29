@@ -6,7 +6,7 @@ maven:
   goals:
     copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
   # path to maven directory where /bin located (/usr/share/maven)
-  home: /usr/share/maven
+  home: M2_HOME
 
 serverLink: "http://localhost:8080"
   # create account and stop using my)
