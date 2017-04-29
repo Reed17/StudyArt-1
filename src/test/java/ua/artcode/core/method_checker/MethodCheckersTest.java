@@ -8,21 +8,18 @@ import static org.junit.Assert.fail;
 public class MethodCheckersTest {
     Class classWithMain;
     Class classWithTest;
-    Class[] classes;
 
     @Before
     public void beforeTest() {
         classWithMain = ClassWithMain.class;
         classWithTest = MethodCheckersTest.class;
-        classes = new Class[1];
 
     }
 
     @Test
     public void testPositiveCheckerMain() {
-        classes[0] = classWithMain;
         try {
-            MethodCheckers.main.checkClasses(classes);
+            MethodCheckers.main.checkClasses(new Class[] {classWithMain});
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             fail("Main Method Not Found!");
@@ -31,16 +28,14 @@ public class MethodCheckersTest {
 
     @Test(expected = NoSuchMethodException.class)
     public void testNegativeCheckerMain() throws NoSuchMethodException {
-        classes[0] = classWithTest;
-        MethodCheckers.main.checkClasses(classes);
+        MethodCheckers.main.checkClasses(new Class[] {classWithTest});
 
     }
 
     @Test
     public void testPositiveCheckerTest() {
-        classes[0] = classWithTest;
         try {
-            MethodCheckers.testChecker.checkClasses(classes);
+            MethodCheckers.testChecker.checkClasses(new Class[] {classWithTest});
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             fail("@Test Method Not Found!");
@@ -49,8 +44,7 @@ public class MethodCheckersTest {
 
     @Test(expected = NoSuchMethodException.class)
     public void testNegativeCheckerTest() throws NoSuchMethodException {
-        classes[0] = classWithMain;
-        MethodCheckers.testChecker.checkClasses(classes);
+        MethodCheckers.testChecker.checkClasses(new Class[] {classWithMain});
 
     }
 
