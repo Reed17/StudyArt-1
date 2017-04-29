@@ -28,18 +28,26 @@ import java.io.IOException;
 public class UserController {
     private static final Logger LOGGER = Logger.getLogger(UserController.class);
 
-    @Autowired
-    private StudentService studentService;
+    private final StudentService studentService;
+
+    private final TeacherService teacherService;
 
     @Autowired
-    private TeacherService teacherService;
+    public UserController(StudentService studentService, TeacherService teacherService) {
+        this.studentService = studentService;
+        this.teacherService = teacherService;
+    }
 
     @ApiOperation(httpMethod = "POST",
             value = "Resource to register new user",
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public User registerUser(@RequestParam String login, @RequestParam String email, @RequestParam String pass, @RequestParam String type,
+    // todo usecure passing of params
+    // return general response
+    // see how to throw an exception to client, ExceptionHandler
+    public User registerUser(@RequestParam String login, @RequestParam String email, @RequestParam String pass,
+                             @RequestParam String type,
                              HttpServletRequest request, HttpServletResponse response) {
         User newUser = null;
 
@@ -60,6 +68,7 @@ public class UserController {
                 response.getWriter().flush();
                 response.getWriter().close();
             } catch (IOException e1) {
+                // todo logger
                 e1.printStackTrace();
             }
         }
@@ -73,6 +82,7 @@ public class UserController {
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
+    // todo use the id as String
     public User activateUser(@RequestParam int id) {
         User activatedUser = teacherService.activate(id);
 
