@@ -18,6 +18,7 @@ import ua.artcode.service.TeacherService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Created by zhenia on 27.04.17.
@@ -53,6 +54,14 @@ public class UserController {
         } catch (Throwable e) {
             LOGGER.warn("Registration - FAILED, msg = " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            try {
+                response.getWriter().write(e.getMessage());
+                response.getWriter().flush();
+                response.getWriter().close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
 
         return newUser;
