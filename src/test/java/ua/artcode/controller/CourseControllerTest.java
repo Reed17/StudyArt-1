@@ -103,14 +103,14 @@ public class CourseControllerTest {
     public void testRunClassPositive() throws Exception {
         ExternalCode code = new ExternalCode("public class test " +
                 "{\npublic static void main(String[] args) " +
-                "{\nSystem.out.println(2+2);\n}\n}\n");
+                "{\nSystem.out.print(2+2);\n}\n}\n");
 
         mockMvc.perform(post("/run-class")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(code))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.methodResult.systemOut").value("4\n"));
+                .andExpect(jsonPath("$.methodResult.systemOut").value("4"));
     }
 
     @Test
