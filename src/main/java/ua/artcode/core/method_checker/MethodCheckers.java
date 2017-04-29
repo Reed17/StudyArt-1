@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.el.MethodNotFoundException;
 import java.util.Arrays;
 
 /**
@@ -18,16 +17,16 @@ public class MethodCheckers {
     {
         if (!Arrays.stream(classes)
                 .allMatch(cls -> Arrays.stream(cls.getDeclaredMethods())
-                        .anyMatch(method -> method.isAnnotationPresent(Test.class)))){
+                        .anyMatch(method -> method.isAnnotationPresent(Test.class)))) {
             LOGGER.error("Check classes for methods/annotations - FAILED. @Test methods not found");
             throw new NoSuchMethodException("@Test methods not found");
         }
     });
 
     public static MethodChecker main = (classes -> {
-        if(!Arrays.stream(classes)
+        if (!Arrays.stream(classes)
                 .allMatch(cls -> Arrays.stream(cls.getDeclaredMethods())
-                        .anyMatch(method -> method.getName().equals("main")))){
+                        .anyMatch(method -> method.getName().equals("main")))) {
             LOGGER.error("Check classes for methods/annotations - FAILED. Main method not found");
             throw new NoSuchMethodException("Main method not found");
         }

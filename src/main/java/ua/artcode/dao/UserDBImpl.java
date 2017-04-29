@@ -1,5 +1,6 @@
 package ua.artcode.dao;
 
+import org.springframework.stereotype.Component;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.model.User;
@@ -10,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by zhenia on 23.04.17.
  */
+@Component
 public class UserDBImpl <T extends User> implements UserDB <T> {
     private Map<Integer, T> users;
 
@@ -19,7 +21,8 @@ public class UserDBImpl <T extends User> implements UserDB <T> {
 
     @Override
     public T add(T user) {
-        return users.put(user.getId(), user);
+        users.put(user.getId(), user);
+        return user;
     }
 
     @Override
@@ -29,26 +32,20 @@ public class UserDBImpl <T extends User> implements UserDB <T> {
 
     @Override
     public T getUserByLogin(String login) throws InvalidUserLoginException {
-        T searchRes = users.values()
+
+        return users.values()
                 .stream()
                 .filter(u -> u.getLogin().equals(login))
-                .findFirst().orElse(null);
-
-        if(searchRes == null) throw new InvalidUserLoginException("No users with that login");
-
-        return searchRes;
+                .findFirst().orElseThrow(() -> new InvalidUserLoginException("No users with that login"));
     }
 
     @Override
     public T getUserByEmail(String email) throws InvalidUserEmailException {
-        T searchRes = users.values()
+
+        return users.values()
                 .stream()
                 .filter(u -> u.getEmail().equals(email))
-                .findFirst().orElse(null);
-
-        if(searchRes == null) throw new InvalidUserEmailException("No users with that email");
-
-        return searchRes;
+                .findFirst().orElseThrow(() -> new InvalidUserEmailException("No users with that email"));
     }
 
     @Override
@@ -60,15 +57,13 @@ public class UserDBImpl <T extends User> implements UserDB <T> {
     public boolean containsLogin(String login) {
         return users.values()
                 .stream()
-                .filter(u -> u.getLogin().equals(login))
-                .findFirst().orElse(null) != null;
+                .anyMatch(u -> u.getLogin().equals(login));
     }
 
     @Override
     public boolean containsEmail(String email) {
         return users.values()
                 .stream()
-                .filter(u -> u.getEmail().equals(email))
-                .findFirst().orElse(null) != null;
+                .anyMatch(u -> u.getEmail().equals(email));
     }
 }

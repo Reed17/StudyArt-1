@@ -10,8 +10,10 @@ import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.MethodStats;
+import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
 
@@ -27,10 +29,19 @@ import java.lang.reflect.InvocationTargetException;
 public class RunCore {
     private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
 
-    @Autowired
-    private CommonIOUtils ioUtils;
+    private final CommonIOUtils ioUtils;
 
-    public RunResults runMethod(String[] classPaths,
+    private final CourseIOUtils courseIOUtils;
+
+    @Autowired
+    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils) {
+        this.ioUtils = ioUtils;
+        this.courseIOUtils = courseIOUtils;
+    }
+
+    public RunResults runMethod(String projectRoot,
+                                String sourcesRoot,
+                                String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
                                 MethodChecker checker,
                                 MethodRunner runner,
@@ -40,20 +51,30 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
+        // todo this step must be extracted somewhere else - it reduces performance dramatically
+        // download and save maven dependencies
+        if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
+            LOGGER.error("Maven dependencies download - FAILED");
+            return new RunResults(
+                    new GeneralResponse(ResponseType.ERROR,"Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
+        }
+        LOGGER.info("Maven dependencies download - OK.");
+
+
         // compile, save results and return it if there are any errors
-        String compilationErrors = RunUtils.compile(classPaths);
+        String compilationErrors = RunUtils.compile(projectRoot, classPaths);
 
         // checking for compilation errors
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
-            return new RunResults(new GeneralResponse(compilationErrors));
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, compilationErrors));
         }
         LOGGER.info("Compilation - OK");
 
         // prepare array with classes
-        Class<?>[] classes = preProcessor.getClasses(classPaths);
+        Class<?>[] classes = preProcessor.getClasses(projectRoot, sourcesRoot, classPaths);
 
-        // checking method(s) needed
+        // checking methods/annotations needed
         checker.checkClasses(classes);
 
         LOGGER.info("Check classes for methods/annotations - OK");

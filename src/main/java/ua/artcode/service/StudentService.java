@@ -1,18 +1,23 @@
 package ua.artcode.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 import ua.artcode.dao.UserDB;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
+import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
 /**
  * Created by zhenia on 24.04.17.
  */
+@Service
 public class StudentService implements UserService<Student> {
 
     @Autowired
@@ -41,7 +46,9 @@ public class StudentService implements UserService<Student> {
 
         Student newStudent = studentDB.add(new Student(login, securityUtils.encryptPass(pass), email));
 
-        // TODO email sending
+        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
+        MailUtils mu = (MailUtils) context.getBean("mailUtils");
+        mu.sendEmail("${emailUsername}", newStudent.getEmail(), "Registration", mu.getActivationLink(newStudent));
 
         return newStudent;
     }

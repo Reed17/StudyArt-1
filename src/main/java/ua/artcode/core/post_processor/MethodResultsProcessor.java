@@ -7,7 +7,7 @@ import ua.artcode.model.response.RunResults;
 /**
  * Created by v21k on 16.04.17.
  */
-
+@FunctionalInterface
 public interface MethodResultsProcessor {
     /**
      * Processing results from MethodRunner

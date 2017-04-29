@@ -1,3 +1,11 @@
 pathForGitProjects: course
 pathForExternalCodeCompiling: ext
 GitURL: https://github.com/v21k/TestGitProject.git
+coreTestDir: coreTest
+
+maven:
+  dependenciesPath: dependencies
+  goals:
+    copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
+  # path to maven directory where /bin located (/usr/share/maven)
+  home: /usr/share/maven

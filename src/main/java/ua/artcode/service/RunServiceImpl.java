@@ -11,12 +11,14 @@ import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
+import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.StringUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
@@ -47,7 +49,14 @@ public class RunServiceImpl implements RunService {
             NoSuchMethodException {
         String path = courseIOUtils.saveExternalCodeLocally(code.getSourceCode());
         String[] classes = {path};
-        return runCore.runMethod(classes, PreProcessors.singleClass, MethodCheckers.main, Runners.main, ResultsProcessors.main);
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        return runCore.runMethod(StringUtils.getClassRootFromClassPath(classes[0], File.separator),
+                StringUtils.getClassRootFromClassPath(classes[0], File.separator),
+                classes,
+                PreProcessors.singleClass,
+                MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
     }
 
     @Override
@@ -61,7 +70,15 @@ public class RunServiceImpl implements RunService {
             IllegalAccessException,
             NoSuchMethodException {
         String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
-        return runCore.runMethod(classPaths, PreProcessors.lessonsMain, MethodCheckers.main, Runners.main, ResultsProcessors.main);
+        Course course = courseDB.getCourseByID(courseId);
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        return runCore.runMethod(course.getLocalPath(),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
+                classPaths,
+                PreProcessors.lessonsMain,
+                MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
     }
 
 
@@ -93,8 +110,16 @@ public class RunServiceImpl implements RunService {
         // delete old content and write new (with solution)
         commonIOUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
 
+        Course course = courseDB.getCourseByID(courseId);
+
         // run main (tests in psvm)
-        RunResults results = runCore.runMethod(classPaths, PreProcessors.lessonsMain, MethodCheckers.main, Runners.main,
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        RunResults results = runCore.runMethod(course.getLocalPath(),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
+                classPaths,
+                PreProcessors.lessonsMain,
+                MethodCheckers.main,
+                Runners.main,
                 ResultsProcessors.main);
 
         // rewrite original content again (reset to original state)

@@ -19,11 +19,6 @@ public class StringUtils {
                 classPath.lastIndexOf(".")).replace(File.separator, ".");
     }
 
-    public static String[] getClassNameAndRootFolder(String classPath, String delimiter) {
-        return new String[]{getClassNameFromClassPath(classPath, delimiter),
-                getClassRootFromClassPath(classPath, delimiter)};
-    }
-
     public static String getClassPathByClassName(String[] classPaths, String className) throws ClassNotFoundException {
         return Arrays.stream(classPaths)
                 .filter(classPath -> classPath.toLowerCase().contains(className.toLowerCase())
