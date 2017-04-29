@@ -1,22 +1,19 @@
 package ua.artcode.core.post_processor;
 
 import ua.artcode.core.method_runner.MethodRunner;
+import ua.artcode.model.response.MethodStats;
 import ua.artcode.model.response.RunResults;
 
 /**
  * Created by v21k on 16.04.17.
  */
-
+@FunctionalInterface
 public interface MethodResultsProcessor {
     /**
-     * Processing results from MethodRunner(string)
+     * Processing results from MethodRunner
      *
-     * @param methodOutput String array with next info:
-     *                     1. index 0 - runtime exceptions
-     *                     2. index 1 - system.out
-     *                     3. index 2 - methodOutput
      * @return RunResult model with all info
      * @see MethodRunner
      */
-    RunResults process(String[] methodOutput);
+    RunResults process(MethodStats stats, String systemErr, String systemOut);
 }

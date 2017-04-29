@@ -4,12 +4,14 @@ package ua.artcode.model.response;
  * Created by v21k on 15.04.17.
  */
 public class GeneralResponse {
+    private ResponseType type;
     private String message;
 
     public GeneralResponse() {
     }
 
-    public GeneralResponse(String message) {
+    public GeneralResponse(ResponseType type, String message) {
+        this.type = type;
         this.message = message;
     }
 
@@ -21,10 +23,19 @@ public class GeneralResponse {
         this.message = message;
     }
 
+    public ResponseType getType() {
+        return type;
+    }
+
+    public void setType(ResponseType type) {
+        this.type = type;
+    }
+
     @Override
     public String toString() {
         return "GeneralResponse{" +
-                "message='" + message + '\'' +
+                "type=" + type +
+                ", message='" + message + '\'' +
                 '}';
     }
 }

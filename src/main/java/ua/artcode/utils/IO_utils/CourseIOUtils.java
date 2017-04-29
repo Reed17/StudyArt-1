@@ -1,5 +1,6 @@
 package ua.artcode.utils.IO_utils;
 
+import org.apache.maven.shared.invoker.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,12 @@ public class CourseIOUtils {
     private String localPathForProjects;
     @Value("${pathForExternalCodeCompiling}")
     private String localPathForExternalCode;
+    @Value("${maven.dependenciesPath}")
+    private String mvnDependencyDownloadPath;
+    @Value("${maven.goals.copyToDirectory}")
+    private String mvnCopyToDirectory;
+    @Value("${maven.home}")
+    private String mvnHome;
 
     @Autowired
     private CommonIOUtils commonIOUtils;
@@ -61,7 +69,10 @@ public class CourseIOUtils {
             Git.cloneRepository()
                     .setURI(course.getUrl())
                     .setDirectory(projectDirectory)
-                    .call();
+                    .call()
+                    .getRepository()
+                    .close();
+//            clone.getRepository().close()
         } catch (IOException e) {
             throw new DirectoryCreatingException("Unable to create a directory for course: " + course.getName());
         }
@@ -85,7 +96,7 @@ public class CourseIOUtils {
                 .map(Path::toString)
                 .filter(path -> path.endsWith("lesson"))
                 .map(path -> {
-                    String lessonName = path.substring(path.lastIndexOf("/") + 1);
+                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
                     return new Lesson(lessonName, path);
                 })
                 .sorted()
@@ -112,7 +123,7 @@ public class CourseIOUtils {
 
         Files.write(sourceFile.toPath(), code.getBytes(), StandardOpenOption.CREATE);
 
-        return localPathForExternalCode + "/" + javaClassName;
+        return localPathForExternalCode + File.separator + javaClassName;
     }
 
     public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
@@ -122,8 +133,59 @@ public class CourseIOUtils {
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 
-    private String generatePath(Course course) {
-        return localPathForProjects + "/" + course.getId() + course.getName() + "/";
+    /**
+     * Saving locally all dependencies from pom.xml locally
+     * Uses 3 values from application.properties:
+     * 1. maven.home
+     * 2. maven.dependenciesPath - where files will be saved
+     * 3. maven.goals.copyToDirectory - maven goal (copy and save files locally)
+     * So you need to specify these 3 values before using application.
+     *
+     * @param projectRoot root folder for project (not src/ or java/, just regular project folder
+     * @return true if saved successfully, false otherwise
+     */
+    public boolean saveMavenDependenciesLocally(String projectRoot) {
+        // todo declare beans for both
+        InvocationRequest request = new DefaultInvocationRequest();
+        Invoker invoker = new DefaultInvoker();
+
+        projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
+
+        String pomPath = generatePomPath(projectRoot);
+        String mavenGoal = generateMavenGoal(projectRoot);
+
+        request.setPomFile(new File(pomPath));
+        request.setGoals(Collections.singletonList(mavenGoal));
+        invoker.setMavenHome(new File(mvnHome));
+
+        try {
+            invoker.execute(request);
+        } catch (MavenInvocationException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
     }
 
+    private String generatePomPath(String projectRoot) {
+        projectRoot = checkEndsWithSeparator(projectRoot);
+        return projectRoot + "pom.xml";
+
+    }
+
+    private String generateMavenGoal(String projectRoot) {
+        projectRoot = checkEndsWithSeparator(projectRoot);
+        return mvnCopyToDirectory
+                + projectRoot
+                + mvnDependencyDownloadPath;
+    }
+
+    private String checkEndsWithSeparator(String path) {
+        return path.endsWith(File.separator) ? path : path + File.separator;
+    }
+
+    private String generatePath(Course course) {
+        return localPathForProjects + File.separator + course.getId() + course.getName() + File.separator;
+    }
 }

@@ -2,6 +2,7 @@ package ua.artcode.utils;
 
 import ua.artcode.model.ExternalCode;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
@@ -15,12 +16,7 @@ public class StringUtils {
 
     public static String getClassNameFromClassPath(String classPath, String delimiter) {
         return classPath.substring(classPath.lastIndexOf(delimiter) + delimiter.length(),
-                classPath.lastIndexOf(".")).replace("/", ".");
-    }
-
-    public static String[] getClassNameAndRootFolder(String classPath, String delimiter) {
-        return new String[]{getClassNameFromClassPath(classPath, delimiter),
-                getClassRootFromClassPath(classPath, delimiter)};
+                classPath.lastIndexOf(".")).replace(File.separator, ".");
     }
 
     public static String getClassPathByClassName(String[] classPaths, String className) throws ClassNotFoundException {

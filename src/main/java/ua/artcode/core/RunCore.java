@@ -4,13 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.artcode.core.method_checkers.MethodChecker;
+import ua.artcode.core.method_checker.MethodChecker;
 import ua.artcode.core.method_runner.MethodRunner;
 import ua.artcode.core.post_processor.MethodResultsProcessor;
 import ua.artcode.core.pre_processor.MethodRunnerPreProcessor;
 import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.MethodStats;
+import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
 
@@ -24,16 +27,21 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Component
 public class RunCore {
-    // constants with indexes for paths array (which contains Course className and root package).
-    private static final int MAIN_CLASS_PATH = 0;
-    private static final int MAIN_CLASS_ROOT_PACKAGE = 1;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
 
-    @Autowired
-    private CommonIOUtils ioUtils;
+    private final CommonIOUtils ioUtils;
 
-    public RunResults runMethod(String[] classPaths,
+    private final CourseIOUtils courseIOUtils;
+
+    @Autowired
+    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils) {
+        this.ioUtils = ioUtils;
+        this.courseIOUtils = courseIOUtils;
+    }
+
+    public RunResults runMethod(String projectRoot,
+                                String sourcesRoot,
+                                String[] classPaths,
                                 MethodRunnerPreProcessor preProcessor,
                                 MethodChecker checker,
                                 MethodRunner runner,
@@ -43,54 +51,45 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
-        // compile, save results and return it if there are any errors
-        String compilationErrors = RunUtils.compile(classPaths);
+        // todo this step must be extracted somewhere else - it reduces performance dramatically
+        // download and save maven dependencies
+        if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
+            LOGGER.error("Maven dependencies download - FAILED");
+            return new RunResults(
+                    new GeneralResponse(ResponseType.ERROR,"Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
+        }
+        LOGGER.info("Maven dependencies download - OK.");
 
+
+        // compile, save results and return it if there are any errors
+        String compilationErrors = RunUtils.compile(projectRoot, classPaths);
+
+        // checking for compilation errors
         if (compilationErrors.length() > 0) {
             LOGGER.error(String.format("Compilation FAILED, errors: %s", compilationErrors));
-            return new RunResults(new GeneralResponse(compilationErrors));
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, compilationErrors));
         }
         LOGGER.info("Compilation - OK");
 
-        // prepare array with main class path and it's root package
-        String[] paths = preProcessor.getPaths(classPaths);
+        // prepare array with classes
+        Class<?>[] classes = preProcessor.getClasses(projectRoot, sourcesRoot, classPaths);
 
-        // getting a class
-        Class<?> cls = RunUtils.getClass(paths[MAIN_CLASS_PATH], paths[MAIN_CLASS_ROOT_PACKAGE]);
+        // checking methods/annotations needed
+        checker.checkClasses(classes);
 
-        // checking method(s) needed
-        if (!checker.checkMethods(cls)) {
-            LOGGER.error("Method check - FAILED. Can't fine required method in class " + cls.getName());
-            return new RunResults(new GeneralResponse("Can't find required method(s)"));
-        }
-        LOGGER.info("Method check - OK");
+        LOGGER.info("Check classes for methods/annotations - OK");
 
         // call runner
-        String[] methodOutput = callRunner(runner, cls);
-
-        // return RunResult
-        return postProcessor.process(methodOutput);
-    }
-
-    /**
-     * @return String array with next info:
-     * 1. index 0 - runtime exceptions
-     * 2. index 1 - system.out
-     * 3. index 2 - methodOutput
-     */
-    private String[] callRunner(MethodRunner runner, Class<?> cls)
-            throws IOException, NoSuchMethodException, IllegalAccessException {
-
         String systemError = null;
         String systemOut = null;
-        String methodOutput = null;
+        MethodStats stats = null;
 
         try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
             PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
             // call method
             try {
-                methodOutput = runner.runMethod(cls);
+                stats = runner.runMethod(classes);
                 systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
                 LOGGER.info("Method call - OK");
             } catch (InvocationTargetException e) {
@@ -100,9 +99,9 @@ public class RunCore {
                 ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
                 LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
             }
-
-
-            return new String[]{systemError, systemOut, methodOutput};
         }
+
+        // return RunResult
+        return postProcessor.process(stats, systemError, systemOut);
     }
 }
