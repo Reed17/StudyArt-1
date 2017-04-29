@@ -24,11 +24,15 @@ public class CourseController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
-    @Autowired
-    private CourseService courseService;
+    private final CourseService courseService;
+
+    private final RunService runService;
 
     @Autowired
-    private RunService runService;
+    public CourseController(CourseService courseService, RunService runService) {
+        this.courseService = courseService;
+        this.runService = runService;
+    }
 
     @ApiOperation(httpMethod = "GET",
             value = "Resource to get a course",

@@ -29,11 +29,15 @@ import java.lang.reflect.InvocationTargetException;
 public class RunCore {
     private static final Logger LOGGER = LoggerFactory.getLogger(RunCore.class);
 
-    @Autowired
-    private CommonIOUtils ioUtils;
+    private final CommonIOUtils ioUtils;
+
+    private final CourseIOUtils courseIOUtils;
 
     @Autowired
-    private CourseIOUtils courseIOUtils;
+    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils) {
+        this.ioUtils = ioUtils;
+        this.courseIOUtils = courseIOUtils;
+    }
 
     public RunResults runMethod(String projectRoot,
                                 String sourcesRoot,
