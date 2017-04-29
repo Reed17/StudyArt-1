@@ -1,8 +1,12 @@
 package ua.artcode.service;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import ua.artcode.exceptions.CourseNotFoundException;
+import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
+import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.RunResults;
 
@@ -18,4 +22,14 @@ public interface RunService {
     RunResults runLesson(int courseId, int lessonNumber) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException;
 
     RunResults runLessonWithSolution(int courseId, int lessonNumber, ExternalCode code) throws InvalidIDException, CourseNotFoundException, LessonNotFoundException, ClassNotFoundException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+
+    RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource)
+            throws InvalidIDException,
+            CourseNotFoundException,
+            LessonNotFoundException,
+            ClassNotFoundException,
+            IOException,
+            InvocationTargetException,
+            IllegalAccessException,
+            NoSuchMethodException, GitAPIException, DirectoryCreatingException;
 }

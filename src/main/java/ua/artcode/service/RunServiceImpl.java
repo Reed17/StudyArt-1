@@ -1,5 +1,6 @@
 package ua.artcode.service;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.core.RunCore;
@@ -9,9 +10,11 @@ import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
+import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
@@ -73,7 +76,7 @@ public class RunServiceImpl implements RunService {
         Course course = courseDB.getCourseByID(courseId);
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         return runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -115,10 +118,47 @@ public class RunServiceImpl implements RunService {
         // run main (tests in psvm)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethod(course.getLocalPath(),
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java"+File.separator),
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
                 classPaths,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
+                Runners.main,
+                ResultsProcessors.main);
+
+        // rewrite original content again (reset to original state)
+        commonIOUtils.deleteAndWrite(solutionClassPath, originalContent);
+
+        return results;
+    }
+
+
+    @Override
+    public RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource)
+            throws InvalidIDException,
+            CourseNotFoundException,
+            LessonNotFoundException,
+            ClassNotFoundException,
+            IOException,
+            InvocationTargetException,
+            IllegalAccessException,
+            NoSuchMethodException,
+            GitAPIException,
+            DirectoryCreatingException {
+
+        String projectLocalPath = courseIOUtils.saveLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
+
+        Course course = courseDB.getCourseByID(courseId);
+
+
+        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(courseId, lessonNumber, courseDB);
+
+        // run main (tests classes)
+        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        RunResults results = runCore.runMethod(projectLocalPath,
+                StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
+                classPaths,
+                PreProcessors.lessonsMain,
+                MethodCheckers.testChecker,
                 Runners.main,
                 ResultsProcessors.main);
 

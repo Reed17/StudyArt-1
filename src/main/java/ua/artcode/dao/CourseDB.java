@@ -34,7 +34,7 @@ public class CourseDB implements StudyArtDB {
         }
         try {
             course.setId(courseMap.size() + 1);
-            course.setLocalPath(courseIOUtils.saveLocally(course));
+            course.setLocalPath(courseIOUtils.saveLocally(course.getUrl(), course.getName(), course.getId()));
             course.setLessons(courseIOUtils.getLessons(course));
         } catch (IOException e) {
             throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
