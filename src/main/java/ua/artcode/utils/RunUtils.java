@@ -36,11 +36,11 @@ public class RunUtils {
     public static String compile(String projectRoot, String[] classPaths) throws IOException {
         // diagnostics - to collect compilation errors
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
+//        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
 
         // .jar files (will be added to classpath) - must be concatenated with ":" delimiter
         String jarPathsAsString = getJarPaths(projectRoot).stream()
-                .map(path -> path + ":")
+                .map(path -> path + File.pathSeparator)
                 .collect(Collectors.joining());
 
         // option list ---> "javac [options...]"
@@ -54,7 +54,7 @@ public class RunUtils {
 
         // task for compiler
         JavaCompiler.CompilationTask task = null;
-        try {
+        try (StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);) {
             task = COMPILER.getTask(null,
                     fileManager,
                     diagnostics,
@@ -70,32 +70,44 @@ public class RunUtils {
         task.call();
 
         // collect and return compilation errors
-        return diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
+        String errors = diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
+        return errors;
     }
 
-    public static Class<?>[] getClass(String projectRoot, String sourcesRoot, String[] classNames)
+    public static Class<?>[] getClass(String[] classNames, URLClassLoader urlClassLoader)
             throws IOException,
             ClassNotFoundException {
 
-        // getting classLoader instance
-        URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
 
         Class<?>[] classes = new Class[classNames.length];
         // no streams because of exception handling
-        for (int i = 0; i < classNames.length; i++) {
-            classes[i] = Class.forName(classNames[i], true, classLoader);
-        }
+
+//        // getting classLoader instance
+//        URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+
+
+//        try (
+//                // getting classLoader instance
+//                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+//        ) {
+            for (int i = 0; i < classNames.length; i++) {
+                classes[i] = Class.forName(classNames[i], true, urlClassLoader);
+            }
+//        }
+
+//        classLoader.close();
+
         return classes;
     }
 
     /**
      * Convert all necessary paths to URL and return URLClassLoader instance
      */
-    private static URLClassLoader getUrlClassLoader(String projectRoot, String sourcesRoot) throws IOException {
+    public static URLClassLoader getUrlClassLoader(String projectRoot, String sourcesRoot) throws IOException {
         // get all necessary paths as URLs
         URL[] classPaths = getClassPathsAsURLs(projectRoot, sourcesRoot);
         // pass them to ClassLoader
-        return URLClassLoader.newInstance(classPaths);
+        return new URLClassLoader(classPaths);
     }
 
     /**

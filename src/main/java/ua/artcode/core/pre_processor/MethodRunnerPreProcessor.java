@@ -5,6 +5,7 @@ package ua.artcode.core.pre_processor;
  */
 
 import java.io.IOException;
+import java.net.URLClassLoader;
 
 /**
  * This functional interface is using for getting paths for
@@ -12,6 +13,6 @@ import java.io.IOException;
  **/
 @FunctionalInterface
 public interface MethodRunnerPreProcessor {
-    Class<?>[] getClasses(String projectRoot, String sourcesRoot, String[] classPaths)
+    Class<?>[] getClasses(String[] classPaths, URLClassLoader classLoader)
             throws ClassNotFoundException, IOException;
 }

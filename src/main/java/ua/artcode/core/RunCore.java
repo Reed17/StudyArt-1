@@ -21,6 +21,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URLClassLoader;
+
+import static ua.artcode.utils.RunUtils.getUrlClassLoader;
 
 /**
  * Created by v21k on 15.04.17.
@@ -53,7 +56,7 @@ public class RunCore {
         if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
             LOGGER.error("Maven dependencies download - FAILED");
             return new RunResults(
-                    new GeneralResponse(ResponseType.ERROR,"Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
+                    new GeneralResponse(ResponseType.ERROR, "Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
         }
         LOGGER.info("Maven dependencies download - OK.");
 
@@ -68,49 +71,56 @@ public class RunCore {
         }
         LOGGER.info("Compilation - OK");
 
-        // prepare array with classes
-        Class<?>[] classes = preProcessor.getClasses(projectRoot, sourcesRoot, classPaths);
+        try (
+                // getting classLoader instance
+                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+        ) {
 
-        // checking methods/annotations needed
-        checker.checkClasses(classes);
+            // prepare array with classes
+            Class<?>[] classes = preProcessor.getClasses(classPaths, classLoader);
 
-        LOGGER.info("Check classes for methods/annotations - OK");
+            // checking methods/annotations needed
+            checker.checkClasses(classes);
 
-        // call runner
-        String systemError = null;
-        String systemOut = null;
-        MethodStats stats = null;
+            LOGGER.info("Check classes for methods/annotations - OK");
 
-        try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
-            PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
+            // call runner
+            String systemError = null;
+            String systemOut = null;
+            MethodStats stats = null;
 
-            // call method
-            try {
-                stats = runner.runMethod(classes);
-                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.info("Method call - OK");
-            } catch (InvocationTargetException e) {
-                // save exception message
-                systemError = StringUtils.getInvocationTargetExceptionInfo(e);
-                //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
-                ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
+            try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
+                PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
+
+                // call method
+                try {
+                    stats = runner.runMethod(classes);
+                    systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                    LOGGER.info("Method call - OK");
+                } catch (InvocationTargetException e) {
+                    // save exception message
+                    systemError = StringUtils.getInvocationTargetExceptionInfo(e);
+                    //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
+                    ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                    LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
+                }
             }
-        }
 
-        // return RunResult
-        return postProcessor.process(stats, systemError, systemOut);
+            classLoader.close();
+            // return RunResult
+            return postProcessor.process(stats, systemError, systemOut);
+        }
     }
 
 
     public RunResults runMethodWithTests(String projectRoot,
-                                String sourcesRoot,
-                                String testsRoot,
-                                String[] classPaths,
-                                MethodRunnerPreProcessor preProcessor,
-                                MethodChecker checker,
-                                MethodRunner runner,
-                                MethodResultsProcessor postProcessor)
+                                         String sourcesRoot,
+                                         String testsRoot,
+                                         String[] classPaths,
+                                         MethodRunnerPreProcessor preProcessor,
+                                         MethodChecker checker,
+                                         MethodRunner runner,
+                                         MethodResultsProcessor postProcessor)
             throws IOException,
             ClassNotFoundException,
             NoSuchMethodException,
@@ -121,7 +131,7 @@ public class RunCore {
         if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
             LOGGER.error("Maven dependencies download - FAILED");
             return new RunResults(
-                    new GeneralResponse(ResponseType.ERROR,"Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
+                    new GeneralResponse(ResponseType.ERROR, "Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
         }
         LOGGER.info("Maven dependencies download - OK.");
 
@@ -136,37 +146,42 @@ public class RunCore {
         }
         LOGGER.info("Compilation - OK");
 
-        // prepare array with classes
-        Class<?>[] classes = preProcessor.getClasses(projectRoot, sourcesRoot, classPaths);
+        try (
+                // getting classLoader instance
+                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+        ) {
+            // prepare array with classes
+            Class<?>[] classes = preProcessor.getClasses(classPaths, classLoader);
 
-        // checking methods/annotations needed
-        checker.checkClasses(classes);
+            // checking methods/annotations needed
+            checker.checkClasses(classes);
 
-        LOGGER.info("Check classes for methods/annotations - OK");
+            LOGGER.info("Check classes for methods/annotations - OK");
 
-        // call runner
-        String systemError = null;
-        String systemOut = null;
-        MethodStats stats = null;
+            // call runner
+            String systemError = null;
+            String systemOut = null;
+            MethodStats stats = null;
 
-        try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
-            PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
+            try (ByteArrayOutputStream redirectedSystemOut = new ByteArrayOutputStream()) {
+                PrintStream systemOutOld = ioUtils.redirectSystemOut(redirectedSystemOut);
 
-            // call method
-            try {
-                stats = runner.runMethod(classes);
-                systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.info("Method call - OK");
-            } catch (InvocationTargetException e) {
-                // save exception message
-                systemError = StringUtils.getInvocationTargetExceptionInfo(e);
-                //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
-                ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
-                LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
+                // call method
+                try {
+                    stats = runner.runMethod(classes);
+                    systemOut = ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                    LOGGER.info("Method call - OK");
+                } catch (InvocationTargetException e) {
+                    // save exception message
+                    systemError = StringUtils.getInvocationTargetExceptionInfo(e);
+                    //redirecting s.out back so we can use logger (and logger's message will not be processed in post-proc)
+                    ioUtils.resetSystemOut(redirectedSystemOut, systemOutOld);
+                    LOGGER.error("Method call - FAILED. Caused by: {}", systemError);
+                }
             }
-        }
 
-        // return RunResult
-        return postProcessor.process(stats, systemError, systemOut);
+            // return RunResult
+            return postProcessor.process(stats, systemError, systemOut);
+        }
     }
 }
