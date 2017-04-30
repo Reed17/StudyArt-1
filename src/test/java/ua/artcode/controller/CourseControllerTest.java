@@ -3,6 +3,7 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 
 import java.io.File;
@@ -156,6 +158,23 @@ public class CourseControllerTest {
                 .andExpect(content().string(is(containsString("7"))))
                 .andExpect(content().string(is(containsString("9"))));
     }
+
+//    @Ignore
+    @Test
+    public void testRunLessonWithSolutionWithTestsPositive() throws Exception {
+
+        CourseFromUser courseFromUser = new CourseFromUser(1, "TestGitProject", "https://github.com/Maks9/TestGitProject.git");
+        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
+
+        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(courseFromUser)))
+                .andExpect(status().isOk())
+                .andExpect(content().string(is(not(containsString("error")))))
+                .andExpect(content().string(is(containsString("7"))))
+                .andExpect(content().string(is(containsString("9"))));
+    }
+
 
     @Test
     public void testRunLessonWithSolutionNegative() throws Exception {

@@ -149,17 +149,21 @@ public class RunServiceImpl implements RunService {
 
         String projectLocalPath = courseIOUtils.saveLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
-        Course course = courseDB.getCourseByID(courseId);
+//        Course course = courseDB.getCourseByID(courseId);
 
         Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
 
         String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getLocalPath());
 
+        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
+        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length-1], "java" + File.separator);
+
+
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethodWithTests(projectLocalPath,
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
-                StringUtils.getClassRootFromClassPath(classPaths[classPaths.length], "java" + File.separator),
+                srcClassRoot,
+                testClassRoot,
                 classPaths,
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
