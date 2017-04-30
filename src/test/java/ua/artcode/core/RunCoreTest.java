@@ -84,7 +84,7 @@ public class RunCoreTest {
 
     @Test
     public void testRunClassWithMainPositive() throws Exception {
-        String classBody = insertInMain("System.out.println(\"Some text\");");
+        String classBody = insertInMain("System.out.print(\"Some text\");");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
         RunResults results = core.runMethod(projectRoot,
@@ -95,7 +95,7 @@ public class RunCoreTest {
                 Runners.main,
                 ResultsProcessors.main);
 
-        assertEquals("Some text\n", results.getMethodResult().getSystemOut());
+        assertEquals("Some text", results.getMethodResult().getSystemOut());
     }
 
     @Test(expected = NoSuchMethodException.class)

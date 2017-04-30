@@ -22,9 +22,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -58,8 +60,8 @@ public class CourseIOUtils {
      *
      * @return path where project has been saved
      */
-    public String saveLocally(Course course) throws DirectoryCreatingException, GitAPIException {
-        String projectPath = generatePath(course);
+    public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
+        String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
             if (projectDirectory.exists()) {
@@ -67,14 +69,14 @@ public class CourseIOUtils {
             }
             Files.createDirectories(Paths.get(projectPath));
             Git.cloneRepository()
-                    .setURI(course.getUrl())
+                    .setURI(courseURL)
                     .setDirectory(projectDirectory)
                     .call()
                     .getRepository()
                     .close();
-//            clone.getRepository().close()
+
         } catch (IOException e) {
-            throw new DirectoryCreatingException("Unable to create a directory for course: " + course.getName());
+            throw new DirectoryCreatingException("Unable to create a directory for course: " + courseName);
         }
         return projectPath;
     }
@@ -103,6 +105,21 @@ public class CourseIOUtils {
                 .collect(Collectors.toList());
     }
 
+    public Lesson getLessonByID(String courseLocalPath, int id) throws IOException {
+
+        return Files.walk(Paths.get(courseLocalPath))
+                .map(Path::toString)
+                .filter(path -> path.endsWith("lesson"))
+                .filter(path -> path.contains(String.valueOf(id)))
+                .map(path -> {
+                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
+                    return new Lesson(lessonName, path);
+                })
+                .findFirst()
+                .get();
+
+    }
+
     /**
      * Save code locally
      * 1. Parse className from code (3rd word - public class NAME {...}
@@ -126,11 +143,19 @@ public class CourseIOUtils {
         return localPathForExternalCode + File.separator + javaClassName;
     }
 
+    @Deprecated
     public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
         Course course = db.getCourseByID(courseId);
         Lesson lesson = courseDB.getLesson(lessonNumber, course);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
+    }
+
+    public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
+        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
+        String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
+        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
+                .toArray(String[]::new);
     }
 
     /**
@@ -156,7 +181,7 @@ public class CourseIOUtils {
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-        invoker.setMavenHome(new File(mvnHome));
+//        invoker.setMavenHome(new File(mvnHome));
 
         try {
             invoker.execute(request);
@@ -185,7 +210,7 @@ public class CourseIOUtils {
         return path.endsWith(File.separator) ? path : path + File.separator;
     }
 
-    private String generatePath(Course course) {
-        return localPathForProjects + File.separator + course.getId() + course.getName() + File.separator;
+    private String generatePath(String courseName, int courceID) {
+        return localPathForProjects + File.separator + courceID + courseName + File.separator;
     }
 }

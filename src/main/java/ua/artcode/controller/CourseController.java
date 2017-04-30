@@ -10,12 +10,14 @@ import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import javax.validation.Valid;
 
@@ -110,6 +112,7 @@ public class CourseController {
         }
     }
 
+    @Deprecated
     @ApiOperation(httpMethod = "POST",
             value = "Resource to run class from lesson with solution (need to add solution before)",
             notes = "Runs a class in certain lesson (class must have main method) which depends on Solution class",
@@ -131,4 +134,28 @@ public class CourseController {
             return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
     }
+
+    @ApiOperation(httpMethod = "POST",
+            value = "Resource to run class from lesson with solution (need to add solution before)",
+            notes = "Runs a tests for a certain lesson",
+            response = RunResults.class,
+            produces = "application/json")
+    @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
+    public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
+                                            @RequestParam int lessonNumber,
+                                            @RequestBody @Valid CourseFromUser userCouse) {
+        try {
+
+            RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCouse);
+            LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
+            return results;
+
+        } catch (Exception e) {
+
+            LOGGER.error("Run class from lesson with solution - FAILED", e);
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
+        }
+    }
+
+
 }

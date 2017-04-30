@@ -131,7 +131,7 @@ public class CourseControllerTest {
 
         mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=3"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.methodResult.systemOut").value("SOME INFO\n"));
+                .andExpect(jsonPath("$.methodResult.systemOut").value("SOME INFO" + System.getProperty("line.separator")));
     }
 
     @Test
