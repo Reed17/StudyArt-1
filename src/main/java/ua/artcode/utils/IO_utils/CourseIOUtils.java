@@ -146,6 +146,8 @@ public class CourseIOUtils {
     @Deprecated
     public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
+
+        //TODO lesson with uniqe id
         Course course = db.getCourseByID(courseId);
         Lesson lesson = courseDB.getLesson(lessonNumber, course);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");

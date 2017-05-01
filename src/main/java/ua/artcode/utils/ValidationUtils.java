@@ -2,12 +2,16 @@ package ua.artcode.utils;
 
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.UserDB;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
+import ua.artcode.model.User;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -52,23 +56,24 @@ public class ValidationUtils {
             throw new InvalidUserPassException("Password doesn't feet in");
     }
 
-    public boolean checkLoginOriginality(String login, UserDB<Teacher> teacherUserDB, UserDB<Student> studentUserDB) {
-        return !(teacherUserDB.containsLogin(login)
-                || studentUserDB.containsLogin(login));
+    public boolean checkLoginOriginality(String login, TeacherRepository teacherRepository, StudentRepository studentRepository) {
+        return (teacherRepository.findByLogin(login).isEmpty()
+                && studentRepository.findByLogin(login).isEmpty());
     }
 
-    public boolean checkEmailOriginality(String email, UserDB<Teacher> teacherUserDB, UserDB<Student> studentUserDB) {
-        return !(teacherUserDB.containsEmail(email)
-                || studentUserDB.containsEmail(email));
+    public boolean checkEmailOriginality(String email, TeacherRepository teacherRepository, StudentRepository studentRepository) {
+        return (teacherRepository.findByEmail(email).isEmpty()
+                && studentRepository.findByEmail(email).isEmpty());
     }
 
-    public void checkOriginality(String login, String email, UserDB<Teacher> teacherDB, UserDB<Student> studentDB)
+
+    public void checkOriginality(String login, String email, TeacherRepository teacherRepository, StudentRepository studentRepository)
             throws InvalidUserLoginException, InvalidUserEmailException {
 
-        if(!checkLoginOriginality(login, teacherDB, studentDB))
+        if(!checkLoginOriginality(login, teacherRepository, studentRepository))
             throw new InvalidUserLoginException("Login already exists");
 
-        if(!checkEmailOriginality(email, teacherDB, studentDB))
+        if(!checkEmailOriginality(email, teacherRepository, studentRepository))
             throw new InvalidUserEmailException("Email already exists");
     }
 }

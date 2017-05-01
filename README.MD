@@ -21,7 +21,7 @@ See my example to understand - https://github.com/v21k/TestGitProject.git
 
 **Algorithm of using app**
 0. You can use Swagger UI to test app - http://localhost:8080/swagger-ui.html
-1. Run ua.artcode.controller.Application class
+1. Run ua.artcode.Application class
 2. Add git repo by using POST request to http://localhost:8080/courses/add with next content:
 ```json
 {

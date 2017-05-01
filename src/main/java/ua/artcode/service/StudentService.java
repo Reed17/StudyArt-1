@@ -5,14 +5,23 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.UserDB;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
+import ua.artcode.dao.repositories.UserRepository;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
+import ua.artcode.model.User;
 import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by zhenia on 24.04.17.
@@ -21,10 +30,10 @@ import ua.artcode.utils.ValidationUtils;
 public class StudentService implements UserService<Student> {
 
     @Autowired
-    private UserDB<Teacher> teacherDB;
-
+    private TeacherRepository teacherRepository;
     @Autowired
-    private UserDB<Student> studentDB;
+    private StudentRepository studentRepository;
+
 
     @Autowired
     private ValidationUtils validationUtils;
@@ -41,10 +50,10 @@ public class StudentService implements UserService<Student> {
 
 
         // checking does user with this parameters already exist
-        validationUtils.checkOriginality(login, email, teacherDB, studentDB);
+        validationUtils.checkOriginality(login, email, teacherRepository, studentRepository);
 
 
-        Student newStudent = studentDB.add(new Student(login, securityUtils.encryptPass(pass), email));
+        Student newStudent = studentRepository.save(new Student(login, securityUtils.encryptPass(pass), email));
 
         ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
         MailUtils mu = (MailUtils) context.getBean("mailUtils");
@@ -55,7 +64,7 @@ public class StudentService implements UserService<Student> {
 
     @Override
     public Student activate(int userId) {
-        Student student = studentDB.getUserById(userId);
+        Student student = studentRepository.findOne(userId);
 
         if(student != null) student.activate();
 

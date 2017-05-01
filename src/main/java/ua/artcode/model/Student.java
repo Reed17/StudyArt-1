@@ -1,17 +1,24 @@
 package ua.artcode.model;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by zhenia on 23.04.17.
  */
+@Entity
 public class Student extends User {
 
     // list of courses, to which subscribed student
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Course> subscribed;
 
     // list of completed courses
+    @OneToMany(cascade = CascadeType.ALL)
     private List<Course> completed;
 
     public Student(String login, String pass, String email) {

@@ -5,6 +5,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.UserDB;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
@@ -23,10 +25,9 @@ import ua.artcode.utils.ValidationUtils;
 public class TeacherService implements UserService<Teacher> {
 
     @Autowired
-    private UserDB<Teacher> teacherDB;
-
+    private TeacherRepository teacherRepository;
     @Autowired
-    private UserDB<Student> studentDB;
+    private StudentRepository studentRepository;
 
     @Autowired
     private ValidationUtils validationUtils;
@@ -41,24 +42,23 @@ public class TeacherService implements UserService<Teacher> {
         validationUtils.validateAllUserFields(login, email, pass);
 
 
-        // checking does user with this parameters already exist
-        validationUtils.checkOriginality(login, email, teacherDB, studentDB);
+        validationUtils.checkOriginality(login, email, teacherRepository, studentRepository);
 
 
-        Teacher newTeacher = teacherDB.add(new Teacher(login, securityUtils.encryptPass(pass), email));
+        Teacher newTeacher = teacherRepository.save(new Teacher(login, securityUtils.encryptPass(pass), email));
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
+ //       ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
 
-        MailUtils mu = (MailUtils) context.getBean("mailUtils");
+ //       MailUtils mu = (MailUtils) context.getBean("mailUtils");
 
-        mu.sendEmail("${emailUsername}", newTeacher.getEmail(), "Registration", mu.getActivationLink(newTeacher));
+ //       mu.sendEmail("${emailUsername}", newTeacher.getEmail(), "Registration", mu.getActivationLink(newTeacher));
 
         return newTeacher;
     }
 
     @Override
     public Teacher activate(int userId) {
-        Teacher teacher = teacherDB.getUserById(userId);
+        Teacher teacher = teacherRepository.findOne(userId);
 
         teacher.activate();
 

@@ -1,13 +1,19 @@
 package ua.artcode.model;
 
+import javax.persistence.*;
 import javax.validation.constraints.Pattern;
 import java.util.List;
+
 
 /**
  * Created by v21k on 15.04.17.
  */
+@Entity
+@Table(name = "course")
 public class Course {
-    private int id;
+    @Id
+    @GeneratedValue
+    private Integer id;
     @Pattern(regexp = "\\w{2,}", message = "Invalid course name")
     private String name;
     @Pattern(regexp = "\\w{2,}", message = "Invalid author name")
@@ -15,6 +21,7 @@ public class Course {
     @Pattern(regexp = "^http(s?):.+\\.git$", message = "Invalid git URL")
     private String url;
     private String localPath;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Lesson> lessons;
 
     public Course() {
@@ -29,17 +36,25 @@ public class Course {
         this.lessons = lessons;
     }
 
+    public Course(String name, String author, String url, String localPath, List<Lesson> lessons) {
+        this.name = name;
+        this.author = author;
+        this.url = url;
+        this.localPath = localPath;
+        this.lessons = lessons;
+    }
+
     public Course(String name, String author, String url) {
         this.name = name;
         this.author = author;
         this.url = url;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

@@ -1,12 +1,19 @@
 package ua.artcode.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by zhenia on 23.04.17.
  */
+@Entity
+@Inheritance
 public class User {
     private static AtomicInteger NEXT_USER_ID = new AtomicInteger();
+    @Id@GeneratedValue
     protected int id;
     protected String login;
     protected String pass;

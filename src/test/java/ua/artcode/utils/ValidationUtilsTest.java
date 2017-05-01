@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import ua.artcode.dao.UserDB;
 import ua.artcode.dao.UserDBImpl;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 
@@ -16,17 +18,15 @@ import static org.hamcrest.Matchers.*;
 public class ValidationUtilsTest {
 
     private ValidationUtils validationUtils = new ValidationUtils();
-    private UserDB<Teacher> teacherUserDB = new UserDBImpl<>();
-    private UserDB<Student> studentUserDB = new UserDBImpl<>();
+    private TeacherRepository teachers;
+    private StudentRepository students;
 
     @Before
     public void setUp() {
         validationUtils = new ValidationUtils();
-        teacherUserDB = new UserDBImpl<>();
-        studentUserDB = new UserDBImpl<>();
 
-        teacherUserDB.add(new Teacher("teacher", "password", "teacher@gmail.com"));
-        studentUserDB.add(new Student("student", "password", "student@gmail.com"));
+        teachers.save(new Teacher("teacher", "password", "teacher@gmail.com"));
+        students.save(new Student("student", "password", "student@gmail.com"));
     }
 
     @Test
@@ -70,15 +70,15 @@ public class ValidationUtilsTest {
 
     @Test
     public void checkLoginOriginalityTest() {
-        assertThat(validationUtils.checkLoginOriginality("teacher", teacherUserDB, studentUserDB), is(false));
-        assertThat(validationUtils.checkLoginOriginality("teacher1", teacherUserDB, studentUserDB), is(true));
-        assertThat(validationUtils.checkLoginOriginality("student", teacherUserDB, studentUserDB), is(false));
+        assertThat(validationUtils.checkLoginOriginality("teacher", teachers, students), is(false));
+        assertThat(validationUtils.checkLoginOriginality("teacher1", teachers, students), is(true));
+        assertThat(validationUtils.checkLoginOriginality("student", teachers, students), is(false));
     }
 
     @Test
     public void checkEmailOriginalityTest() {
-        assertThat(validationUtils.checkEmailOriginality("teacher@gmail.com", teacherUserDB, studentUserDB), is(false));
-        assertThat(validationUtils.checkEmailOriginality("teacher1@gmail.com", teacherUserDB, studentUserDB), is(true));
-        assertThat(validationUtils.checkEmailOriginality("student@gmail.com", teacherUserDB, studentUserDB), is(false));
+        assertThat(validationUtils.checkEmailOriginality("teacher@gmail.com", teachers, students), is(false));
+        assertThat(validationUtils.checkEmailOriginality("teacher1@gmail.com", teachers, students), is(true));
+        assertThat(validationUtils.checkEmailOriginality("student@gmail.com", teachers, students), is(false));
     }
 }
