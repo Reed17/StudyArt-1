@@ -55,9 +55,9 @@ public class StudentService implements UserService<Student> {
 
         Student newStudent = studentRepository.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
-        MailUtils mu = (MailUtils) context.getBean("mailUtils");
-        mu.sendEmail("${emailUsername}", newStudent.getEmail(), "Registration", mu.getActivationLink(newStudent));
+//        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
+//        MailUtils mu = (MailUtils) context.getBean("mailUtils");
+//        mu.sendEmail("${emailUsername}", newStudent.getEmail(), "Registration", mu.getActivationLink(newStudent));
 
         return newStudent;
     }

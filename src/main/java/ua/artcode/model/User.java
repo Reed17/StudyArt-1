@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Entity
 @Inheritance
 public class User {
-    private static AtomicInteger NEXT_USER_ID = new AtomicInteger();
     @Id@GeneratedValue
     protected int id;
     protected String login;
@@ -24,7 +23,6 @@ public class User {
     }
 
     public User(String login, String pass, String email) {
-        this.id = NEXT_USER_ID.incrementAndGet();
         this.login = login;
         this.pass = pass;
         this.email = email;

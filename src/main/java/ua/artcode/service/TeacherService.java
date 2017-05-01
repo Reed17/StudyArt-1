@@ -47,11 +47,11 @@ public class TeacherService implements UserService<Teacher> {
 
         Teacher newTeacher = teacherRepository.save(new Teacher(login, securityUtils.encryptPass(pass), email));
 
-        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
+ //       ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
 
-        MailUtils mu = (MailUtils) context.getBean("mailUtils");
+//        MailUtils mu = (MailUtils) context.getBean("mailUtils");
 
-        mu.sendEmail("${emailUsername}", newTeacher.getEmail(), "Registration", mu.getActivationLink(newTeacher));
+//        mu.sendEmail("${emailUsername}", newTeacher.getEmail(), "Registration", mu.getActivationLink(newTeacher));
 
         return newTeacher;
     }
