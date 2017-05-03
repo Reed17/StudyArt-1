@@ -7,7 +7,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.StudyArtDB;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
@@ -150,7 +149,7 @@ public class CourseIOUtils {
 
         //TODO lesson with uniqe id
         Course course = courseRepository.findOne(courseId);
-        Lesson lesson = course.getLesson(lessonNumber);
+        Lesson lesson = course.getLesson(lessonNumber-1);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 

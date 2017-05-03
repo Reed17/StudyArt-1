@@ -1,17 +1,12 @@
 package ua.artcode.utils;
 
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.UserDB;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.model.Student;
-import ua.artcode.model.Teacher;
-import ua.artcode.model.User;
 
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**

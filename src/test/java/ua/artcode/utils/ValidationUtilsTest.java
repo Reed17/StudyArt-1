@@ -2,8 +2,6 @@ package ua.artcode.utils;
 
 import org.junit.Before;
 import org.junit.Test;
-import ua.artcode.dao.UserDB;
-import ua.artcode.dao.UserDBImpl;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.model.Student;

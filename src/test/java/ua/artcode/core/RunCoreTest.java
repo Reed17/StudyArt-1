@@ -13,7 +13,6 @@ import ua.artcode.core.method_checker.MethodCheckers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
-import ua.artcode.dao.CourseDB;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
@@ -34,7 +33,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringRunner.class)
 // todo ask Serhii how to simplify
-@SpringBootTest(classes = {RunCore.class, CourseIOUtils.class, CommonIOUtils.class, CourseDB.class})
+@SpringBootTest(classes = {RunCore.class, CourseIOUtils.class, CommonIOUtils.class})
 public class RunCoreTest {
 
     @Value("${coreTestDir}")

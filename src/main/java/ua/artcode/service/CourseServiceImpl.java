@@ -3,7 +3,6 @@ package ua.artcode.service;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ua.artcode.dao.StudyArtDB;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
@@ -22,7 +21,6 @@ import java.util.Collection;
 public class CourseServiceImpl implements CourseService {
 
     @Autowired
-    //private StudyArtDB courseDB;
     private CourseRepository courseRepository;
     @Autowired
     private CourseIOUtils courseIOUtils;
