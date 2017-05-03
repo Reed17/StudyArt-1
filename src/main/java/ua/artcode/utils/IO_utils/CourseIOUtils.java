@@ -152,10 +152,11 @@ public class CourseIOUtils {
     }
 
     public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
-        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
+//        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
         String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
-        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
-                .toArray(String[]::new);
+        return testsClassPaths;
+//        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
+//                .toArray(String[]::new);
     }
 
     /**
@@ -202,8 +203,8 @@ public class CourseIOUtils {
     private String generateMavenGoal(String projectRoot) {
         projectRoot = checkEndsWithSeparator(projectRoot);
         return mvnCopyToDirectory
-                + projectRoot
-                + mvnDependencyDownloadPath;
+                + '"' + projectRoot
+                + mvnDependencyDownloadPath + '"';
     }
 
     private String checkEndsWithSeparator(String path) {

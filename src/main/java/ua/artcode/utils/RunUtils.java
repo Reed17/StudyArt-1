@@ -91,6 +91,7 @@ public class RunUtils {
 //                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
 //        ) {
             for (int i = 0; i < classNames.length; i++) {
+//                classes[i] = Class.forName(classNames[i]);
                 classes[i] = Class.forName(classNames[i], true, urlClassLoader);
             }
 //        }

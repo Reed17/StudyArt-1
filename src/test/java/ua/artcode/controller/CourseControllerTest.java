@@ -164,7 +164,7 @@ public class CourseControllerTest {
     public void testRunLessonWithSolutionWithTestsPositive() throws Exception {
 
         CourseFromUser courseFromUser = new CourseFromUser(1, "TestGitProject", "https://github.com/Maks9/TestGitProject.git");
-        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
+//        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
 
         mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
                 .contentType(MediaType.APPLICATION_JSON)
