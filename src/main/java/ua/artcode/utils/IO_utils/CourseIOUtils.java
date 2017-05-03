@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.StudyArtDB;
+import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -49,7 +50,7 @@ public class CourseIOUtils {
     private CommonIOUtils commonIOUtils;
 
     @Autowired
-    private StudyArtDB courseDB;
+    private CourseRepository courseRepository;
 
     /**
      * Downloading project from Git and save it locally
@@ -144,12 +145,12 @@ public class CourseIOUtils {
     }
 
     @Deprecated
-    public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
+    public String[] getLessonClassPaths(int courseId, int lessonNumber) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
 
         //TODO lesson with uniqe id
-        Course course = db.getCourseByID(courseId);
-        Lesson lesson = courseDB.getLesson(lessonNumber, course);
+        Course course = courseRepository.findOne(courseId);
+        Lesson lesson = course.getLesson(lessonNumber);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 
