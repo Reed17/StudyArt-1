@@ -90,10 +90,10 @@ public class RunUtils {
 //                // getting classLoader instance
 //                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
 //        ) {
-            for (int i = 0; i < classNames.length; i++) {
+        for (int i = 0; i < classNames.length; i++) {
 //                classes[i] = Class.forName(classNames[i]);
-                classes[i] = Class.forName(classNames[i], true, urlClassLoader);
-            }
+            classes[i] = Class.forName(classNames[i], true, urlClassLoader);
+        }
 //        }
 
 //        classLoader.close();
@@ -104,7 +104,7 @@ public class RunUtils {
     /**
      * Convert all necessary paths to URL and return URLClassLoader instance
      */
-    public static URLClassLoader getUrlClassLoader(String projectRoot, String sourcesRoot) throws IOException {
+    public static URLClassLoader getUrlClassLoader(String projectRoot, String[] sourcesRoot) throws IOException {
         // get all necessary paths as URLs
         URL[] classPaths = getClassPathsAsURLs(projectRoot, sourcesRoot);
         // pass them to ClassLoader
@@ -114,15 +114,19 @@ public class RunUtils {
     /**
      * Convert all classPath values (.jar and sourceRoot path) to URLs
      */
-    private static URL[] getClassPathsAsURLs(String projectRoot, String sourcesRoot) throws IOException {
+    private static URL[] getClassPathsAsURLs(String projectRoot, String[] sourcesRoot) throws IOException {
         List<String> jarPaths = getJarPaths(projectRoot);
 
         // size()+1 - because we will add 1 more URL - sourceRoot
-        URL[] classPathsAsURLs = new URL[jarPaths.size() + 1];
+        URL[] classPathsAsURLs = new URL[jarPaths.size() + sourcesRoot.length];
         for (int i = 0; i < jarPaths.size(); i++) {
             classPathsAsURLs[i] = new File(jarPaths.get(i)).toURI().toURL();
         }
-        classPathsAsURLs[classPathsAsURLs.length - 1] = new File(sourcesRoot).toURI().toURL();
+
+        // add sourceRoot paths
+        for (int i = classPathsAsURLs.length - sourcesRoot.length; i < classPathsAsURLs.length; i++) {
+            classPathsAsURLs[i] = new File(sourcesRoot[i - sourcesRoot.length]).toURI().toURL();
+        }
 
         return classPathsAsURLs;
     }
