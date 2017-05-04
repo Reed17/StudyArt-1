@@ -162,8 +162,8 @@ public class RunServiceImpl implements RunService {
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethodWithTests(projectLocalPath,
-                srcClassRoot,
-                testClassRoot,
+                new String[]{srcClassRoot,
+                testClassRoot},
                 classPaths,
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
