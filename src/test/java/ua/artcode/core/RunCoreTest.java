@@ -33,7 +33,6 @@ import static org.junit.Assert.assertTrue;
  * Created by v21k on 27.04.17.
  */
 @RunWith(SpringRunner.class)
-// todo ask Serhii how to simplify
 @SpringBootTest(classes = {Application.class})
 public class RunCoreTest {
 
