@@ -7,7 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by v21k on 04.05.17.
@@ -18,12 +21,12 @@ public class TimeExecutionProfiler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeExecutionProfiler.class);
 
-    private Map<String, Long> stats = new LinkedHashMap<>();
-    private List<String> methodOrder = new ArrayList<>();
-    private List<Integer> methodStack = new ArrayList<>();
+    private Map<String, Long> methodStats = new LinkedHashMap<>();
+    private List<String> methodNamesOrdered = new ArrayList<>();
+    private List<Integer> methodDepthValues = new ArrayList<>();
     private StringBuffer message = new StringBuffer();
 
-    private int order = 0;
+    private int depth = 0;
 
     // todo tree structure
 
@@ -34,7 +37,7 @@ public class TimeExecutionProfiler {
      */
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object aroundEndPoints(ProceedingJoinPoint joinPoint) throws Throwable {
-        message.append("\nPROFILING(execution order):\n")
+        message.append("\nPROFILING(execution depth):\n")
                 .append("Endpoint - ")
                 .append(joinPoint.getSignature().getDeclaringType().getName())
                 .append(".")
@@ -70,43 +73,43 @@ public class TimeExecutionProfiler {
     public Object aroundServicesAndCore(ProceedingJoinPoint joinPoint) throws Throwable {
 
         String methodName = joinPoint.getSignature().getDeclaringType().getName() + "." + joinPoint.getSignature().getName();
-        methodOrder.add(methodName);
+        methodNamesOrdered.add(methodName);
 
 
-        methodStack.add(++order);
+        methodDepthValues.add(++depth);
         long localStart = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long localEnd = System.currentTimeMillis();
-        order--;
+        depth--;
 
         long time = localEnd - localStart;
-        stats.put(methodName, time);
+        methodStats.put(methodName, time);
 
         return result;
     }
 
     private void resetValues() {
-        stats = new LinkedHashMap<>();
-        methodOrder = new ArrayList<>();
-        methodStack = new ArrayList<>();
-        order = 0;
+        methodStats = new LinkedHashMap<>();
+        methodNamesOrdered = new ArrayList<>();
+        methodDepthValues = new ArrayList<>();
+        depth = 0;
         message = new StringBuffer();
     }
 
     /**
-     * Reordering stats to match invocation order
+     * Reordering methodStats to match invocation depth
      */
     private Map<String, Long> reorderStats() {
         Map<String, Long> orderedStats = new LinkedHashMap<>();
 
-        // generate new methodOrder list with tree structure
+        // generate new methodNamesOrdered list with tree structure
         List<String> newMethodOrder = getMethodWithTreeStructure();
 
-        for (int i = 0; i < methodOrder.size(); i++) {
+        for (int i = 0; i < methodNamesOrdered.size(); i++) {
             String methodNameWithPrefix = newMethodOrder.get(i);
-            String cleanMethodName = methodOrder.get(i);
+            String cleanMethodName = methodNamesOrdered.get(i);
 
-            orderedStats.put(methodNameWithPrefix, stats.get(cleanMethodName));
+            orderedStats.put(methodNameWithPrefix, methodStats.get(cleanMethodName));
         }
 
         return orderedStats;
@@ -114,12 +117,12 @@ public class TimeExecutionProfiler {
 
     private List<String> getMethodWithTreeStructure() {
         List<String> newMethodOrder = new ArrayList<>();
-        for (int i = 0; i < methodOrder.size(); i++) {
+        for (int i = 0; i < methodNamesOrdered.size(); i++) {
             StringBuilder prefix = new StringBuilder();
-            for (int j = 0; j < methodStack.get(i); j++) {
+            for (int j = 0; j < methodDepthValues.get(i); j++) {
                 prefix.append("_");
             }
-            newMethodOrder.add("|" + prefix + methodOrder.get(i));
+            newMethodOrder.add("|" + prefix + methodNamesOrdered.get(i));
         }
         return newMethodOrder;
     }
