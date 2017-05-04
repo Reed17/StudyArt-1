@@ -23,6 +23,7 @@ public class Teacher extends User {
         super(login, pass, email);
         courses = new ArrayList<>();
     }
+    public Teacher(){};
 
     public List<Course> getCourses() {
         return courses;
