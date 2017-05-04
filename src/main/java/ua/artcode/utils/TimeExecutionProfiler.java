@@ -23,10 +23,14 @@ public class TimeExecutionProfiler {
 
     private Map<String, Long> stats = new LinkedHashMap<>();
     private List<String> methodOrder = new ArrayList<>();
-
     private StringBuffer message = new StringBuffer();
 
-
+    // todo tree structure
+    /**
+     * Profiling around endpoints - all classes annotated with @RestController annotatio*
+     *
+     * @see TimeExecutionProfiler#reorderStats()
+     */
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object aroundEndPoints(ProceedingJoinPoint joinPoint) throws Throwable {
         message.append("\nPROFILING(execution order):\n")
@@ -54,6 +58,10 @@ public class TimeExecutionProfiler {
         return result;
     }
 
+    /**
+     * Profiling around core, service and utils classes.
+     * To add more pointcuts - just add "|| [your_pointcut]" at the end.
+     */
     @Around("execution(* ua.artcode.core.*.*(..))" +
             "|| execution(* ua.artcode.service.*.*(..))" +
             "|| execution(* ua.artcode.utils.*.*(..))" +
@@ -78,6 +86,9 @@ public class TimeExecutionProfiler {
         message = new StringBuffer();
     }
 
+    /**
+     * Reordering stats to match invocation order
+     */
     private Map<String, Long> reorderStats() {
         Map<String, Long> orderedStats = new LinkedHashMap<>();
         methodOrder.forEach(methodName -> orderedStats.put(methodName, stats.get(methodName)));
