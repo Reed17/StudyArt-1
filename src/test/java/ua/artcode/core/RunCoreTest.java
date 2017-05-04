@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import ua.artcode.Application;
 import ua.artcode.core.method_checker.MethodCheckers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
@@ -33,7 +34,7 @@ import static org.junit.Assert.assertTrue;
  */
 @RunWith(SpringRunner.class)
 // todo ask Serhii how to simplify
-@SpringBootTest(classes = {RunCore.class, CourseIOUtils.class, CommonIOUtils.class})
+@SpringBootTest(classes = {Application.class})
 public class RunCoreTest {
 
     @Value("${coreTestDir}")

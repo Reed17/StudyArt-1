@@ -21,6 +21,7 @@ public class Student extends User {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Course> completed;
 
+    public Student(){};
     public Student(String login, String pass, String email) {
         super(login, pass, email);
         subscribed = new ArrayList<>();
