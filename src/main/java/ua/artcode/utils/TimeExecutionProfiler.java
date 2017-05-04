@@ -7,10 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by v21k on 04.05.17.
@@ -23,9 +20,13 @@ public class TimeExecutionProfiler {
 
     private Map<String, Long> stats = new LinkedHashMap<>();
     private List<String> methodOrder = new ArrayList<>();
+    private List<Integer> methodStack = new ArrayList<>();
     private StringBuffer message = new StringBuffer();
 
+    private int order = 0;
+
     // todo tree structure
+
     /**
      * Profiling around endpoints - all classes annotated with @RestController annotatio*
      *
@@ -44,7 +45,7 @@ public class TimeExecutionProfiler {
         long endpointEnd = System.currentTimeMillis();
 
         reorderStats().forEach((key, value) ->
-                message.append("\nMethod name - ")
+                message.append("\n")
                         .append(key)
                         .append(". Execution time - ")
                         .append(value));
@@ -70,9 +71,13 @@ public class TimeExecutionProfiler {
 
         String methodName = joinPoint.getSignature().getDeclaringType().getName() + "." + joinPoint.getSignature().getName();
         methodOrder.add(methodName);
+
+
+        methodStack.add(++order);
         long localStart = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long localEnd = System.currentTimeMillis();
+        order--;
 
         long time = localEnd - localStart;
         stats.put(methodName, time);
@@ -83,6 +88,8 @@ public class TimeExecutionProfiler {
     private void resetValues() {
         stats = new LinkedHashMap<>();
         methodOrder = new ArrayList<>();
+        methodStack = new ArrayList<>();
+        order = 0;
         message = new StringBuffer();
     }
 
@@ -91,7 +98,29 @@ public class TimeExecutionProfiler {
      */
     private Map<String, Long> reorderStats() {
         Map<String, Long> orderedStats = new LinkedHashMap<>();
-        methodOrder.forEach(methodName -> orderedStats.put(methodName, stats.get(methodName)));
+
+        // generate new methodOrder list with tree structure
+        List<String> newMethodOrder = getMethodWithTreeStructure();
+
+        for (int i = 0; i < methodOrder.size(); i++) {
+            String methodNameWithPrefix = newMethodOrder.get(i);
+            String cleanMethodName = methodOrder.get(i);
+
+            orderedStats.put(methodNameWithPrefix, stats.get(cleanMethodName));
+        }
+
         return orderedStats;
+    }
+
+    private List<String> getMethodWithTreeStructure() {
+        List<String> newMethodOrder = new ArrayList<>();
+        for (int i = 0; i < methodOrder.size(); i++) {
+            StringBuilder prefix = new StringBuilder();
+            for (int j = 0; j < methodStack.get(i); j++) {
+                prefix.append("_");
+            }
+            newMethodOrder.add("|" + prefix + methodOrder.get(i));
+        }
+        return newMethodOrder;
     }
 }
