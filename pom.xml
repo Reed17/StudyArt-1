@@ -103,6 +103,14 @@
             <artifactId>spring-context-support</artifactId>
             <version>${spring-context-support.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-aop -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring-aop.version}</version>
+        </dependency>
+
     </dependencies>
 
     <properties>
@@ -118,6 +126,7 @@
         <springfox-swagger2.version>2.2.2</springfox-swagger2.version>
         <spring-context-support.version>4.2.2.RELEASE</spring-context-support.version>
         <spring-data-version>1.11.3.RELEASE</spring-data-version>
+        <spring-aop.version>4.3.8.RELEASE</spring-aop.version>
     </properties>
 
     <build>
