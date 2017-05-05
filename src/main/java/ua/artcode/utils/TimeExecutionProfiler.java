@@ -22,22 +22,23 @@ public class TimeExecutionProfiler {
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeExecutionProfiler.class);
 
     private Map<String, Long> methodStats = new LinkedHashMap<>();
+
     private List<String> methodNamesOrdered = new ArrayList<>();
-    private List<Integer> methodDepthValues = new ArrayList<>();
+    private List<Integer> methodDepthValuesOrdered = new ArrayList<>();
     private StringBuffer message = new StringBuffer();
 
-    private int depth = 0;
+    private int depthLevel = 0;
 
-    // todo tree structure
+    private String treePrefix = "___";
 
     /**
-     * Profiling around endpoints - all classes annotated with @RestController annotatio*
+     * Profiling around endpoints - all classes annotated with @RestController annotation.
      *
-     * @see TimeExecutionProfiler#reorderStats()
+     * @see TimeExecutionProfiler#reorderStats(List, List, Map)
      */
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object aroundEndPoints(ProceedingJoinPoint joinPoint) throws Throwable {
-        message.append("\nPROFILING(execution depth):\n")
+        message.append("\nPROFILING(execution depthLevel):\n")
                 .append("Endpoint - ")
                 .append(joinPoint.getSignature().getDeclaringType().getName())
                 .append(".")
@@ -47,11 +48,12 @@ public class TimeExecutionProfiler {
         Object result = joinPoint.proceed();
         long endpointEnd = System.currentTimeMillis();
 
-        reorderStats().forEach((key, value) ->
-                message.append("\n")
-                        .append(key)
-                        .append(". Execution time - ")
-                        .append(value));
+        reorderStats(methodNamesOrdered, methodDepthValuesOrdered, methodStats)
+                .forEach((key, value) ->
+                        message.append("\n")
+                                .append(key)
+                                .append(". Execution time - ")
+                                .append(value));
 
         message.append("\nDONE. ")
                 .append("Overall time - ")
@@ -75,12 +77,13 @@ public class TimeExecutionProfiler {
         String methodName = joinPoint.getSignature().getDeclaringType().getName() + "." + joinPoint.getSignature().getName();
         methodNamesOrdered.add(methodName);
 
+        methodDepthValuesOrdered.add(++depthLevel);
 
-        methodDepthValues.add(++depth);
         long localStart = System.currentTimeMillis();
         Object result = joinPoint.proceed();
         long localEnd = System.currentTimeMillis();
-        depth--;
+
+        depthLevel--;
 
         long time = localEnd - localStart;
         methodStats.put(methodName, time);
@@ -91,19 +94,26 @@ public class TimeExecutionProfiler {
     private void resetValues() {
         methodStats = new LinkedHashMap<>();
         methodNamesOrdered = new ArrayList<>();
-        methodDepthValues = new ArrayList<>();
-        depth = 0;
+        methodDepthValuesOrdered = new ArrayList<>();
+        depthLevel = 0;
         message = new StringBuffer();
     }
 
     /**
-     * Reordering methodStats to match invocation depth
+     * Creating new map with ordered stats (according to methodNamesOrdered) with tree structure (prefixes)
+     *
+     * @param methodNamesOrdered       list of method names in execution order
+     * @param methodDepthValuesOrdered same to methodNamesOrdered, but stores depthLevel level for every method
+     * @param methodStats              map with stats for every method (methodName - execution time). Not ordered.
+     * @return orderedStats Map with right method order and prefixes before method name (tree structure)
      */
-    private Map<String, Long> reorderStats() {
+    private Map<String, Long> reorderStats(List<String> methodNamesOrdered,
+                                           List<Integer> methodDepthValuesOrdered,
+                                           Map<String, Long> methodStats) {
         Map<String, Long> orderedStats = new LinkedHashMap<>();
 
         // generate new methodNamesOrdered list with tree structure
-        List<String> newMethodOrder = getMethodWithTreeStructure();
+        List<String> newMethodOrder = getMethodWithTreeStructure(methodNamesOrdered, methodDepthValuesOrdered);
 
         for (int i = 0; i < methodNamesOrdered.size(); i++) {
             String methodNameWithPrefix = newMethodOrder.get(i);
@@ -115,13 +125,28 @@ public class TimeExecutionProfiler {
         return orderedStats;
     }
 
-    private List<String> getMethodWithTreeStructure() {
+    /**
+     * Iterate through methodNamesOrdered list and add prefix
+     * to every value according to value in methodDepthValuesOrdered
+     *
+     * @param methodNamesOrdered       list of method names in execution order
+     * @param methodDepthValuesOrdered same to methodNamesOrdered, but stores depthLevel level for every method
+     * @return new List (prefix + methodName)
+     */
+    private List<String> getMethodWithTreeStructure(List<String> methodNamesOrdered,
+                                                    List<Integer> methodDepthValuesOrdered) {
         List<String> newMethodOrder = new ArrayList<>();
+
+        // iterate through methodNameOrdered
         for (int i = 0; i < methodNamesOrdered.size(); i++) {
-            StringBuilder prefix = new StringBuilder();
-            for (int j = 0; j < methodDepthValues.get(i); j++) {
-                prefix.append("_");
+
+            // generate prefix for method name
+            StringBuffer prefix = new StringBuffer();
+            for (int j = 0; j < methodDepthValuesOrdered.get(i); j++) {
+                prefix.append(treePrefix);
             }
+
+            // add prefix + methodName to new list
             newMethodOrder.add("|" + prefix + methodNamesOrdered.get(i));
         }
         return newMethodOrder;
