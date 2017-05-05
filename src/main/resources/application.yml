@@ -1,5 +1,6 @@
 pathForGitProjects: courses
 pathForExternalCodeCompiling: temp
+profiling: true
 
 maven:
   dependenciesPath: dependencies
