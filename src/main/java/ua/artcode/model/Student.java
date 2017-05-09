@@ -14,10 +14,14 @@ public class Student extends User {
     // list of completed courses
     private List<Course> completed;
 
+    // list of completed lessons
+    private List<Lesson> completedLessons;
+
     public Student(String login, String pass, String email) {
         super(login, pass, email);
         subscribed = new ArrayList<>();
         completed = new ArrayList<>();
+        completedLessons = new ArrayList<>();
     }
 
     public List<Course> getSubscribed() {
@@ -34,6 +38,14 @@ public class Student extends User {
 
     public void setCompleted(List<Course> completed) {
         this.completed = completed;
+    }
+
+    public List<Lesson> getCompletedLessons() {
+        return completedLessons;
+    }
+
+    public void setCompletedLessons(List<Lesson> completedLessons) {
+        this.completedLessons = completedLessons;
     }
 
     public boolean subscribeTo(Course course) {

@@ -3,6 +3,7 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import ua.artcode.model.Course;
-import ua.artcode.model.ExternalCode;
+import ua.artcode.dao.CourseDB;
+import ua.artcode.dao.UserDB;
+import ua.artcode.exceptions.InvalidUserEmailException;
+import ua.artcode.exceptions.InvalidUserLoginException;
+import ua.artcode.exceptions.InvalidUserPassException;
+import ua.artcode.model.*;
+import ua.artcode.service.StudentService;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -34,6 +42,15 @@ public class CourseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserDB userDB;
+
+    @Autowired
+    private CourseDB courseDB;
+
+    @Autowired
+    private StudentService studentService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -118,7 +135,6 @@ public class CourseControllerTest {
         ExternalCode code = new ExternalCode("public class test " +
                 "{\npublic static void main(String[] args) " +
                 "{\nSystem.out.println(2+2;\n}\n}\n");
-
         mockMvc.perform(post("/run-class")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(code)))
@@ -167,6 +183,38 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(code)))
                 .andExpect(status().isOk())
                 .andExpect(content().string(is(containsString("error"))));
+    }
+
+    @Test
+    public void getUserCourseStatistic()
+            throws Exception,
+            InvalidUserLoginException,
+            InvalidUserEmailException,
+            InvalidUserPassException {
+        List<Course> courses = new ArrayList<>();
+        courses.add(new Course(0,
+                "someCourse",
+                "VK",
+                GitURL,
+                null,
+                null));
+        courseDB.addCourse(courses.get(0));
+        studentService.register("login1", "123456", "newbie@gmail.com");
+        Student found = (Student) userDB.getUserByLogin("login1");
+        studentService.activate(found.getId());
+        found.subscribeTo(courses.get(0));
+        found.setCompleted(courses);
+        String actual = studentService.getUserCourseStatistic(found.getLogin(), courses.get(0).getId());
+        String expected = "{\"value\":" +
+                "{\"id\":4,\"name\":\"someCourse\",\"author\":\"VK\"," +
+                "\"url\":\"https://github.com/v21k/TestGitProject.git\"," +
+                "\"localPath\":\"course/4someCourse/\"," +
+                "\"lessons\":[{\"id\":0,\"name\":\"_01_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_01_lesson\"}," +
+                "{\"id\":0,\"name\":\"_02_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_02_lesson\"}," +
+                "{\"id\":0,\"name\":\"_03_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_03_lesson\"}," +
+                "{\"id\":0,\"name\":\"_04_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_04_lesson\"}]}}";
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected, actual);
     }
 
     private void addCourse() throws Exception {

@@ -6,9 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.exceptions.AppException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.GeneralResponse;
@@ -16,11 +14,13 @@ import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
+import ua.artcode.service.StudentService;
 
+import javax.security.auth.login.LoginException;
 import javax.validation.Valid;
 
 @RestController
-public class CourseController {
+public class CourseController{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
@@ -28,10 +28,13 @@ public class CourseController {
 
     private final RunService runService;
 
+    private final StudentService studentService;
+
     @Autowired
-    public CourseController(CourseService courseService, RunService runService) {
+    public CourseController(CourseService courseService, RunService runService, StudentService studentService) {
         this.courseService = courseService;
         this.runService = runService;
+        this.studentService = studentService;
     }
 
     @ApiOperation(httpMethod = "GET",
@@ -130,5 +133,19 @@ public class CourseController {
             LOGGER.error("Run class from lesson with solution - FAILED", e);
             return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
+    }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "",
+            notes = "",
+            response = StudentService.class,
+            produces = "application/json")
+    @RequestMapping(value = "/course/{courseID}/{login}/stat", method = RequestMethod.GET)
+    public String getCourseStatisticByUser(@PathVariable("login") String login, @PathVariable("courseID") int courseID)
+            throws LoginException,
+            CourseNotFoundException,
+            InvalidIDException,
+            InvalidUserLoginException {
+        return studentService.getUserCourseStatistic(login, courseID);
     }
 }

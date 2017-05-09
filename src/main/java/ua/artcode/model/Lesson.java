@@ -4,8 +4,10 @@ package ua.artcode.model;
  * Created by v21k on 15.04.17.
  */
 public class Lesson implements Comparable<Lesson> {
+    private int id;
     private String name;
     private String localPath;
+
 
     public Lesson() {
     }
@@ -13,6 +15,14 @@ public class Lesson implements Comparable<Lesson> {
     public Lesson(String name, String localPath) {
         this.name = name;
         this.localPath = localPath;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getName() {
