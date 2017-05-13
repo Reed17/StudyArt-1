@@ -3,6 +3,9 @@ package ua.artcode.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * Created by v21k on 15.04.17.
@@ -15,6 +18,15 @@ public class Lesson implements Comparable<Lesson> {
     private Integer id;
     private String name;
     private String localPath;
+    private List<String> baseClasses;
+    private List<String> requiredClasses;
+    private List<String> testsClasses;
+    private String sourcesRoot;
+    private String testsRoot;
+    private String description;
+    private LocalDateTime date;
+
+
     /* todo
     * ... 3 lists with classpaths (.java.) - base, required, tests
     * 3 ready OR 3 paths to directories(need to parse)
