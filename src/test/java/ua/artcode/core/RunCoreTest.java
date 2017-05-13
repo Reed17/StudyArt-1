@@ -161,7 +161,7 @@ public class RunCoreTest {
         String classBody = insertInMain("CmdLineParser parser = new CmdLineParser(null);" +
                 "\nSystem.out.println(parser);");
 
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1,
                 "import org.kohsuke.args4j.CmdLineParser;",
@@ -193,7 +193,7 @@ public class RunCoreTest {
                 "import static org.junit.Assert.assertTrue;";
 
         String className = "Tests";
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
@@ -220,7 +220,7 @@ public class RunCoreTest {
                 "import static org.junit.Assert.assertTrue;";
 
         String className = "Tests";
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
@@ -262,7 +262,7 @@ public class RunCoreTest {
         return classFile.getPath();
     }
 
-    private void generateAndSavePom() throws IOException, URISyntaxException {
+    private void copyTestPom() throws IOException, URISyntaxException {
         Path sourcePomPath = Paths.get(Resources.getResource("run_core_tests" + File.separator + "testpom.xml").toURI());
         Path pomPath = Paths.get(projectRoot + File.separator + "pom.xml");
 
