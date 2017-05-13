@@ -7,9 +7,20 @@ test:
 application:
   courses:
     paths:
-      git: courses_test
-      externalCode: temp_test
+      git: courses
+      externalCode: temp
   profiling: true
+
+email:
+    server: "http://localhost:8080"
+    user: "studyartteam@gmail.com"
+    pass: "pass_for_study"
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      smtp:
+        auth: true
+        starttls.enable: true
 
 maven:
     dependenciesPath: dependencies
