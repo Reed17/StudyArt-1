@@ -43,11 +43,21 @@ public class CourseIOUtils {
     @Value("${maven.home}")
     private String mvnHome;
 
-    @Autowired
-    private CommonIOUtils commonIOUtils;
+    private final CommonIOUtils commonIOUtils;
+
+    private final CourseRepository courseRepository;
+
+    private final InvocationRequest request;
+
+    private final Invoker invoker;
 
     @Autowired
-    private CourseRepository courseRepository;
+    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+        this.commonIOUtils = commonIOUtils;
+        this.courseRepository = courseRepository;
+        this.request = invocationRequest;
+        this.invoker = invoker;
+    }
 
     /**
      * Downloading project from Git and save it locally
@@ -171,10 +181,6 @@ public class CourseIOUtils {
      * @return true if saved successfully, false otherwise
      */
     public boolean saveMavenDependenciesLocally(String projectRoot) {
-        // todo declare beans for both
-        InvocationRequest request = new DefaultInvocationRequest();
-        Invoker invoker = new DefaultInvoker();
-
         projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
 
         String pomPath = generatePomPath(projectRoot);
@@ -182,7 +188,6 @@ public class CourseIOUtils {
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-//        invoker.setMavenHome(new File(mvnHome));
 
         try {
             invoker.execute(request);
