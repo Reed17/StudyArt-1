@@ -145,49 +145,6 @@ public class CourseControllerTest {
                 .andExpect(content().string(containsString("error")));
     }
 
-    @Test
-    public void testRunLessonWithSolutionPositive() throws Exception {
-        addCourse();
-        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(code)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(not(containsString("error")))))
-                .andExpect(content().string(is(containsString("7"))))
-                .andExpect(content().string(is(containsString("9"))));
-    }
-
-//    @Ignore
-    @Test
-    public void testRunLessonWithSolutionWithTestsPositive() throws Exception {
-
-        CourseFromUser courseFromUser = new CourseFromUser(1, "TestGitProject", "https://github.com/Maks9/TestGitProject.git");
-//        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(courseFromUser)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(not(containsString("error")))))
-                .andExpect(content().string(is(containsString("7"))))
-                .andExpect(content().string(is(containsString("9"))));
-    }
-
-
-    @Test
-    public void testRunLessonWithSolutionNegative() throws Exception {
-        addCourse();
-        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(code)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(containsString("error"))));
-    }
-
     private void addCourse() throws Exception {
         Course course = new Course(0,
                 "someCourse",

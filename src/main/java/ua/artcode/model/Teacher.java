@@ -2,7 +2,6 @@ package ua.artcode.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,11 @@ public class Teacher extends User {
         super(login, pass, email);
         courses = new ArrayList<>();
     }
-    public Teacher(){};
+
+    public Teacher() {
+    }
+
+    ;
 
     public List<Course> getCourses() {
         return courses;

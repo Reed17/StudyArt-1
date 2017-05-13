@@ -17,17 +17,18 @@ import ua.artcode.utils.ValidationUtils;
 @Service
 public class StudentService implements UserService<Student> {
 
-    @Autowired
-    private TeacherRepository teacherRepository;
-    @Autowired
-    private StudentRepository studentRepository;
-
-
-    @Autowired
-    private ValidationUtils validationUtils;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final ValidationUtils validationUtils;
+    private final SecurityUtils securityUtils;
 
     @Autowired
-    private SecurityUtils securityUtils;
+    public StudentService(TeacherRepository teacherRepository, StudentRepository studentRepository, ValidationUtils validationUtils, SecurityUtils securityUtils) {
+        this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
+        this.validationUtils = validationUtils;
+        this.securityUtils = securityUtils;
+    }
 
     @Override
     public Student register(String login, String pass, String email)
@@ -54,7 +55,7 @@ public class StudentService implements UserService<Student> {
     public Student activate(int userId) {
         Student student = studentRepository.findOne(userId);
 
-        if(student != null) student.activate();
+        if (student != null) student.activate();
 
         return student;
     }

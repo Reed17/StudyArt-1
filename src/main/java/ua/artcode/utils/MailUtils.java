@@ -1,9 +1,7 @@
 package ua.artcode.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.stereotype.Component;
 import ua.artcode.model.User;
 
 /**

@@ -22,10 +22,9 @@ public class ValidationUtils {
             Pattern.compile("^[a-z0-9_-]{6,15}$", Pattern.CASE_INSENSITIVE);
 
 
-
     public boolean loginValidation(String login) {
         return login != null &&
-                        VALID_LOGIN_PATTERN.matcher(login).matches();
+                VALID_LOGIN_PATTERN.matcher(login).matches();
     }
 
     public boolean emailValidation(String email) {
@@ -41,13 +40,13 @@ public class ValidationUtils {
     public void validateAllUserFields(String login, String email, String pass)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException {
 
-        if(!loginValidation(login))
+        if (!loginValidation(login))
             throw new InvalidUserLoginException("Login doesn't feet in");
 
-        if(!emailValidation(email))
+        if (!emailValidation(email))
             throw new InvalidUserEmailException("Email doesn't feet in");
 
-        if(!passValidation(pass))
+        if (!passValidation(pass))
             throw new InvalidUserPassException("Password doesn't feet in");
     }
 
@@ -65,10 +64,10 @@ public class ValidationUtils {
     public void checkOriginality(String login, String email, TeacherRepository teacherRepository, StudentRepository studentRepository)
             throws InvalidUserLoginException, InvalidUserEmailException {
 
-        if(!checkLoginOriginality(login, teacherRepository, studentRepository))
+        if (!checkLoginOriginality(login, teacherRepository, studentRepository))
             throw new InvalidUserLoginException("Login already exists");
 
-        if(!checkEmailOriginality(email, teacherRepository, studentRepository))
+        if (!checkEmailOriginality(email, teacherRepository, studentRepository))
             throw new InvalidUserEmailException("Email already exists");
     }
 }

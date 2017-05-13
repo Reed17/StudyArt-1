@@ -22,11 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -149,7 +147,7 @@ public class CourseIOUtils {
 
         //TODO lesson with uniqe id
         Course course = courseRepository.findOne(courseId);
-        Lesson lesson = course.getLesson(lessonNumber-1);
+        Lesson lesson = course.getLesson(lessonNumber - 1);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 

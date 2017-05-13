@@ -86,8 +86,8 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.print(\"Some text\");");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -102,8 +102,8 @@ public class RunCoreTest {
         String classBody = "";
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        core.runMethod(projectRoot,
-                sourcesRoot,
+        core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -116,8 +116,8 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(\"Some text\";");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -132,8 +132,8 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(2/0);");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -147,8 +147,8 @@ public class RunCoreTest {
     public void testRunClassNonExistingClass() throws Exception {
         String classPath = sourcesRoot + File.separator + "_01_lesson";
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -171,8 +171,8 @@ public class RunCoreTest {
                 classBody,
                 false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -199,8 +199,8 @@ public class RunCoreTest {
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesTestRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
@@ -226,8 +226,8 @@ public class RunCoreTest {
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesTestRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
