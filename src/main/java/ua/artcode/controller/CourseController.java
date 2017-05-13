@@ -143,10 +143,10 @@ public class CourseController {
     @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
                                             @RequestParam int lessonNumber,
-                                            @RequestBody @Valid CourseFromUser userCouse) {
+                                            @RequestBody @Valid CourseFromUser userCourse) {
         try {
 
-            RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCouse);
+            RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);
             LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
             return results;
 
