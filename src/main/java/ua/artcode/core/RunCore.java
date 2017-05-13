@@ -77,7 +77,7 @@ public class RunCore {
 
         try (
                 // getting classLoader instance
-                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+                URLClassLoader classLoader = getUrlClassLoader(projectRoot, new String[]{sourcesRoot});
         ) {
 
             // prepare array with classes
@@ -118,8 +118,7 @@ public class RunCore {
 
 
     public RunResults runMethodWithTests(String projectRoot,
-                                         String sourcesRoot,
-                                         String testsRoot,
+                                         String[] sourcesRoot,
                                          String[] classPaths,
                                          MethodRunnerPreProcessor preProcessor,
                                          MethodChecker checker,
@@ -152,7 +151,7 @@ public class RunCore {
 
         try (
                 // getting classLoader instance
-                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot)
         ) {
             // prepare array with classes
             Class<?>[] classes = preProcessor.getClasses(classPaths, classLoader);

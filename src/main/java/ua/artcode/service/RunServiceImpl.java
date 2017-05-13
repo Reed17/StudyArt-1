@@ -8,7 +8,7 @@ import ua.artcode.core.method_checker.MethodCheckers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
-import ua.artcode.dao.repositories.CourseRepository;
+import ua.artcode.dao.StudyArtDB;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -38,7 +39,7 @@ public class RunServiceImpl implements RunService {
     @Autowired
     CommonIOUtils commonIOUtils;
     @Autowired
-    private CourseRepository courseRepository;
+    private StudyArtDB courseDB;
     @Autowired
     private CourseIOUtils courseIOUtils;
     @Autowired
@@ -73,8 +74,8 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber);
-        Course course = courseRepository.findOne(courseId);
+        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
+        Course course = courseDB.getCourseByID(courseId);
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         return runCore.runMethod(course.getLocalPath(),
                 StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
@@ -96,7 +97,7 @@ public class RunServiceImpl implements RunService {
             InvocationTargetException,
             IllegalAccessException,
             NoSuchMethodException {
-        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber);
+        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber, courseDB);
 
         //
         //  Should be discussed!!!! use Annotation instead of className @Solution on className
@@ -114,7 +115,7 @@ public class RunServiceImpl implements RunService {
         // delete old content and write new (with solution)
         commonIOUtils.deleteAndWrite(solutionClassPath, originalWithSolution);
 
-        Course course = courseRepository.findOne(courseId);
+        Course course = courseDB.getCourseByID(courseId);
 
         // run main (tests in psvm)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
@@ -148,17 +149,21 @@ public class RunServiceImpl implements RunService {
 
         String projectLocalPath = courseIOUtils.saveLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
-        Course course = courseRepository.findOne(courseId);
+//        Course course = courseDB.getCourseByID(courseId);
 
         Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
 
         String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getLocalPath());
 
+        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
+        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length-1], "java" + File.separator);
+
+
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.runMethodWithTests(projectLocalPath,
-                StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator),
-                StringUtils.getClassRootFromClassPath(classPaths[classPaths.length], "java" + File.separator),
+                new String[]{srcClassRoot,
+                testClassRoot},
                 classPaths,
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
