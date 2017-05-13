@@ -1,7 +1,6 @@
 package ua.artcode.model;
 
 import javax.validation.constraints.Pattern;
-import java.util.List;
 
 /**
  * Created by v21k on 15.04.17.

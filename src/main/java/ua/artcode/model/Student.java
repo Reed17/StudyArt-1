@@ -2,7 +2,6 @@ package ua.artcode.model;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +20,11 @@ public class Student extends User {
     @OneToMany(cascade = CascadeType.ALL)
     private List<Course> completed;
 
-    public Student(){};
+    public Student() {
+    }
+
+    ;
+
     public Student(String login, String pass, String email) {
         super(login, pass, email);
         subscribed = new ArrayList<>();

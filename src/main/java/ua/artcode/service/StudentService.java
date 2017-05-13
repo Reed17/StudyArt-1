@@ -8,6 +8,7 @@ import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
 import ua.artcode.model.Student;
+import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
@@ -17,17 +18,20 @@ import ua.artcode.utils.ValidationUtils;
 @Service
 public class StudentService implements UserService<Student> {
 
-    @Autowired
-    private TeacherRepository teacherRepository;
-    @Autowired
-    private StudentRepository studentRepository;
-
-
-    @Autowired
-    private ValidationUtils validationUtils;
+    private final TeacherRepository teacherRepository;
+    private final StudentRepository studentRepository;
+    private final ValidationUtils validationUtils;
+    private final SecurityUtils securityUtils;
+    private final MailUtils mailUtils;
 
     @Autowired
-    private SecurityUtils securityUtils;
+    public StudentService(TeacherRepository teacherRepository, StudentRepository studentRepository, ValidationUtils validationUtils, SecurityUtils securityUtils, MailUtils mailUtils) {
+        this.teacherRepository = teacherRepository;
+        this.studentRepository = studentRepository;
+        this.validationUtils = validationUtils;
+        this.securityUtils = securityUtils;
+        this.mailUtils = mailUtils;
+    }
 
     @Override
     public Student register(String login, String pass, String email)
@@ -43,9 +47,7 @@ public class StudentService implements UserService<Student> {
 
         Student newStudent = studentRepository.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-//        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
-//        MailUtils mu = (MailUtils) context.getBean("mailUtils");
-//        mu.sendEmail("${emailUsername}", newStudent.getEmail(), "Registration", mu.getActivationLink(newStudent));
+        // todo send email
 
         return newStudent;
     }
@@ -54,7 +56,7 @@ public class StudentService implements UserService<Student> {
     public Student activate(int userId) {
         Student student = studentRepository.findOne(userId);
 
-        if(student != null) student.activate();
+        if (student != null) student.activate();
 
         return student;
     }

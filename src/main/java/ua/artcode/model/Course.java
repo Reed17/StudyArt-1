@@ -93,10 +93,13 @@ public class Course {
     public List<Lesson> getLessons() {
         return lessons;
     }
-    public Lesson getLesson(int id) {return lessons.get(id);}
 
     public void setLessons(List<Lesson> lessons) {
         this.lessons = lessons;
+    }
+
+    public Lesson getLesson(int id) {
+        return lessons.get(id);
     }
 
     @Override

@@ -8,13 +8,14 @@ import ua.artcode.model.User;
 /**
  * Created by zhenia on 23.04.17.
  */
-public interface UserService <T extends User> {
+public interface UserService<T extends User> {
 
     /**
      * method for creation new user with data validation
      * and message to email for account activation
+     *
      * @param login - user login
-     * @param pass - user pass
+     * @param pass  - user pass
      * @param email - user email
      * @return new User with inputed fields
      */
@@ -23,6 +24,7 @@ public interface UserService <T extends User> {
 
     /**
      * method for accepting email
+     *
      * @param userId - id of user for activation
      * @return activated user
      */

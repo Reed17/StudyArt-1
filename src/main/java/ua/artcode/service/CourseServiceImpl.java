@@ -20,10 +20,14 @@ import java.util.Collection;
 @Service
 public class CourseServiceImpl implements CourseService {
 
+    private final CourseRepository courseRepository;
+    private final CourseIOUtils courseIOUtils;
+
     @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private CourseIOUtils courseIOUtils;
+    public CourseServiceImpl(CourseRepository courseRepository, CourseIOUtils courseIOUtils) {
+        this.courseRepository = courseRepository;
+        this.courseIOUtils = courseIOUtils;
+    }
 
     @Override
     public boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException {

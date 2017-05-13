@@ -3,7 +3,6 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
-import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -34,27 +32,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class CourseControllerTest {
 
+    private static String tempPathForGitProjects;
+    private static String tempPathForExternalCodeCompiling;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper mapper;
-
-    @Value("${GitURL}")
+    @Value("${test.git.URL}")
     private String GitURL;
-
-    private static String tempPathForGitProjects;
-
-    private static String tempPathForExternalCodeCompiling;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
 
-    @Value("${pathForGitProjects}")
+    @AfterClass
+    public static void removeTempDir() throws IOException {
+        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
+        if (externalCodeCompiling.exists() && externalCodeCompiling.isDirectory())
+            FileUtils.deleteDirectory(externalCodeCompiling);
+        File gitProjects = new File(tempPathForGitProjects);
+        if (gitProjects.exists() && gitProjects.isDirectory())
+            FileUtils.deleteDirectory(gitProjects);
+    }
+
+    @Value("${application.courses.paths.git}")
     public void setPathForGitProjects(String path) {
         tempPathForGitProjects = path;
     }
 
-    @Value("${pathForExternalCodeCompiling}")
+    @Value("${application.courses.paths.externalCode}")
     public void setPathForExternalCodeCompiling(String path) {
         tempPathForExternalCodeCompiling = path;
     }
@@ -145,49 +149,6 @@ public class CourseControllerTest {
                 .andExpect(content().string(containsString("error")));
     }
 
-    @Test
-    public void testRunLessonWithSolutionPositive() throws Exception {
-        addCourse();
-        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(code)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(not(containsString("error")))))
-                .andExpect(content().string(is(containsString("7"))))
-                .andExpect(content().string(is(containsString("9"))));
-    }
-
-//    @Ignore
-    @Test
-    public void testRunLessonWithSolutionWithTestsPositive() throws Exception {
-
-        CourseFromUser courseFromUser = new CourseFromUser(1, "TestGitProject", "https://github.com/Maks9/TestGitProject.git");
-//        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+b;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(courseFromUser)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(not(containsString("error")))))
-                .andExpect(content().string(is(containsString("7"))))
-                .andExpect(content().string(is(containsString("9"))));
-    }
-
-
-    @Test
-    public void testRunLessonWithSolutionNegative() throws Exception {
-        addCourse();
-        ExternalCode code = new ExternalCode("public static int sum(int a, int b){return a+;}");
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(code)))
-                .andExpect(status().isOk())
-                .andExpect(content().string(is(containsString("error"))));
-    }
-
     private void addCourse() throws Exception {
         Course course = new Course(0,
                 "someCourse",
@@ -200,15 +161,5 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
-
-    @AfterClass
-    public static void removeTempDir() throws IOException {
-        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
-        if (externalCodeCompiling.exists() && externalCodeCompiling.isDirectory())
-            FileUtils.deleteDirectory(externalCodeCompiling);
-        File gitProjects = new File(tempPathForGitProjects);
-        if (gitProjects.exists() && gitProjects.isDirectory())
-            FileUtils.deleteDirectory(gitProjects);
     }
 }
