@@ -54,8 +54,8 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
+        // Course JSON with required name, author, URL, description
         try {
-
             boolean result = courseService.addCourse(course);
             LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
                     course.getName(),

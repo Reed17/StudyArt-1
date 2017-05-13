@@ -1,18 +1,17 @@
 package ua.artcode.service;
 
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
+import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
+import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 
-import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by v21k on 15.04.17.
@@ -21,24 +20,28 @@ import java.util.Collection;
 public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
+    private final LessonRepository lessonRepository;
     private final CourseIOUtils courseIOUtils;
 
     @Autowired
-    public CourseServiceImpl(CourseRepository courseRepository, CourseIOUtils courseIOUtils) {
+    public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository, CourseIOUtils courseIOUtils) {
         this.courseRepository = courseRepository;
+        this.lessonRepository = lessonRepository;
         this.courseIOUtils = courseIOUtils;
     }
 
     @Override
-    public boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException {
-        try {
-            course.setLocalPath(courseIOUtils.saveLocally(course.getUrl(), course.getName(), course.getId()));
-            course.setLessons(courseIOUtils.getLessons(course));
-        } catch (IOException e) {
-            throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
+    public int addCourse(Course course) /*throws DirectoryCreatingException, LessonsParsingException, GitAPIException*/ {
+//        try {
+//            course.setLocalPath(courseIOUtils.saveLocally(course.getUrl(), course.getName(), course.getId()));
+//            course.setLessons(courseIOUtils.getLessons(course));
+//        } catch (IOException e) {
+//            throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
+//        }
+        if (courseRepository.findByNameAndAuthor(course.getName(),course.getAuthor()) != null) {
+            return -1;
         }
-        courseRepository.save(course);
-        return true;
+        return courseRepository.save(course).getId();
     }
 
     @Override
@@ -55,5 +58,24 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Collection<Course> getAll() {
         return (Collection<Course>) courseRepository.findAll();
+    }
+
+    @Override
+    public int addLesson(Lesson lesson, int courceID) {
+//        try {
+//            lesson.setLocalPath(courseIOUtils.saveLocally(course.getUrl(), course.getName(), course.getId()));
+//            course.setLessons(courseIOUtils.getLessons(course));
+//        } catch (IOException e) {
+//            throw new LessonsParsingException("Can't parse lessons for course: " + course.getName());
+//        }
+        //add class paths
+        //add validation
+
+        List<Lesson> courseLessons = courseRepository.findOne(courceID).getLessons();
+        if (courseLessons.contains(lesson)) {
+            return -1;
+        }
+        courseLessons.add(lessonRepository.save(lesson));
+        return lesson.getId();
     }
 }

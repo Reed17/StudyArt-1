@@ -6,6 +6,7 @@ import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
+import ua.artcode.model.Lesson;
 
 import java.util.Collection;
 
@@ -13,11 +14,13 @@ import java.util.Collection;
  * Created by v21k on 15.04.17.
  */
 public interface CourseService {
-    boolean addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
+    int addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
 
     Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
 
     boolean removeCourse(int id) throws InvalidIDException;
 
     Collection<Course> getAll();
+
+    int addLesson(Lesson lesson, int courceID);
 }

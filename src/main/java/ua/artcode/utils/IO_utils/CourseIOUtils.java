@@ -58,7 +58,38 @@ public class CourseIOUtils {
      *
      * @return path where project has been saved
      */
+    @Deprecated
     public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
+        String projectPath = generatePath(courseName, courseID);
+        File projectDirectory = new File(projectPath);
+        try {
+            if (projectDirectory.exists()) {
+                FileUtils.cleanDirectory(new File(projectPath));
+            }
+            Files.createDirectories(Paths.get(projectPath));
+            Git.cloneRepository()
+                    .setURI(courseURL)
+                    .setDirectory(projectDirectory)
+                    .call()
+                    .getRepository()
+                    .close();
+
+        } catch (IOException e) {
+            throw new DirectoryCreatingException("Unable to create a directory for course: " + courseName);
+        }
+        return projectPath;
+    }
+
+    /**
+     * Downloading lesson from Git and save it locally
+     * <p>
+     * 1.Create directory for project.
+     * 2.Clone git project to dir.
+     * 3.Return path.
+     *
+     * @return path where project has been saved
+     */
+    public String saveCourseLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
@@ -88,7 +119,7 @@ public class CourseIOUtils {
      *
      * @return List of lessons
      **/
-
+    @Deprecated
     public List<Lesson> getLessons(Course course) throws IOException {
         String courseLocalPath = course.getLocalPath();
 

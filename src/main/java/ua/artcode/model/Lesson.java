@@ -43,6 +43,62 @@ public class Lesson implements Comparable<Lesson> {
         this.localPath = localPath;
     }
 
+    public List<String> getBaseClasses() {
+        return baseClasses;
+    }
+
+    public void setBaseClasses(List<String> baseClasses) {
+        this.baseClasses = baseClasses;
+    }
+
+    public List<String> getRequiredClasses() {
+        return requiredClasses;
+    }
+
+    public void setRequiredClasses(List<String> requiredClasses) {
+        this.requiredClasses = requiredClasses;
+    }
+
+    public List<String> getTestsClasses() {
+        return testsClasses;
+    }
+
+    public void setTestsClasses(List<String> testsClasses) {
+        this.testsClasses = testsClasses;
+    }
+
+    public String getSourcesRoot() {
+        return sourcesRoot;
+    }
+
+    public void setSourcesRoot(String sourcesRoot) {
+        this.sourcesRoot = sourcesRoot;
+    }
+
+    public String getTestsRoot() {
+        return testsRoot;
+    }
+
+    public void setTestsRoot(String testsRoot) {
+        this.testsRoot = testsRoot;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -75,7 +131,8 @@ public class Lesson implements Comparable<Lesson> {
         Lesson lesson = (Lesson) o;
 
         if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
-        return localPath != null ? localPath.equals(lesson.localPath) : lesson.localPath == null;
+        return true;
+//        return localPath != null ? localPath.equals(lesson.localPath) : lesson.localPath == null;
     }
 
     @Override

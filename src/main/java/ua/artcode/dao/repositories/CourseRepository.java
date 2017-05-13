@@ -7,4 +7,6 @@ import ua.artcode.model.Course;
 @Repository
 public interface CourseRepository extends CrudRepository<Course, Integer> {
 
+    Course findByNameAndAuthor(String name, String author);
+
 }

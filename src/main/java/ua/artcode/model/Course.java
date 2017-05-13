@@ -23,10 +23,14 @@ public class Course {
     private String localPath;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Lesson> lessons;
+    private String description;
+
+
 
     public Course() {
     }
 
+    @Deprecated
     public Course(int id, String name, String author, String url, String localPath, List<Lesson> lessons) {
         this.id = id;
         this.name = name;
@@ -36,6 +40,7 @@ public class Course {
         this.lessons = lessons;
     }
 
+    @Deprecated
     public Course(String name, String author, String url, String localPath, List<Lesson> lessons) {
         this.name = name;
         this.author = author;
@@ -48,6 +53,14 @@ public class Course {
         this.name = name;
         this.author = author;
         this.url = url;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Integer getId() {
