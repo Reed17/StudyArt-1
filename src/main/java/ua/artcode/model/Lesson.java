@@ -15,6 +15,13 @@ public class Lesson implements Comparable<Lesson> {
     private Integer id;
     private String name;
     private String localPath;
+    /* todo
+    * ... 3 lists with classpaths (.java.) - base, required, tests
+    * 3 ready OR 3 paths to directories(need to parse)
+    * + sourcesRoot - src/main/java
+    * + testsRoot - src/test/java
+    * + descr
+    * + date */
 
     public Lesson() {
     }
