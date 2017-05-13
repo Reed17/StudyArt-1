@@ -41,8 +41,6 @@ public class CourseControllerTest {
     @Value("${test.git.URL}")
     private String GitURL;
 
-    // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
-
     @AfterClass
     public static void removeTempDir() throws IOException {
         File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
