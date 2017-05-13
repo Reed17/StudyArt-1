@@ -3,7 +3,6 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +13,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
-import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;

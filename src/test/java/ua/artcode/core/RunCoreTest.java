@@ -1,5 +1,6 @@
 package ua.artcode.core;
 
+import com.google.common.io.Resources;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -15,14 +16,11 @@ import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.model.response.RunResults;
-import ua.artcode.utils.IO_utils.CommonIOUtils;
-import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.net.URISyntaxException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +40,7 @@ public class RunCoreTest {
     private String sourcesTestRoot;
 
     @Autowired
-    RunCore core;
+    private RunCore core;
 
     @Before
     public void setUp() throws Exception {
@@ -264,32 +262,11 @@ public class RunCoreTest {
         return classFile.getPath();
     }
 
-    private void generateAndSavePom() throws IOException {
-        String pomContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
-                "    <modelVersion>4.0.0</modelVersion>\n" +
-                "\n" +
-                "    <groupId>ua.artcode</groupId>\n" +
-                "    <artifactId>study-art</artifactId>\n" +
-                "    <version>1.0</version>\n" +
-                "<dependencies>\n" +
-                "<dependency>\n" +
-                "    <groupId>args4j</groupId>\n" +
-                "    <artifactId>args4j</artifactId>\n" +
-                "    <version>2.33</version>\n" +
-                "</dependency>\n" +
-                "<dependency>\n" +
-                "            <groupId>junit</groupId>\n" +
-                "            <artifactId>junit</artifactId>\n" +
-                "            <version>4.12</version>\n" +
-                "        </dependency>" +
-                "</dependencies>\n" +
-                "</project>";
+    private void generateAndSavePom() throws IOException, URISyntaxException {
+        Path sourcePomPath = Paths.get(Resources.getResource("run_core_tests" + File.separator + "testpom.xml").toURI());
+        Path pomPath = Paths.get(projectRoot + File.separator + "pom.xml");
 
-        String pomPath = projectRoot + File.separator + "pom.xml";
-
-        Files.write(Paths.get(pomPath), pomContent.getBytes(), StandardOpenOption.CREATE);
+        Files.copy(sourcePomPath, pomPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private String insertInMain(String content) {

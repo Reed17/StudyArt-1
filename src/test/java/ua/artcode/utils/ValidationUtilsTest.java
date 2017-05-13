@@ -14,7 +14,7 @@ import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Created by zhenia on 28.04.17.
