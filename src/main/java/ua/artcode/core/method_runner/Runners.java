@@ -10,6 +10,7 @@ import java.lang.reflect.Method;
  * Created by v21k on 16.04.17.
  */
 public class Runners {
+    // todo we should pass methodName to run... Discuss it???
     public static MethodRunner main = (classes -> {
         for (Class<?> aClass : classes) {
             Method method = aClass.getMethod("main", String[].class);
