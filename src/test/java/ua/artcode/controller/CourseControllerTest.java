@@ -192,19 +192,23 @@ public class CourseControllerTest {
             InvalidUserEmailException,
             InvalidUserPassException {
         List<Course> courses = new ArrayList<>();
-        courses.add(new Course(0,
+        Course e = new Course(0,
                 "someCourse",
                 "VK",
                 GitURL,
                 null,
-                null));
-        courseDB.addCourse(courses.get(0));
+                null);
+        courses.add(e);
+        courseDB.addCourse(e);
         studentService.register("login1", "123456", "newbie@gmail.com");
+
+        // todo use Repositories
         Student found = (Student) userDB.getUserByLogin("login1");
         studentService.activate(found.getId());
-        found.subscribeTo(courses.get(0));
+        found.subscribeTo(e);
         found.setCompleted(courses);
-        String actual = studentService.getUserCourseStatistic(found.getLogin(), courses.get(0).getId());
+        String actual = studentService.getUserCourseStatistic(found.getLogin(), e.getId());
+        // todo extract to separate file or ???
         String expected = "{\"value\":" +
                 "{\"id\":4,\"name\":\"someCourse\",\"author\":\"VK\"," +
                 "\"url\":\"https://github.com/v21k/TestGitProject.git\"," +
@@ -213,6 +217,7 @@ public class CourseControllerTest {
                 "{\"id\":0,\"name\":\"_02_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_02_lesson\"}," +
                 "{\"id\":0,\"name\":\"_03_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_03_lesson\"}," +
                 "{\"id\":0,\"name\":\"_04_lesson\",\"localPath\":\"course/4someCourse/src/main/java/_04_lesson\"}]}}";
+        // todo use lib to compare two jsons. Spring test knows how to do it. Assertions within jsons. JSON path
         Assert.assertNotNull(actual);
         Assert.assertEquals(expected, actual);
     }

@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 public class StudentService implements UserService<Student>, IStudentService {
 
+    // todo use Repositories
     @Autowired
     private UserDB<Teacher> teacherDB;
 
@@ -81,9 +82,12 @@ public class StudentService implements UserService<Student>, IStudentService {
             LoginException,
             InvalidUserLoginException {
 
+        // refactor validation considering Repositories
         validationUtils.checkLoginOriginality(login, teacherDB, studentDB);
         Student student = studentDB.getUserByLogin(login);
         List<Course> subscribed = student.getSubscribed();
+        // todo you have not create Gson each time. GSon object should be a bean
+        // todo what if student has more than one subscribed course
         return new Gson().toJson(subscribed.stream().filter(subscribed::contains).findFirst());
 
     }
