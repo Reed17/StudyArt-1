@@ -19,6 +19,9 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
+
+    // todo copy mail sender configuration from xml
+
     @Bean
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
