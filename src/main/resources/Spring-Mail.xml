@@ -1,15 +1,15 @@
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <!--todo create using class configuration-->
 
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtp.gmail.com" />
-        <property name="port" value="587" />
-        <property name="username" value="studyartteam@gmail.com" />
-        <property name="password" value="pass_for_study" />
+        <property name="host" value="smtp.gmail.com"/>
+        <property name="port" value="587"/>
+        <property name="username" value="studyartteam@gmail.com"/>
+        <property name="password" value="pass_for_study"/>
 
         <property name="javaMailProperties">
             <props>
@@ -20,7 +20,7 @@ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
     </bean>
 
     <bean id="mailUtils" class="ua.artcode.utils.MailUtils">
-        <property name="mailSender" ref="mailSender" />
+        <property name="mailSender" ref="mailSender"/>
     </bean>
 
 </beans>

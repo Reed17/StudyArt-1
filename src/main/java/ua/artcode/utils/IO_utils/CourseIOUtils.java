@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 @Component
 public class CourseIOUtils {
 
-    @Value("${pathForGitProjects}")
+    @Value("${application.courses.paths.git}")
     private String localPathForProjects;
-    @Value("${pathForExternalCodeCompiling}")
+    @Value("${application.courses.paths.externalCode}")
     private String localPathForExternalCode;
     @Value("${maven.dependenciesPath}")
     private String mvnDependencyDownloadPath;

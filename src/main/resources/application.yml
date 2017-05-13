@@ -1,17 +1,21 @@
-pathForGitProjects: courses
-pathForExternalCodeCompiling: temp
-profiling: true
+application:
+  courses:
+    paths:
+      git: courses
+      externalCode: temp
+  profiling: true
+
+email:
+    server: "http://localhost:8080"
+    user: "studyartteam@gmail.com"
+    pass: "pass_for_study"
 
 maven:
-  dependenciesPath: dependencies
-  goals:
-    copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-  # path to maven directory where /bin located (/usr/share/maven)
-  home: M2_HOME
-
-serverLink: "http://localhost:8080"
-emailUsername: "studyartteam@gmail.com"
-emailPass: "pass_for_study"
+    dependenciesPath: dependencies
+    goals:
+      copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
+    # path to maven directory where /bin located (/usr/share/maven)
+    home: M2_HOME
 
 logging:
   level:

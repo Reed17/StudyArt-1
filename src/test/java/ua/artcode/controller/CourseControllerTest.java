@@ -32,27 +32,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 public class CourseControllerTest {
 
+    private static String tempPathForGitProjects;
+    private static String tempPathForExternalCodeCompiling;
     @Autowired
     private MockMvc mockMvc;
-
     @Autowired
     private ObjectMapper mapper;
-
-    @Value("${GitURL}")
+    @Value("${test.git.URL}")
     private String GitURL;
-
-    private static String tempPathForGitProjects;
-
-    private static String tempPathForExternalCodeCompiling;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
 
-    @Value("${pathForGitProjects}")
+    @AfterClass
+    public static void removeTempDir() throws IOException {
+        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
+        if (externalCodeCompiling.exists() && externalCodeCompiling.isDirectory())
+            FileUtils.deleteDirectory(externalCodeCompiling);
+        File gitProjects = new File(tempPathForGitProjects);
+        if (gitProjects.exists() && gitProjects.isDirectory())
+            FileUtils.deleteDirectory(gitProjects);
+    }
+
+    @Value("${application.courses.paths.git}")
     public void setPathForGitProjects(String path) {
         tempPathForGitProjects = path;
     }
 
-    @Value("${pathForExternalCodeCompiling}")
+    @Value("${application.courses.paths.externalCode}")
     public void setPathForExternalCodeCompiling(String path) {
         tempPathForExternalCodeCompiling = path;
     }
@@ -155,15 +161,5 @@ public class CourseControllerTest {
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-    }
-
-    @AfterClass
-    public static void removeTempDir() throws IOException {
-        File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
-        if (externalCodeCompiling.exists() && externalCodeCompiling.isDirectory())
-            FileUtils.deleteDirectory(externalCodeCompiling);
-        File gitProjects = new File(tempPathForGitProjects);
-        if (gitProjects.exists() && gitProjects.isDirectory())
-            FileUtils.deleteDirectory(gitProjects);
     }
 }

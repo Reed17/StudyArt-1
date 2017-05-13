@@ -34,7 +34,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = {Application.class})
 public class RunCoreTest {
 
-    @Value("${coreTestDir}")
+    @Value("${test.paths.core}")
     private String projectRoot;
     private String sourcesRoot;
     private String sourcesTestRoot;

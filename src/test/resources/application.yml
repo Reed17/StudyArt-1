@@ -1,14 +1,22 @@
-pathForGitProjects: course
-pathForExternalCodeCompiling: ext
-GitURL: https://github.com/v21k/TestGitProject.git
-coreTestDir: coreTest
+test:
+  paths:
+    core: coreTest
+  git:
+    URL: https://github.com/v21k/TestGitProject.git
+
+application:
+  courses:
+    paths:
+      git: courses_test
+      externalCode: temp_test
+  profiling: true
 
 maven:
-  dependenciesPath: dependencies
-  goals:
-    copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-  # path to maven directory where /bin located (/usr/share/maven)
-  home: M2_HOME
+    dependenciesPath: dependencies
+    goals:
+      copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
+    # path to maven directory where /bin located (/usr/share/maven)
+    home: M2_HOME
 
 spring.datasource:
   url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
