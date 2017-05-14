@@ -20,8 +20,8 @@ maven:
     dependenciesPath: dependencies
     goals:
       copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-    # path to maven directory where /bin located (/usr/share/maven)
-    home: M2_HOME
+    embedded:
+      path: /home/v21k/dev/project/StudyArt-1/mvnw
 
 spring:
   datasource:

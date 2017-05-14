@@ -1,6 +1,8 @@
 package ua.artcode.utils.IO_utils;
 
-import org.apache.maven.shared.invoker.*;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -42,6 +44,8 @@ public class CourseIOUtils {
     private String mvnCopyToDirectory;
     @Value("${maven.home}")
     private String mvnHome;
+    @Value("${maven.embedded.path}")
+    private String embeddedMavenExecutablePath;
 
     private final CommonIOUtils commonIOUtils;
 
@@ -190,6 +194,7 @@ public class CourseIOUtils {
         request.setGoals(Collections.singletonList(mavenGoal));
 
         try {
+            invoker.setMavenExecutable(new File(embeddedMavenExecutablePath));
             invoker.execute(request);
         } catch (MavenInvocationException e) {
             e.printStackTrace();
