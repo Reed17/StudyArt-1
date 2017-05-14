@@ -2,16 +2,11 @@ package ua.artcode.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
-import org.apache.log4j.spi.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ua.artcode.exceptions.*;
-import ua.artcode.model.Course;
 import ua.artcode.model.User;
 import ua.artcode.service.StudentService;
 import ua.artcode.service.TeacherService;
@@ -52,7 +47,7 @@ public class UserController {
         User newUser = null;
 
         try {
-            if(type.toLowerCase().equals("teacher")) {
+            if (type.toLowerCase().equals("teacher")) {
                 newUser = teacherService.register(login, pass, email);
             } else {
                 newUser = studentService.register(login, pass, email);
@@ -86,7 +81,7 @@ public class UserController {
     public User activateUser(@RequestParam int id) {
         User activatedUser = teacherService.activate(id);
 
-        if(activatedUser == null) activatedUser = studentService.activate(id);
+        if (activatedUser == null) activatedUser = studentService.activate(id);
 
         LOGGER.info("Activation - OK, id = " + activatedUser.getId());
 

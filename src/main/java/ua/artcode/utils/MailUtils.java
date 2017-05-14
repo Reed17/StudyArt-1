@@ -9,9 +9,15 @@ import ua.artcode.model.User;
 /**
  * Created by zhenia on 24.04.17.
  */
+@Component
 public class MailUtils {
 
-    private MailSender mailSender;
+    private final MailSender mailSender;
+
+    @Autowired
+    public MailUtils(MailSender mailSender) {
+        this.mailSender = mailSender;
+    }
 
     public void sendEmail(String myAdress, String email, String subject, String msg) {
         SimpleMailMessage message = new SimpleMailMessage();
@@ -30,9 +36,5 @@ public class MailUtils {
 
     public MailSender getMailSender() {
         return mailSender;
-    }
-
-    public void setMailSender(MailSender mailSender) {
-        this.mailSender = mailSender;
     }
 }

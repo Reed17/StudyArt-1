@@ -1,6 +1,8 @@
 package ua.artcode.utils;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,7 @@ import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Created by zhenia on 28.04.17.
@@ -37,6 +39,12 @@ public class ValidationUtilsTest {
 
         teachers.save(new Teacher("teacher", "password", "teacher@gmail.com"));
         students.save(new Student("student", "password", "student@gmail.com"));
+    }
+
+    @After
+    public void cleanRepositories(){
+        teachers.deleteAll();
+        students.deleteAll();
     }
 
     @Test

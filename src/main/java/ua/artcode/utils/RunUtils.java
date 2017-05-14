@@ -1,5 +1,6 @@
 package ua.artcode.utils;
 
+import com.google.common.collect.ObjectArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -39,7 +41,7 @@ public class RunUtils {
 //        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
 
         // .jar files (will be added to classpath) - must be concatenated with ":" delimiter
-        String jarPathsAsString = getJarPaths(projectRoot).stream()
+        String jarPathsAsString = Arrays.stream(getJarPaths(projectRoot))
                 .map(path -> path + File.pathSeparator)
                 .collect(Collectors.joining());
 
@@ -115,30 +117,34 @@ public class RunUtils {
      * Convert all classPath values (.jar and sourceRoot path) to URLs
      */
     private static URL[] getClassPathsAsURLs(String projectRoot, String[] sourcesRoot) throws IOException {
-        List<String> jarPaths = getJarPaths(projectRoot);
 
-        // size()+1 - because we will add 1 more URL - sourceRoot
-        URL[] classPathsAsURLs = new URL[jarPaths.size() + sourcesRoot.length];
-        for (int i = 0; i < jarPaths.size(); i++) {
-            classPathsAsURLs[i] = new File(jarPaths.get(i)).toURI().toURL();
-        }
+        URL[] jarPathsAsURL = convertToURL(getJarPaths(projectRoot));
+        URL[] classPathsAsURL = convertToURL(sourcesRoot);
+        return ObjectArrays.concat(jarPathsAsURL, classPathsAsURL, URL.class);
+    }
 
-        // add sourceRoot paths
-        for (int i = classPathsAsURLs.length - sourcesRoot.length; i < classPathsAsURLs.length; i++) {
-            classPathsAsURLs[i] = new File(sourcesRoot[i - sourcesRoot.length]).toURI().toURL();
-        }
-
-        return classPathsAsURLs;
+    private static URL[] convertToURL(String[] paths) {
+        return Arrays.stream(paths)
+                .map(File::new)
+                .map(File::toURI)
+                .map(uri -> {
+                    try {
+                        return uri.toURL();
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toArray(URL[]::new);
     }
 
     /**
      * Walks through project root dir and collects all .jar files
      */
-    private static List<String> getJarPaths(String projectRoot) throws IOException {
+    private static String[] getJarPaths(String projectRoot) throws IOException {
         return Files.walk(Paths.get(projectRoot))
                 .map(Path::toString)
                 .filter(path -> path.endsWith(".jar"))
                 .map(path -> new File(path).getAbsolutePath())
-                .collect(Collectors.toList());
+                .toArray(String[]::new);
     }
 }

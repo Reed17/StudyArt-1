@@ -1,4 +1,4 @@
-package ua.artcode.utils;
+package ua.artcode.aop;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -18,7 +18,7 @@ import java.util.Map;
  */
 @Aspect
 @Component
-@ConditionalOnProperty(name = "profiling", havingValue = "true")
+@ConditionalOnProperty(name = "application.profiling", havingValue = "true")
 public class TimeExecutionProfiler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TimeExecutionProfiler.class);

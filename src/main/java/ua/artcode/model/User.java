@@ -1,10 +1,6 @@
 package ua.artcode.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.persistence.*;
 
 /**
  * Created by zhenia on 23.04.17.
@@ -12,10 +8,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Entity
 @Inheritance
 public class User {
-    @Id@GeneratedValue
+    @Id
+    @GeneratedValue
     protected int id;
+    @Column (unique = true)
     protected String login;
     protected String pass;
+    @Column (unique = true)
     protected String email;
     protected boolean isActivated;
 

@@ -3,8 +3,6 @@ package ua.artcode.core.pre_processor;
 import ua.artcode.utils.RunUtils;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import static ua.artcode.utils.StringUtils.getClassNameFromClassPath;
@@ -26,7 +24,7 @@ public class PreProcessors {
 
     public static MethodRunnerPreProcessor lessonsMain = ((classPaths, classLoader) -> {
         String classNames[] = Arrays.stream(classPaths)
-                .map(path -> getClassNameFromClassPath(path, "java"+File.separator))
+                .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
                 .filter(path -> path.toLowerCase().contains("main"))
                 .toArray(String[]::new);
 
@@ -38,7 +36,7 @@ public class PreProcessors {
     public static MethodRunnerPreProcessor lessonsTests = ((classPaths, classLoader) -> {
 
         String[] classNames = Arrays.stream(classPaths)
-                .map(path -> getClassNameFromClassPath(path, "java"+File.separator))
+                .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
 //                .map(path -> Paths.get(path).toAbsolutePath().toString())
                 .filter(path -> path.toLowerCase().contains("test"))
                 .toArray(String[]::new);

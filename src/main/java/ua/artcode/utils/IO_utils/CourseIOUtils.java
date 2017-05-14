@@ -22,11 +22,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -34,9 +32,9 @@ import java.util.stream.Stream;
 @Component
 public class CourseIOUtils {
 
-    @Value("${pathForGitProjects}")
+    @Value("${application.courses.paths.git}")
     private String localPathForProjects;
-    @Value("${pathForExternalCodeCompiling}")
+    @Value("${application.courses.paths.externalCode}")
     private String localPathForExternalCode;
     @Value("${maven.dependenciesPath}")
     private String mvnDependencyDownloadPath;
@@ -45,11 +43,21 @@ public class CourseIOUtils {
     @Value("${maven.home}")
     private String mvnHome;
 
-    @Autowired
-    private CommonIOUtils commonIOUtils;
+    private final CommonIOUtils commonIOUtils;
+
+    private final CourseRepository courseRepository;
+
+    private final InvocationRequest request;
+
+    private final Invoker invoker;
 
     @Autowired
-    private CourseRepository courseRepository;
+    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+        this.commonIOUtils = commonIOUtils;
+        this.courseRepository = courseRepository;
+        this.request = invocationRequest;
+        this.invoker = invoker;
+    }
 
     /**
      * Downloading project from Git and save it locally
@@ -149,7 +157,7 @@ public class CourseIOUtils {
 
         //TODO lesson with uniqe id
         Course course = courseRepository.findOne(courseId);
-        Lesson lesson = course.getLesson(lessonNumber-1);
+        Lesson lesson = course.getLesson(lessonNumber - 1);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
     }
 
@@ -173,10 +181,6 @@ public class CourseIOUtils {
      * @return true if saved successfully, false otherwise
      */
     public boolean saveMavenDependenciesLocally(String projectRoot) {
-        // todo declare beans for both
-        InvocationRequest request = new DefaultInvocationRequest();
-        Invoker invoker = new DefaultInvoker();
-
         projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
 
         String pomPath = generatePomPath(projectRoot);
@@ -184,7 +188,6 @@ public class CourseIOUtils {
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-//        invoker.setMavenHome(new File(mvnHome));
 
         try {
             invoker.execute(request);
