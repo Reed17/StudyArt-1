@@ -8,6 +8,7 @@ Hi there
 1. Set path for git project and for external code (if you want to send a class) in resources/app.properties
 2. Create git repository if you want to run "lessons" or send solutions. You can use my test repo https://github.com/v21k/TestGitProject.git
 3. Install Postman or another app to send GET/POST requests
+4. Change maven.embedded.path in application.yml (for main and test)
 
 **Git repo**
 
