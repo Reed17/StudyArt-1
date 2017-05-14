@@ -1,9 +1,6 @@
 package ua.artcode.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Inheritance;
+import javax.persistence.*;
 
 /**
  * Created by zhenia on 23.04.17.
@@ -14,8 +11,10 @@ public class User {
     @Id
     @GeneratedValue
     protected int id;
+    @Column (unique = true)
     protected String login;
     protected String pass;
+    @Column (unique = true)
     protected String email;
     protected boolean isActivated;
 

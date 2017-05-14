@@ -51,13 +51,13 @@ public class ValidationUtils {
     }
 
     public boolean checkLoginOriginality(String login, TeacherRepository teacherRepository, StudentRepository studentRepository) {
-        return (teacherRepository.findByLogin(login).isEmpty()
-                && studentRepository.findByLogin(login).isEmpty());
+        return (teacherRepository.findByLogin(login) == null
+                && studentRepository.findByLogin(login) == null);
     }
 
     public boolean checkEmailOriginality(String email, TeacherRepository teacherRepository, StudentRepository studentRepository) {
-        return (teacherRepository.findByEmail(email).isEmpty()
-                && studentRepository.findByEmail(email).isEmpty());
+        return (teacherRepository.findByEmail(email) == null
+                && studentRepository.findByEmail(email) == null);
     }
 
 
