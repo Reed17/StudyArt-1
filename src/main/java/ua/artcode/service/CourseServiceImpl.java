@@ -5,14 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -59,30 +58,32 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public int addLesson(Lesson lesson, int courseID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException {
+    public int addLesson(Lesson lesson, int courseID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException, IOException, LessonClassPathsException {
 
         Course course = courseRepository.findOne(courseID);
 
         String tempCourseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
-        if (lesson.getBaseClasses() == null) {
-            if (lesson.getSourcesRoot() != null) {
-                String[] baseClassPaths = courseIOUtils.getLessonClassPaths();
-            } else {
-             //exception
-            }
+        String[] baseClassPaths = courseIOUtils.getLessonClassPaths(lesson.getBaseClasses(), lesson.getSourcesRoot());
+
+        String[] testsClassPaths = courseIOUtils.getLessonClassPaths(lesson.getTestsClasses(), lesson.getTestsRoot());
+
+        if (baseClassPaths.length == 0 || testsClassPaths.length == 0) {
+            throw new LessonClassPathsException("No class paths in lesson");
         }
 
+        lesson.setBaseClasses(Arrays.asList(baseClassPaths));
+        lesson.setTestsClasses(Arrays.asList(baseClassPaths));
 
-
-
-        //add class paths
         //add validation
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) {
             return -1;
         }
+
+        lesson.setCourseID(courseID);
+
         courseLessons.add(lessonRepository.save(lesson));
         return lesson.getId();
     }

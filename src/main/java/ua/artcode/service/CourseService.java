@@ -1,13 +1,11 @@
 package ua.artcode.service;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 
+import java.io.IOException;
 import java.util.Collection;
 
 /**
@@ -22,5 +20,5 @@ public interface CourseService {
 
     Collection<Course> getAll();
 
-    int addLesson(Lesson lesson, int courceID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException;
+    int addLesson(Lesson lesson, int courceID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException, IOException, LessonClassPathsException;
 }

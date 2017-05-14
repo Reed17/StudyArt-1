@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.repositories.CourseRepository;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonNotFoundException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.StringUtils;
@@ -24,9 +21,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -145,18 +144,30 @@ public class CourseIOUtils {
     }
 
 
-    public String[] getLessonClassPaths(String path) {
-        return parseFilePaths(path, ".java");
+    public String[] getLessonClassPaths(List<String> classPaths, String sourceRoot) throws IOException, LessonClassPathsException {
+
+        if (classPaths == null || classPaths.size() == 0) {
+            if (sourceRoot != null) {
+                try {
+                    return commonIOUtils.parseFilePaths(sourceRoot);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                throw new LessonClassPathsException("No classes in lesson or not valid class path");
+            }
+        }
+
+        return (String[]) classPaths.toArray();
     }
 
+    public String[] getLessonClassPaths(String path, String endsWith) throws IOException {
+        return commonIOUtils.parseFilePaths(path, "java");
+    }
 
-
-    public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
-//        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
-        String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
-        return testsClassPaths;
-//        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
-//                .toArray(String[]::new);
+    public String[] getLessonClassAndTestsPaths(List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws IOException {
+        return Stream.concat(lessonSourceClasses.stream(), Stream.concat(lessonTestsClasses.stream(), lessonRequiredClasses.stream()))
+                .toArray(String[]::new);
     }
 
     /**

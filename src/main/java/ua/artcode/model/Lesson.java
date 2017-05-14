@@ -1,9 +1,6 @@
 package ua.artcode.model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
@@ -26,6 +23,7 @@ public class Lesson implements Comparable<Lesson> {
     private String sourcesRoot;
     private String testsRoot;
     private String description;
+    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime date;
 
 
@@ -123,6 +121,14 @@ public class Lesson implements Comparable<Lesson> {
 
     public void setLocalPath(String localPath) {
         this.localPath = localPath;
+    }
+
+    public Integer getCourseID() {
+        return courseID;
+    }
+
+    public void setCourseID(Integer courseID) {
+        this.courseID = courseID;
     }
 
     @Override

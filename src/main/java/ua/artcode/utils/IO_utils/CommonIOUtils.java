@@ -33,6 +33,12 @@ public class CommonIOUtils {
                 .toArray(String[]::new);
     }
 
+    public String[] parseFilePaths(String path) throws IOException {
+        return Files.walk(Paths.get(path))
+                .map(Path::toString)
+                .toArray(String[]::new);
+    }
+
     public void deleteAndWrite(String path, String content) throws FileNotFoundException {
         try (PrintWriter pw = new PrintWriter(path)) {
             pw.write(content);

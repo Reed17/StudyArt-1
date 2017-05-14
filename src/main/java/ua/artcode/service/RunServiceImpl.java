@@ -8,6 +8,7 @@ import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.dao.repositories.CourseRepository;
+import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -18,6 +19,7 @@ import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
+import java.util.Arrays;
 
 /**
  * Created by v21k on 15.04.17.
@@ -27,13 +29,15 @@ public class RunServiceImpl implements RunService {
 
     private final CommonIOUtils commonIOUtils;
     private final CourseRepository courseDB;
+    private final LessonRepository lessonDB;
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
 
     @Autowired
-    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, CourseIOUtils courseIOUtils, RunCore runCore) {
+    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, LessonRepository lessonDB, CourseIOUtils courseIOUtils, RunCore runCore) {
         this.commonIOUtils = commonIOUtils;
         this.courseDB = courseDB;
+        this.lessonDB = lessonDB;
         this.courseIOUtils = courseIOUtils;
         this.runCore = runCore;
     }
@@ -72,17 +76,23 @@ public class RunServiceImpl implements RunService {
     }
 
     @Override
-    public RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource) throws Exception {
+    public RunResults runLessonWithSolutionTests(int courseId, int lessonID, CourseFromUser userCource) throws Exception {
 
         String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
         // todo get lesson by date (corresponding course)
-        Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
 
-        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getLocalPath());
+        Lesson lesson = lessonDB.findOne(lessonID);
 
-        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
-        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length - 1], "java" + File.separator);
+//        Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
+
+        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getBaseClasses(), lesson.getTestsClasses(), lesson.getRequiredClasses());
+
+//        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
+//        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length - 1], "java" + File.separator);
+
+        String[] classPaths =
+
 
 
         // run main (tests classes)

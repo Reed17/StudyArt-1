@@ -7,4 +7,5 @@ import ua.artcode.model.Lesson;
 
 @Repository
 public interface LessonRepository extends CrudRepository<Lesson, Integer> {
+
 }
