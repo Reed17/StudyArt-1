@@ -23,8 +23,8 @@ public class Course {
     private String localPath;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Lesson> lessons;
+    @Pattern(regexp = "^[\\s]*$", message = "No description")
     private String description;
-
 
 
     public Course() {

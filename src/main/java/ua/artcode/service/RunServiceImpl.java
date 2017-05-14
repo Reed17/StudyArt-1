@@ -74,7 +74,7 @@ public class RunServiceImpl implements RunService {
     @Override
     public RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource) throws Exception {
 
-        String projectLocalPath = courseIOUtils.saveLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
+        String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
         // todo get lesson by date (corresponding course)
         Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);

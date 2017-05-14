@@ -3,6 +3,7 @@ package ua.artcode.model;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
@@ -16,6 +17,7 @@ public class Lesson implements Comparable<Lesson> {
     @Id
     @GeneratedValue
     private Integer id;
+    private Integer courseID;
     private String name;
     private String localPath;
     private List<String> baseClasses;
@@ -126,19 +128,18 @@ public class Lesson implements Comparable<Lesson> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof Lesson)) return false;
 
         Lesson lesson = (Lesson) o;
 
-        if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
-        return true;
-//        return localPath != null ? localPath.equals(lesson.localPath) : lesson.localPath == null;
+        if (courseID != null ? !courseID.equals(lesson.courseID) : lesson.courseID != null) return false;
+        return name != null ? name.equals(lesson.name) : lesson.name == null;
     }
 
     @Override
     public int hashCode() {
-        int result = name != null ? name.hashCode() : 0;
-        result = 31 * result + (localPath != null ? localPath.hashCode() : 0);
+        int result = courseID != null ? courseID.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
         return result;
     }
 
@@ -151,8 +152,13 @@ public class Lesson implements Comparable<Lesson> {
     public String toString() {
         return "Lesson{" +
                 "id=" + id +
+                ", courseID=" + courseID +
                 ", name='" + name + '\'' +
-                ", localPath='" + localPath + '\'' +
+                ", baseClasses=" + baseClasses +
+                ", requiredClasses=" + requiredClasses +
+                ", testsClasses=" + testsClasses +
+                ", description='" + description + '\'' +
+                ", date=" + date +
                 '}';
     }
 }

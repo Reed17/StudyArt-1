@@ -55,19 +55,22 @@ public class CourseController {
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
         // Course JSON with required name, author, URL, description
-        try {
-            boolean result = courseService.addCourse(course);
-            LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
-                    course.getName(),
-                    course.getAuthor(),
-                    course.getUrl());
-            return new GeneralResponse(ResponseType.INFO, "Course add - OK");
+//        try {
+        int result = courseService.addCourse(course);
+            if (result != -1) {
+                LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
+                        course.getName(),
+                        course.getAuthor(),
+                        course.getUrl());
+                return new GeneralResponse(ResponseType.INFO, "Course add - OK");
+            } else {
+                LOGGER.error("Course add - FAILED", "Course already exists!");
+                return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
+            }
+//        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
+//
 
-        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
-
-            LOGGER.error("Course add - FAILED", e);
-            return new GeneralResponse(ResponseType.ERROR, e.getMessage());
-        }
+//        }
     }
 
     @ApiOperation(httpMethod = "POST",

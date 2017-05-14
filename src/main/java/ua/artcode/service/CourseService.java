@@ -14,7 +14,7 @@ import java.util.Collection;
  * Created by v21k on 15.04.17.
  */
 public interface CourseService {
-    int addCourse(Course course) throws DirectoryCreatingException, LessonsParsingException, GitAPIException;
+    int addCourse(Course course);
 
     Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
 
@@ -22,5 +22,5 @@ public interface CourseService {
 
     Collection<Course> getAll();
 
-    int addLesson(Lesson lesson, int courceID);
+    int addLesson(Lesson lesson, int courceID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException;
 }

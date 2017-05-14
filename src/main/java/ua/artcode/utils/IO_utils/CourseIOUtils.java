@@ -4,6 +4,8 @@ import org.apache.maven.shared.invoker.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -58,37 +60,7 @@ public class CourseIOUtils {
      *
      * @return path where project has been saved
      */
-    @Deprecated
-    public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
-        String projectPath = generatePath(courseName, courseID);
-        File projectDirectory = new File(projectPath);
-        try {
-            if (projectDirectory.exists()) {
-                FileUtils.cleanDirectory(new File(projectPath));
-            }
-            Files.createDirectories(Paths.get(projectPath));
-            Git.cloneRepository()
-                    .setURI(courseURL)
-                    .setDirectory(projectDirectory)
-                    .call()
-                    .getRepository()
-                    .close();
 
-        } catch (IOException e) {
-            throw new DirectoryCreatingException("Unable to create a directory for course: " + courseName);
-        }
-        return projectPath;
-    }
-
-    /**
-     * Downloading lesson from Git and save it locally
-     * <p>
-     * 1.Create directory for project.
-     * 2.Clone git project to dir.
-     * 3.Return path.
-     *
-     * @return path where project has been saved
-     */
     public String saveCourseLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
@@ -172,15 +144,12 @@ public class CourseIOUtils {
         return localPathForExternalCode + File.separator + javaClassName;
     }
 
-    @Deprecated
-    public String[] getLessonClassPaths(int courseId, int lessonNumber) throws InvalidIDException,
-            CourseNotFoundException, LessonNotFoundException, IOException {
 
-        //TODO lesson with uniqe id
-        Course course = courseRepository.findOne(courseId);
-        Lesson lesson = course.getLesson(lessonNumber - 1);
-        return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
+    public String[] getLessonClassPaths(String path) {
+        return parseFilePaths(path, ".java");
     }
+
+
 
     public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
 //        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
