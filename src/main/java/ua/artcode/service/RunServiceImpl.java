@@ -80,20 +80,12 @@ public class RunServiceImpl implements RunService {
 
         String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
-        // todo get lesson by date (corresponding course)
-
         Lesson lesson = lessonDB.findOne(lessonID);
-
-//        Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
 
         String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getBaseClasses(), lesson.getTestsClasses(), lesson.getRequiredClasses());
 
 //        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
 //        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length - 1], "java" + File.separator);
-
-        String[] classPaths =
-
-
 
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model

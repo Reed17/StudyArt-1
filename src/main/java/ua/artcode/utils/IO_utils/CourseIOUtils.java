@@ -166,7 +166,9 @@ public class CourseIOUtils {
     }
 
     public String[] getLessonClassAndTestsPaths(List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws IOException {
-        return Stream.concat(lessonSourceClasses.stream(), Stream.concat(lessonTestsClasses.stream(), lessonRequiredClasses.stream()))
+        lessonSourceClasses.addAll(lessonTestsClasses);
+        lessonSourceClasses.addAll(lessonRequiredClasses);
+        return lessonSourceClasses.stream()
                 .toArray(String[]::new);
     }
 
