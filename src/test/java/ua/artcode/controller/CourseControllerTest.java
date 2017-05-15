@@ -68,6 +68,11 @@ public class CourseControllerTest {
         addCourse();
     }
 
+//    @Test
+//    public void testAddLesson() throws Exception {
+//        addLesson();
+//    }
+
     // validation check
     @Test
     public void testAddNegative() throws Exception {

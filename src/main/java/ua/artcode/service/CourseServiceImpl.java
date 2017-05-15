@@ -1,5 +1,6 @@
 package ua.artcode.service;
 
+import javafx.util.Pair;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,6 @@ import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -64,16 +64,13 @@ public class CourseServiceImpl implements CourseService {
 
         String tempCourseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
-        String[] baseClassPaths = courseIOUtils.getLessonClassPaths(lesson.getBaseClasses(), lesson.getSourcesRoot());
+        Pair<List<String>, String> baseClasses = courseIOUtils.ensureLessonClassPathsAndRoot(lesson.getBaseClasses(), lesson.getSourcesRoot());
+        Pair<List<String>, String> testClasses = courseIOUtils.ensureLessonClassPathsAndRoot(lesson.getTestsClasses(), lesson.getTestsRoot());
 
-        String[] testsClassPaths = courseIOUtils.getLessonClassPaths(lesson.getTestsClasses(), lesson.getTestsRoot());
-
-        if (baseClassPaths.length == 0 || testsClassPaths.length == 0) {
-            throw new LessonClassPathsException("No class paths in lesson");
-        }
-
-        lesson.setBaseClasses(Arrays.asList(baseClassPaths));
-        lesson.setTestsClasses(Arrays.asList(baseClassPaths));
+        lesson.setBaseClasses(baseClasses.getKey());
+        lesson.setSourcesRoot(baseClasses.getValue());
+        lesson.setTestsClasses(testClasses.getKey());
+        lesson.setTestsRoot(testClasses.getValue());
 
         //add validation
 

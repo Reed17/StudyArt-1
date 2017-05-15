@@ -58,22 +58,6 @@ public class RunServiceImpl implements RunService {
                 ResultsProcessors.main);
     }
 
-    @Override
-    public RunResults runLesson(int courseId, int lessonNumber) throws Exception {
-
-        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber);
-        Course course = courseDB.findOne(courseId);
-
-        // todo 2nd arg - project sources root have to be added as fields to Course model
-        String sourcesRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
-        return runCore.run(course.getLocalPath(),
-                new String[]{sourcesRoot},
-                classPaths,
-                PreProcessors.lessonsMain,
-                MethodCheckers.main,
-                Runners.main,
-                ResultsProcessors.main);
-    }
 
     @Override
     public RunResults runLessonWithSolutionTests(int courseId, int lessonID, CourseFromUser userCource) throws Exception {
@@ -84,14 +68,11 @@ public class RunServiceImpl implements RunService {
 
         String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getBaseClasses(), lesson.getTestsClasses(), lesson.getRequiredClasses());
 
-//        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
-//        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length - 1], "java" + File.separator);
-
         // run main (tests classes)
         // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
         RunResults results = runCore.run(projectLocalPath,
-                new String[]{srcClassRoot,
-                        testClassRoot},
+                new String[]{lesson.getSourcesRoot(),
+                        lesson.getTestsRoot()},
                 classPaths,
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,

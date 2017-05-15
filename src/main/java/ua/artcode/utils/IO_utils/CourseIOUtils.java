@@ -1,5 +1,6 @@
 package ua.artcode.utils.IO_utils;
 
+import javafx.util.Pair;
 import org.apache.maven.shared.invoker.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
@@ -144,28 +145,33 @@ public class CourseIOUtils {
     }
 
 
-    public String[] getLessonClassPaths(List<String> classPaths, String sourceRoot) throws IOException, LessonClassPathsException {
+    public Pair<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths, String sourceRoot) throws IOException, LessonClassPathsException {
 
-        if (classPaths == null || classPaths.size() == 0) {
-            if (sourceRoot != null) {
+        if (sourceRoot == null) {
+            if (classPaths == null || classPaths.size() == 0) {
+                throw new LessonClassPathsException("No classes in lesson or not valid class path");
+            } else {
+                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0), "java" + File.separator);
+            }
+        } else {
+            if (classPaths == null || classPaths.size() == 0) {
                 try {
-                    return commonIOUtils.parseFilePaths(sourceRoot);
+                    classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot, "java"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else {
-                throw new LessonClassPathsException("No classes in lesson or not valid class path");
             }
         }
-
-        return (String[]) classPaths.toArray();
+        return new Pair(classPaths,sourceRoot);
     }
 
     public String[] getLessonClassPaths(String path, String endsWith) throws IOException {
         return commonIOUtils.parseFilePaths(path, "java");
     }
 
-    public String[] getLessonClassAndTestsPaths(List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws IOException {
+    public String[] getLessonClassAndTestsPaths
+            (List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws
+            IOException {
         lessonSourceClasses.addAll(lessonTestsClasses);
         lessonSourceClasses.addAll(lessonRequiredClasses);
         return lessonSourceClasses.stream()
@@ -183,6 +189,7 @@ public class CourseIOUtils {
      * @param projectRoot root folder for project (not src/ or java/, just regular project folder
      * @return true if saved successfully, false otherwise
      */
+
     public boolean saveMavenDependenciesLocally(String projectRoot) {
         // todo declare beans for both
         InvocationRequest request = new DefaultInvocationRequest();
