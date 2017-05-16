@@ -4,6 +4,17 @@ test:
   git:
     URL: https://github.com/v21k/TestGitProject.git
 
+email:
+    server: "http://localhost:8080"
+    user: "studyartteam@gmail.com"
+    pass: "pass_for_study"
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      smtp:
+        auth: true
+        starttls.enable: true
+
 application:
   courses:
     paths:

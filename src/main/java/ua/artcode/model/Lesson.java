@@ -9,6 +9,7 @@ import java.util.List;
  * Created by v21k on 15.04.17.
  */
 @Entity
+//@Table(name = "lesson")
 public class Lesson implements Comparable<Lesson> {
 
     @Id
@@ -17,14 +18,17 @@ public class Lesson implements Comparable<Lesson> {
     private Integer courseID;
     private String name;
     private String localPath;
+    @ElementCollection
     private List<String> baseClasses;
+    @ElementCollection
     private List<String> requiredClasses;
+    @ElementCollection
     private List<String> testsClasses;
     private String sourcesRoot;
     private String testsRoot;
     private String description;
-    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime date;
+//    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+//    private LocalDateTime date;
 
 
     /* todo
@@ -91,13 +95,13 @@ public class Lesson implements Comparable<Lesson> {
         this.description = description;
     }
 
-    public LocalDateTime getDate() {
-        return date;
-    }
-
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+//    public LocalDateTime getDate() {
+//        return date;
+//    }
+//
+//    public void setDate(LocalDateTime date) {
+//        this.date = date;
+//    }
 
     public Integer getId() {
         return id;
@@ -164,7 +168,7 @@ public class Lesson implements Comparable<Lesson> {
                 ", requiredClasses=" + requiredClasses +
                 ", testsClasses=" + testsClasses +
                 ", description='" + description + '\'' +
-                ", date=" + date +
+                ", date=" + /*date**/ +
                 '}';
     }
 }

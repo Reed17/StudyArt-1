@@ -155,12 +155,11 @@ public class CourseControllerTest {
     }
 
     private void addCourse() throws Exception {
-        Course course = new Course(0,
-                "someCourse",
-                "VK",
-                GitURL,
-                null,
-                null);
+        Course course = new Course();
+        course.setName("someCourse");
+        course.setAuthor("Maks");
+        course.setUrl(GitURL);
+        course.setDescription("Just test cource");
         mockMvc.perform(post("/courses/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
