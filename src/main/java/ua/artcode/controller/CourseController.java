@@ -111,7 +111,7 @@ public class CourseController {
             notes = "Runs a tests for a certain lesson",
             response = GeneralResponse.class,
             produces = "application/json")
-    @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
+    @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
                                                  @RequestParam int lessonNumber,
                                                  @RequestBody @Valid CourseFromUser userCourse) {
@@ -133,7 +133,7 @@ public class CourseController {
             notes = "Need to pass description, courseID, source and tests class paths and roots, name",
             response = RunResults.class,
             produces = "application/json")
-    @RequestMapping(value = "courses/lessons/add", method = RequestMethod.POST)
+    @RequestMapping(value = "/courses/lessons/add", method = RequestMethod.POST)
     public GeneralResponse addLessonToCourse(@RequestParam int courseId,
                                                  @RequestBody @Valid Lesson lesson) {
         try {

@@ -1,6 +1,5 @@
 package ua.artcode.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
@@ -14,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 
@@ -43,7 +43,7 @@ public class CourseControllerTest {
     @Autowired
     private ObjectMapper mapper;
     @Value("${test.git.URL}")
-    private String GitURL;
+    private String gitURL;
 
     // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
 
@@ -108,7 +108,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("someCourse"))
                 .andExpect(jsonPath("$.author").value("VK"))
-                .andExpect(jsonPath("$.url").value(GitURL));
+                .andExpect(jsonPath("$.url").value(gitURL));
     }
 
     @Test
@@ -153,10 +153,17 @@ public class CourseControllerTest {
     @Test
     public void testRunLessonPositive() throws Exception {
         addCourse();
-
-        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=3"))
+        addLesson();
+        CourseFromUser courseFromUser = new CourseFromUser();
+        courseFromUser.setName("someCourse");
+        courseFromUser.setUrl(gitURL);
+        courseFromUser.setId(1);
+        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(courseFromUser))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.methodResult.systemOut").value("SOME INFO" + System.getProperty("line.separator")));
+                .andExpect(jsonPath("$.methodResult.systemOut").value(""));
     }
 
     @Deprecated
@@ -173,7 +180,7 @@ public class CourseControllerTest {
         Course course = new Course();
         course.setName("someCourse");
         course.setAuthor("VK");
-        course.setUrl(GitURL);
+        course.setUrl(gitURL);
         course.setDescription("Just test cource");
         mockMvc.perform(post("/courses/add")
                 .contentType(MediaType.APPLICATION_JSON)

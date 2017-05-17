@@ -156,13 +156,16 @@ public class CourseIOUtils {
         } else {
             if (classPaths == null || classPaths.size() == 0) {
                 try {
-                    classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot, "java"));
+                    classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot.replace("/",File.separator), "java"));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
-        return new Pair(classPaths,sourceRoot);
+
+        classPaths = classPaths.stream().map(path -> path.replace("/",File.separator)).collect(Collectors.toList());
+
+        return new Pair(classPaths,sourceRoot.replace("/",File.separator));
     }
 
     public String[] getLessonClassPaths(String path, String endsWith) throws IOException {
