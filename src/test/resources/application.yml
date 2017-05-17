@@ -2,7 +2,7 @@ test:
   paths:
     core: coreTest
   git:
-    URL: https://github.com/v21k/TestGitProject.git
+    URL: https://github.com/Maks9/TestGitProject.git
 
 email:
     server: "http://localhost:8080"

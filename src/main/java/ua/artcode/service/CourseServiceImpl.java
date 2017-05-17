@@ -84,4 +84,10 @@ public class CourseServiceImpl implements CourseService {
         courseLessons.add(lessonRepository.save(lesson));
         return lesson.getId();
     }
+
+
+    @Override
+    public Lesson getLessonByID(int id) {
+        return lessonRepository.findOne(id);
+    }
 }

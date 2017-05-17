@@ -48,6 +48,18 @@ public class CourseController {
         return course;
     }
 
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get a lesson",
+            response = Lesson.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
+    public Lesson getLessonByID(@RequestParam int id) throws AppException {
+
+        Lesson lesson = courseService.getLessonByID(id);
+        LOGGER.info("Lesson get - OK, id {}", id);
+        return lesson;
+    }
+
     @ApiOperation(httpMethod = "POST",
             value = "Resource to add a course",
             notes = "ID, lessons and localPath will be generated on server side, so you can pass 0/null or default values",

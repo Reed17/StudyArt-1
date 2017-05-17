@@ -151,7 +151,7 @@ public class CourseIOUtils {
             if (classPaths == null || classPaths.size() == 0) {
                 throw new LessonClassPathsException("No classes in lesson or not valid class path");
             } else {
-                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0), "java" + File.separator);
+                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0).replace("/",File.separator), "java" + File.separator);
             }
         } else {
             if (classPaths == null || classPaths.size() == 0) {

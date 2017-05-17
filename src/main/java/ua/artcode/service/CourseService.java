@@ -21,4 +21,6 @@ public interface CourseService {
     Collection<Course> getAll();
 
     int addLesson(Lesson lesson, int courceID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException, IOException, LessonClassPathsException;
+
+    Lesson getLessonByID(int id);
 }
