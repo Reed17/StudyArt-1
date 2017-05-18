@@ -5,8 +5,6 @@ import org.apache.maven.shared.invoker.*;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by v21k on 20.04.17.
@@ -151,6 +148,8 @@ public class CourseIOUtils {
             if (classPaths == null || classPaths.size() == 0) {
                 throw new LessonClassPathsException("No classes in lesson or not valid class path");
             } else {
+                // todo delimiter must be not hardcoded - we can have another project structures, no only maven. Also /java is not enough
+                // todo because user can have his custom package with name 'java'. In this case everything will crash :)
                 sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0).replace("/",File.separator), "java" + File.separator);
             }
         } else {
@@ -158,14 +157,16 @@ public class CourseIOUtils {
                 try {
                     classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot.replace("/",File.separator), "java"));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    e.printStackTrace(); // todo why catch if we throw IOExc?
                 }
             }
         }
 
-        classPaths = classPaths.stream().map(path -> path.replace("/",File.separator)).collect(Collectors.toList());
+        classPaths = classPaths.stream().
+                map(path -> path.replace("/",File.separator))
+                .collect(Collectors.toList());
 
-        return new Pair(classPaths,sourceRoot.replace("/",File.separator));
+        return new Pair<>(classPaths,sourceRoot.replace("/",File.separator));
     }
 
     public String[] getLessonClassPaths(String path, String endsWith) throws IOException {
@@ -178,6 +179,7 @@ public class CourseIOUtils {
         lessonSourceClasses.addAll(lessonTestsClasses);
         lessonSourceClasses.addAll(lessonRequiredClasses);
         return lessonSourceClasses.stream()
+                .filter(lesson -> lesson.endsWith(".java"))
                 .toArray(String[]::new);
     }
 

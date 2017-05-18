@@ -1,6 +1,7 @@
 package ua.artcode.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -26,6 +27,10 @@ public class Course {
     @Pattern(regexp = "(?!(^$)|(\\s+$)).*", message = "No description")
     private String description;
 
+    @NotNull
+    private String sourcesRoot;
+    @NotNull
+    private String testsRoot;
 
     public Course() {
     }
@@ -53,6 +58,15 @@ public class Course {
         this.name = name;
         this.author = author;
         this.url = url;
+    }
+
+    public Course(String name, String author, String url, String description, String sourcesRoot, String testsRoot) {
+        this.name = name;
+        this.author = author;
+        this.url = url;
+        this.description = description;
+        this.sourcesRoot = sourcesRoot;
+        this.testsRoot = testsRoot;
     }
 
     public String getDescription() {
@@ -113,6 +127,22 @@ public class Course {
 
     public Lesson getLesson(int id) {
         return lessons.get(id);
+    }
+
+    public String getSourcesRoot() {
+        return sourcesRoot;
+    }
+
+    public void setSourcesRoot(String sourcesRoot) {
+        this.sourcesRoot = sourcesRoot;
+    }
+
+    public String getTestsRoot() {
+        return testsRoot;
+    }
+
+    public void setTestsRoot(String testsRoot) {
+        this.testsRoot = testsRoot;
     }
 
     @Override

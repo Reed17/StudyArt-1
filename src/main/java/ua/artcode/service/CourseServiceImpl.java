@@ -33,9 +33,9 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public int addCourse(Course course){
-
-        if (courseRepository.findByNameAndAuthor(course.getName(),course.getAuthor()) != null) {
+    public int addCourse(Course course) {
+        // todo why int, not Course? Return Course
+        if (courseRepository.findByNameAndAuthor(course.getName(), course.getAuthor()) != null) {
             return -1;
         }
         return courseRepository.save(course).getId();
@@ -60,28 +60,52 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public int addLesson(Lesson lesson, int courseID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException, IOException, LessonClassPathsException {
 
+        // todo if we already have this lesson, what should we do?
+        // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = courseRepository.findOne(courseID);
 
-        String tempCourseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
-        Pair<List<String>, String> baseClasses = courseIOUtils.ensureLessonClassPathsAndRoot(lesson.getBaseClasses(), lesson.getSourcesRoot());
-        Pair<List<String>, String> testClasses = courseIOUtils.ensureLessonClassPathsAndRoot(lesson.getTestsClasses(), lesson.getTestsRoot());
+        // todo extract to method (setters and update)
+        // save course and set roots
+        String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
+        if(!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
+            course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
+            course.setTestsRoot(courseLocalPath + course.getTestsRoot());
+
+            // update course so we can use roots later in RunService
+            courseRepository.updateCourse(course.getSourcesRoot(), course.getTestsRoot(), course.getId());
+        }
+
+
+        Pair<List<String>, String> baseClasses =
+                courseIOUtils.ensureLessonClassPathsAndRoot(
+                        lesson.getBaseClasses(),
+                        lesson.getSourcesRoot());
+
+        Pair<List<String>, String> testClasses =
+                courseIOUtils.ensureLessonClassPathsAndRoot(
+                        lesson.getTestsClasses(),
+                        lesson.getTestsRoot());
+
 
         lesson.setBaseClasses(baseClasses.getKey());
         lesson.setSourcesRoot(baseClasses.getValue());
+
         lesson.setTestsClasses(testClasses.getKey());
         lesson.setTestsRoot(testClasses.getValue());
 
-        //add validation
+        // todo validation
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) {
-            return -1;
+            return -1; // todo why -1? return lesson back if ok, Exception otherwise. Error codes are for C developers :)
         }
 
         lesson.setCourseID(courseID);
 
+        // todo did we update course? add lesson to it? and update in DB? see above my example update method for course
         courseLessons.add(lessonRepository.save(lesson));
+
         return lesson.getId();
     }
 

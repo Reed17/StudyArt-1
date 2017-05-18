@@ -1,44 +1,43 @@
 package ua.artcode.model;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Calendar;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 /**
  * Created by v21k on 15.04.17.
  */
 @Entity
-//@Table(name = "lesson")
 public class Lesson implements Comparable<Lesson> {
 
     @Id
     @GeneratedValue
     private Integer id;
+
+    @NotNull
     private Integer courseID;
+    @NotNull
     private String name;
+    @NotNull
     private String localPath;
+
     @ElementCollection
     private List<String> baseClasses;
     @ElementCollection
     private List<String> requiredClasses;
     @ElementCollection
     private List<String> testsClasses;
+
+    // todo sourcesRoot here - is only directory for lesson with .java files. For RunCore we need PROJECT sources root (src/main/java), not path to lesson dir
     private String sourcesRoot;
     private String testsRoot;
     private String description;
 //    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 //    private LocalDateTime date;
-
-
-    /* todo
-    * ... 3 lists with classpaths (.java.) - base, required, tests
-    * 3 ready OR 3 paths to directories(need to parse)
-    * + sourcesRoot - src/main/java
-    * + testsRoot - src/test/java
-    * + descr
-    * + date */
-
+// todo date
     public Lesson() {
     }
 
@@ -138,12 +137,13 @@ public class Lesson implements Comparable<Lesson> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Lesson)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         Lesson lesson = (Lesson) o;
 
         if (courseID != null ? !courseID.equals(lesson.courseID) : lesson.courseID != null) return false;
-        return name != null ? name.equals(lesson.name) : lesson.name == null;
+        if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
+        return description != null ? description.equals(lesson.description) : lesson.description == null;
     }
 
     @Override

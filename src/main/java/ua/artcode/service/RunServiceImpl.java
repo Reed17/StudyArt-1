@@ -19,7 +19,6 @@ import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * Created by v21k on 15.04.17.
@@ -60,19 +59,25 @@ public class RunServiceImpl implements RunService {
 
 
     @Override
-    public RunResults runLessonWithSolutionTests(int courseId, int lessonID, CourseFromUser userCource) throws Exception {
+    public RunResults runLessonWithSolutionTests(int courseID, int lessonID, CourseFromUser userCource) throws Exception {
 
         String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
         Lesson lesson = lessonDB.findOne(lessonID);
+        Course course = courseDB.findOne(courseID);
 
-        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getBaseClasses(), lesson.getTestsClasses(), lesson.getRequiredClasses());
+        String[] classPaths =
+                courseIOUtils.getLessonClassAndTestsPaths(
+                        lesson.getBaseClasses(),
+                        lesson.getTestsClasses(),
+                        lesson.getRequiredClasses());
 
-        // run main (tests classes)
-        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        String sourcesRoot = course.getSourcesRoot();
+        String testsRoot = course.getTestsRoot();
+
         RunResults results = runCore.run(projectLocalPath,
-                new String[]{lesson.getSourcesRoot(),
-                        lesson.getTestsRoot()},
+                new String[]{sourcesRoot,
+                        testsRoot},
                 classPaths,
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,

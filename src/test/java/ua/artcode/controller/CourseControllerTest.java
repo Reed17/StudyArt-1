@@ -2,7 +2,9 @@ package ua.artcode.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +12,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+import ua.artcode.dao.repositories.CourseRepository;
+import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -34,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CourseControllerTest {
 
     private static String tempPathForGitProjects;
@@ -45,7 +53,12 @@ public class CourseControllerTest {
     @Value("${test.git.URL}")
     private String gitURL;
 
-    // TODO create temp folders before all tests, then removeCourse them in the end (after all tests) ????????
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private LessonRepository lessonRepository;
+
+
 
     @AfterClass
     public static void removeTempDir() throws IOException {
@@ -56,6 +69,8 @@ public class CourseControllerTest {
         if (gitProjects.exists() && gitProjects.isDirectory())
             FileUtils.deleteDirectory(gitProjects);
     }
+
+
 
     @Value("${application.courses.paths.git}")
     public void setPathForGitProjects(String path) {
@@ -81,7 +96,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("first_lesson"))
                 .andExpect(jsonPath("$.courseID").value(1))
-                .andExpect(jsonPath("$.sourcesRoot").value("courses_test/1someCourse/src/main/java/_02_lesson/"))
+                .andExpect(jsonPath("$.sourcesRoot").value("courses_test/1someCourse/src/main/java/_02_lesson"))
                 .andExpect(jsonPath("$.description").value("First test lesson"));
     }
 
@@ -121,7 +136,6 @@ public class CourseControllerTest {
         }
     }
 
-    @Deprecated
     @Test
     public void testRunClassPositive() throws Exception {
         ExternalCode code = new ExternalCode("public class test " +
@@ -136,7 +150,6 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.methodResult.systemOut").value("4"));
     }
 
-    @Deprecated
     @Test
     public void testRunClassNegative() throws Exception {
         ExternalCode code = new ExternalCode("public class test " +
@@ -149,39 +162,52 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.generalResponse.message").value(containsString("error")));
     }
 
-    @Deprecated
     @Test
     public void testRunLessonPositive() throws Exception {
         addCourse();
         addLesson();
+
         CourseFromUser courseFromUser = new CourseFromUser();
         courseFromUser.setName("someCourse");
         courseFromUser.setUrl(gitURL);
         courseFromUser.setId(1);
+
         mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(courseFromUser))
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.methodResult.systemOut").value(""));
+                .andExpect(jsonPath("$.methodResult.systemOut").value(""))
+                .andExpect(jsonPath("$.methodStats.passedTests").value(1));
     }
 
-    @Deprecated
     @Test
     public void testRunLessonNegative() throws Exception {
         addCourse();
 
-        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=1"))
+        CourseFromUser courseFromUser = new CourseFromUser();
+        courseFromUser.setName("someCourse");
+        courseFromUser.setUrl(gitURL);
+        courseFromUser.setId(1);
+
+        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(courseFromUser))
+                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("error")));
+                .andExpect(jsonPath("$.generalResponse.type").value("ERROR"));
     }
 
     private void addCourse() throws Exception {
+
         Course course = new Course();
-        course.setName("someCourse");
+        String name = "someCourse";
+        course.setName(name);
         course.setAuthor("VK");
         course.setUrl(gitURL);
         course.setDescription("Just test cource");
+        course.setSourcesRoot("src/main/java".replace("/", File.separator));
+        course.setTestsRoot("src/test/java".replace("/", File.separator));
         mockMvc.perform(post("/courses/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
@@ -198,8 +224,9 @@ public class CourseControllerTest {
         lesson.setName("first_lesson");
         lesson.setDescription("First test lesson");
         lesson.setCourseID(1);
-        lesson.setSourcesRoot("courses_test/1someCourse/src/main/java/_02_lesson/");
+        lesson.setSourcesRoot("courses_test/1someCourse/src/main/java/_02_lesson");
         lesson.setTestsClasses(testClassPaths);
+        lesson.setLocalPath("_02_lesson");
 
         mockMvc.perform(post("/courses/lessons/add?courseId=1")
                 .contentType(MediaType.APPLICATION_JSON)
