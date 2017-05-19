@@ -42,9 +42,7 @@ public class StringUtils {
         return path.replace(File.separator + File.separator, File.separator);
     }
 
-    // todo replace by some template engine
-    public static String appendSolution(ExternalCode code, String originalContent) {
-        return originalContent.substring(0, originalContent.lastIndexOf("}")) + code.getSourceCode() + "}";
+    public static String checkStartsWithAndAppend(String source, String startsWith){
+        return source.startsWith(startsWith) ? source : startsWith + source;
     }
-
 }

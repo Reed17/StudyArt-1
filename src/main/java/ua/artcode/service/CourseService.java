@@ -7,8 +7,10 @@ import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 
+import javax.xml.bind.ValidationException;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by v21k on 15.04.17.
@@ -22,7 +24,9 @@ public interface CourseService {
 
     Collection<Course> getAll();
 
-    int addLesson(Lesson lesson, int courceID) throws GitAPIException, IOException, AppException;
+    int addLesson(Lesson lesson, int courceID) throws GitAPIException, IOException, AppException, ValidationException;
 
     Lesson getLessonByID(int id);
+
+    List<Lesson> getAllLessons();
 }

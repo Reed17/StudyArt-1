@@ -11,13 +11,18 @@ import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
-import ua.artcode.utils.StringUtils;
+import ua.artcode.utils.ValidationUtils;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import static ua.artcode.utils.StringUtils.*;
 /**
  * Created by v21k on 15.04.17.
  */
@@ -27,12 +32,14 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
     private final CourseIOUtils courseIOUtils;
+    private final ValidationUtils validationUtils;
 
     @Autowired
-    public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository, CourseIOUtils courseIOUtils) {
+    public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository, CourseIOUtils courseIOUtils, CommonIOUtils commonIOUtils, ValidationUtils validateFiles) {
         this.courseRepository = courseRepository;
         this.lessonRepository = lessonRepository;
         this.courseIOUtils = courseIOUtils;
+        this.validationUtils = validateFiles;
     }
 
     @Override
@@ -67,16 +74,13 @@ public class CourseServiceImpl implements CourseService {
         // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = courseRepository.findOne(courseID);
 
-        // save locally
+        // save locally for further operations
         String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
-        // todo extract somewhere??? (not sure)
         if (!lesson.getSourcesRoot().isEmpty()) {
-            String newPath = StringUtils.normalizePath(courseLocalPath + lesson.getSourcesRoot());
-            lesson.setSourcesRoot(newPath);
+            lesson.setSourcesRoot(normalizePath(checkStartsWithAndAppend(lesson.getSourcesRoot(), courseLocalPath)));
         } else if (!lesson.getTestsRoot().isEmpty()) {
-            String newPath = StringUtils.normalizePath(courseLocalPath + lesson.getTestsRoot());
-            lesson.setTestsRoot(newPath);
+            lesson.setTestsRoot(normalizePath(checkStartsWithAndAppend(lesson.getTestsRoot(), courseLocalPath)));
         }
 
         // update root packages
@@ -105,10 +109,16 @@ public class CourseServiceImpl implements CourseService {
         lesson.setTestsClasses(testClasses.getKey());
         lesson.setTestsRoot(testClasses.getValue());
 
-        // todo validation (test and base classes MUST exist in corresponding folders)
+        // check if exists
+        validationUtils.validateFiles(Stream.of(
+                lesson.getBaseClasses(),
+                lesson.getTestsClasses(),
+                lesson.getRequiredClasses())
+                .flatMap(Collection::stream)
+                .toArray(String[]::new));
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
-        if (courseLessons.contains(lesson)) {
+        if (courseLessons.contains(lesson)) { // todo check equals and hash
             return -1; // todo why -1? return lesson back if ok, Exception otherwise. Error codes are for C developers :)
         }
 
@@ -120,9 +130,14 @@ public class CourseServiceImpl implements CourseService {
         return lesson.getId();
     }
 
-
     @Override
     public Lesson getLessonByID(int id) {
         return lessonRepository.findOne(id);
+    }
+
+    @Override
+    public List<Lesson> getAllLessons(){
+        return StreamSupport.stream(lessonRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
     }
 }

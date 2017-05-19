@@ -6,7 +6,10 @@ import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
+import ua.artcode.exceptions.ValidationException;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -70,4 +73,13 @@ public class ValidationUtils {
         if (!checkEmailOriginality(email, teacherRepository, studentRepository))
             throw new InvalidUserEmailException("Email already exists");
     }
+
+    public void validateFiles(String[] paths) throws ValidationException {
+        if (!Arrays.stream(paths)
+                .allMatch(path -> new File(path).exists())) {
+            throw new ValidationException("Files doesn't exist!");
+        }
+    }
+
+
 }

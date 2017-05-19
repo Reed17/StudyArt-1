@@ -17,6 +17,7 @@ import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 public class CourseController {
@@ -55,7 +56,20 @@ public class CourseController {
         Lesson lesson = courseService.getLessonByID(id);
         LOGGER.info("Lesson get - OK, id {}", id);
         return lesson;
+
     }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get all esson",
+            response = List.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
+    public List<Lesson> getLessonByID() throws AppException {
+        List<Lesson> lessons = courseService.getAllLessons();
+        LOGGER.info("Lesson get all - OK");
+        return lessons;
+    }
+
 
     @ApiOperation(httpMethod = "POST",
             value = "Resource to add a course",
@@ -64,9 +78,6 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
-        // todo delete comments
-        // Course JSON with required name, author, URL, description
-//        try {
         int result = courseService.addCourse(course);
         if (result != -1) {
             LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
@@ -78,10 +89,6 @@ public class CourseController {
             LOGGER.error("Course add - FAILED", "Course already exists!");
             return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
         }
-//        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
-//
-
-//        }
     }
 
     @ApiOperation(httpMethod = "POST",
@@ -136,7 +143,7 @@ public class CourseController {
                                              @RequestBody @Valid Lesson lesson) {
         try {
 
-            // todo return Lesson(co, not int
+            // todo return Lesson, not int
             int result = courseService.addLesson(lesson, courseId);
 
             LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
