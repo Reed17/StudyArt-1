@@ -9,6 +9,7 @@ import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.InvalidIDException;
+import ua.artcode.exceptions.SuchLessonAlreadyExist;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
@@ -67,7 +68,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public int addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException {
+    public Lesson addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException {
 
         // todo if we already have this lesson, what should we do?
         // todo think about updateLesson method and corresponding query in LessonRepo
@@ -117,7 +118,7 @@ public class CourseServiceImpl implements CourseService {
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) { // todo check equals and hash
-            return -1; // todo why -1? return lesson back if ok, Exception otherwise. Error codes are for C developers :)
+            throw new SuchLessonAlreadyExist("Such lesson already exist!");
         }
 
         lesson.setCourseID(courseID);
@@ -125,7 +126,7 @@ public class CourseServiceImpl implements CourseService {
         // todo did we update course? add lesson to it? and update in DB? see above my example update method for course
         courseLessons.add(lessonRepository.save(lesson));
 
-        return lesson.getId();
+        return lesson;
     }
 
     @Override

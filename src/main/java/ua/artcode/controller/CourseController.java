@@ -143,8 +143,7 @@ public class CourseController {
                                              @RequestBody @Valid Lesson lesson) {
         try {
 
-            // todo return Lesson, not int
-            int result = courseService.addLesson(lesson, courseId);
+            Lesson result = courseService.addLesson(lesson, courseId);
 
             LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
             return new GeneralResponse(ResponseType.INFO, "Lesson add - OK");
