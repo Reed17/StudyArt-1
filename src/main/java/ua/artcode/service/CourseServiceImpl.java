@@ -44,7 +44,6 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course addCourse(Course course) {
-        // todo why int, not Course? Return Course
         if (courseRepository.findByNameAndAuthor(course.getName(), course.getAuthor()) != null) {
             return null;
         }
