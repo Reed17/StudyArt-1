@@ -2,7 +2,14 @@ test:
   paths:
     core: coreTest
   git:
-    URL: https://github.com/Maks9/TestGitProject.git
+    URL: https://github.com/v21k/TestGitProject.git
+
+application:
+  courses:
+    paths:
+      git: courses
+      externalCode: temp
+  profiling: true
 
 email:
     server: "http://localhost:8080"
@@ -15,19 +22,10 @@ email:
         auth: true
         starttls.enable: true
 
-application:
-  courses:
-    paths:
-      git: courses
-      externalCode: temp
-      dependencies: dependencies
-  profiling: true
-
 maven:
     dependenciesPath: dependencies
     goals:
       copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-    # path to maven directory where /bin located (/usr/share/maven)
     home: M2_HOME
 
 spring:

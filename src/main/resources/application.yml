@@ -3,7 +3,6 @@ application:
     paths:
       git: courses
       externalCode: temp
-      dependencies: dependencies
   profiling: true
 
 email:
@@ -21,8 +20,8 @@ maven:
     dependenciesPath: dependencies
     goals:
       copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-    # path to maven directory where /bin located (/usr/share/maven)
-    home: M2_HOME
+    embedded:
+      path: C:\Users\ksyashka\IdeaProjects\StudyArt-1\mvnw.cmd
 
 spring:
   datasource:
