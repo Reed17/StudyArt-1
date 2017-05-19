@@ -10,6 +10,8 @@ import ua.artcode.exceptions.ValidationException;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -74,8 +76,11 @@ public class ValidationUtils {
             throw new InvalidUserEmailException("Email already exists");
     }
 
-    public void validateFiles(String[] paths) throws ValidationException {
-        if (!Arrays.stream(paths)
+    @SafeVarargs
+    public final void validateFiles(List<String>... pathLists) throws ValidationException {
+        if (!Arrays.stream(pathLists)
+                .filter(list -> list != null && list.size() > 0)
+                .flatMap(Collection::stream)
                 .allMatch(path -> new File(path).exists())) {
             throw new ValidationException("Files doesn't exist!");
         }

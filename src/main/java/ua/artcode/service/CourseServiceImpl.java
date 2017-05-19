@@ -110,12 +110,11 @@ public class CourseServiceImpl implements CourseService {
         lesson.setTestsRoot(testClasses.getValue());
 
         // check if exists
-        validationUtils.validateFiles(Stream.of(
+        validationUtils.validateFiles(
                 lesson.getBaseClasses(),
                 lesson.getTestsClasses(),
-                lesson.getRequiredClasses())
-                .flatMap(Collection::stream)
-                .toArray(String[]::new));
+                lesson.getRequiredClasses()
+        );
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) { // todo check equals and hash
