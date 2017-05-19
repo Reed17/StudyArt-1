@@ -19,7 +19,7 @@ public class MethodCheckersTest {
     @Test
     public void testPositiveCheckerMain() {
         try {
-            MethodCheckers.main.checkClasses(new Class[] {classWithMain});
+            MethodCheckers.main.checkClasses(new Class[]{classWithMain});
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             fail("Main Method Not Found!");
@@ -28,14 +28,14 @@ public class MethodCheckersTest {
 
     @Test(expected = NoSuchMethodException.class)
     public void testNegativeCheckerMain() throws NoSuchMethodException {
-        MethodCheckers.main.checkClasses(new Class[] {classWithTest});
+        MethodCheckers.main.checkClasses(new Class[]{classWithTest});
 
     }
 
     @Test
     public void testPositiveCheckerTest() {
         try {
-            MethodCheckers.testChecker.checkClasses(new Class[] {classWithTest});
+            MethodCheckers.testChecker.checkClasses(new Class[]{classWithTest});
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
             fail("@Test Method Not Found!");
@@ -44,7 +44,7 @@ public class MethodCheckersTest {
 
     @Test(expected = NoSuchMethodException.class)
     public void testNegativeCheckerTest() throws NoSuchMethodException {
-        MethodCheckers.testChecker.checkClasses(new Class[] {classWithMain});
+        MethodCheckers.testChecker.checkClasses(new Class[]{classWithMain});
 
     }
 

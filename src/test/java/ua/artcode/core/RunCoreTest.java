@@ -1,5 +1,6 @@
 package ua.artcode.core;
 
+import com.google.common.io.Resources;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -9,20 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import ua.artcode.Application;
 import ua.artcode.core.method_checker.MethodCheckers;
 import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
-import ua.artcode.dao.CourseDB;
 import ua.artcode.model.response.RunResults;
-import ua.artcode.utils.IO_utils.CommonIOUtils;
-import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.net.URISyntaxException;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,17 +31,16 @@ import static org.junit.Assert.assertTrue;
  * Created by v21k on 27.04.17.
  */
 @RunWith(SpringRunner.class)
-// todo ask Serhii how to simplify
-@SpringBootTest(classes = {RunCore.class, CourseIOUtils.class, CommonIOUtils.class, CourseDB.class})
+@SpringBootTest(classes = {Application.class})
 public class RunCoreTest {
 
-    @Value("${coreTestDir}")
+    @Value("${test.paths.core}")
     private String projectRoot;
     private String sourcesRoot;
     private String sourcesTestRoot;
 
     @Autowired
-    RunCore core;
+    private RunCore core;
 
     @Before
     public void setUp() throws Exception {
@@ -84,18 +81,18 @@ public class RunCoreTest {
 
     @Test
     public void testRunClassWithMainPositive() throws Exception {
-        String classBody = insertInMain("System.out.println(\"Some text\");");
+        String classBody = insertInMain("System.out.print(\"Some text\");");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
                 ResultsProcessors.main);
 
-        assertEquals("Some text\n", results.getMethodResult().getSystemOut());
+        assertEquals("Some text", results.getMethodResult().getSystemOut());
     }
 
     @Test(expected = NoSuchMethodException.class)
@@ -103,8 +100,8 @@ public class RunCoreTest {
         String classBody = "";
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        core.runMethod(projectRoot,
-                sourcesRoot,
+        core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -117,8 +114,8 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(\"Some text\";");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -133,8 +130,8 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(2/0);");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -148,8 +145,8 @@ public class RunCoreTest {
     public void testRunClassNonExistingClass() throws Exception {
         String classPath = sourcesRoot + File.separator + "_01_lesson";
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -164,7 +161,7 @@ public class RunCoreTest {
         String classBody = insertInMain("CmdLineParser parser = new CmdLineParser(null);" +
                 "\nSystem.out.println(parser);");
 
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1,
                 "import org.kohsuke.args4j.CmdLineParser;",
@@ -172,8 +169,8 @@ public class RunCoreTest {
                 classBody,
                 false);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
@@ -196,12 +193,12 @@ public class RunCoreTest {
                 "import static org.junit.Assert.assertTrue;";
 
         String className = "Tests";
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesTestRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
@@ -223,12 +220,12 @@ public class RunCoreTest {
                 "import static org.junit.Assert.assertTrue;";
 
         String className = "Tests";
-        generateAndSavePom();
+        copyTestPom();
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
-        RunResults results = core.runMethod(projectRoot,
-                sourcesTestRoot,
+        RunResults results = core.run(projectRoot,
+                new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
@@ -265,32 +262,11 @@ public class RunCoreTest {
         return classFile.getPath();
     }
 
-    private void generateAndSavePom() throws IOException {
-        String pomContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-                "         xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd\">\n" +
-                "    <modelVersion>4.0.0</modelVersion>\n" +
-                "\n" +
-                "    <groupId>ua.artcode</groupId>\n" +
-                "    <artifactId>study-art</artifactId>\n" +
-                "    <version>1.0</version>\n" +
-                "<dependencies>\n" +
-                "<dependency>\n" +
-                "    <groupId>args4j</groupId>\n" +
-                "    <artifactId>args4j</artifactId>\n" +
-                "    <version>2.33</version>\n" +
-                "</dependency>\n" +
-                "<dependency>\n" +
-                "            <groupId>junit</groupId>\n" +
-                "            <artifactId>junit</artifactId>\n" +
-                "            <version>4.12</version>\n" +
-                "        </dependency>" +
-                "</dependencies>\n" +
-                "</project>";
+    private void copyTestPom() throws IOException, URISyntaxException {
+        Path sourcePomPath = Paths.get(Resources.getResource("run_core_tests" + File.separator + "testpom.xml").toURI());
+        Path pomPath = Paths.get(projectRoot + File.separator + "pom.xml");
 
-        String pomPath = projectRoot + File.separator + "pom.xml";
-
-        Files.write(Paths.get(pomPath), pomContent.getBytes(), StandardOpenOption.CREATE);
+        Files.copy(sourcePomPath, pomPath, StandardCopyOption.REPLACE_EXISTING);
     }
 
     private String insertInMain(String content) {

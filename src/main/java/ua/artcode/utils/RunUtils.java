@@ -1,5 +1,6 @@
 package ua.artcode.utils;
 
+import com.google.common.collect.ObjectArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.tools.*;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
@@ -36,11 +38,11 @@ public class RunUtils {
     public static String compile(String projectRoot, String[] classPaths) throws IOException {
         // diagnostics - to collect compilation errors
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
+//        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
 
         // .jar files (will be added to classpath) - must be concatenated with ":" delimiter
-        String jarPathsAsString = getJarPaths(projectRoot).stream()
-                .map(path -> path + ":")
+        String jarPathsAsString = Arrays.stream(getJarPaths(projectRoot))
+                .map(path -> path + File.pathSeparator)
                 .collect(Collectors.joining());
 
         // option list ---> "javac [options...]"
@@ -54,7 +56,7 @@ public class RunUtils {
 
         // task for compiler
         JavaCompiler.CompilationTask task = null;
-        try {
+        try (StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);) {
             task = COMPILER.getTask(null,
                     fileManager,
                     diagnostics,
@@ -70,58 +72,79 @@ public class RunUtils {
         task.call();
 
         // collect and return compilation errors
-        return diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
+        String errors = diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
+        return errors;
     }
 
-    public static Class<?>[] getClass(String projectRoot, String sourcesRoot, String[] classNames)
+    public static Class<?>[] getClass(String[] classNames, URLClassLoader urlClassLoader)
             throws IOException,
             ClassNotFoundException {
 
-        // getting classLoader instance
-        URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
 
         Class<?>[] classes = new Class[classNames.length];
         // no streams because of exception handling
+
+//        // getting classLoader instance
+//        URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+
+
+//        try (
+//                // getting classLoader instance
+//                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
+//        ) {
         for (int i = 0; i < classNames.length; i++) {
-            classes[i] = Class.forName(classNames[i], true, classLoader);
+//                classes[i] = Class.forName(classNames[i]);
+            classes[i] = Class.forName(classNames[i], true, urlClassLoader);
         }
+//        }
+
+//        classLoader.close();
+
         return classes;
     }
 
     /**
      * Convert all necessary paths to URL and return URLClassLoader instance
      */
-    private static URLClassLoader getUrlClassLoader(String projectRoot, String sourcesRoot) throws IOException {
+    public static URLClassLoader getUrlClassLoader(String projectRoot, String[] sourcesRoot) throws IOException {
         // get all necessary paths as URLs
         URL[] classPaths = getClassPathsAsURLs(projectRoot, sourcesRoot);
         // pass them to ClassLoader
-        return URLClassLoader.newInstance(classPaths);
+        return new URLClassLoader(classPaths);
     }
 
     /**
      * Convert all classPath values (.jar and sourceRoot path) to URLs
      */
-    private static URL[] getClassPathsAsURLs(String projectRoot, String sourcesRoot) throws IOException {
-        List<String> jarPaths = getJarPaths(projectRoot);
+    private static URL[] getClassPathsAsURLs(String projectRoot, String[] sourcesRoot) throws IOException {
 
-        // size()+1 - because we will add 1 more URL - sourceRoot
-        URL[] classPathsAsURLs = new URL[jarPaths.size() + 1];
-        for (int i = 0; i < jarPaths.size(); i++) {
-            classPathsAsURLs[i] = new File(jarPaths.get(i)).toURI().toURL();
-        }
-        classPathsAsURLs[classPathsAsURLs.length - 1] = new File(sourcesRoot).toURI().toURL();
+        URL[] jarPathsAsURL = convertToURL(getJarPaths(projectRoot));
+        URL[] classPathsAsURL = convertToURL(sourcesRoot);
+        return ObjectArrays.concat(jarPathsAsURL, classPathsAsURL, URL.class);
+    }
 
-        return classPathsAsURLs;
+    private static URL[] convertToURL(String[] paths) {
+        return Arrays.stream(paths)
+                .map(File::new)
+                .map(File::toURI)
+                .map(uri -> {
+                    try {
+                        return uri.toURL();
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .toArray(URL[]::new);
     }
 
     /**
      * Walks through project root dir and collects all .jar files
      */
-    private static List<String> getJarPaths(String projectRoot) throws IOException {
+    private static String[] getJarPaths(String projectRoot) throws IOException {
         return Files.walk(Paths.get(projectRoot))
                 .map(Path::toString)
                 .filter(path -> path.endsWith(".jar"))
                 .map(path -> new File(path).getAbsolutePath())
-                .collect(Collectors.toList());
+                .toArray(String[]::new);
     }
 }

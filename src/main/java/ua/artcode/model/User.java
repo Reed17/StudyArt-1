@@ -1,15 +1,20 @@
 package ua.artcode.model;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import javax.persistence.*;
 
 /**
  * Created by zhenia on 23.04.17.
  */
+@Entity
+@Inheritance
 public class User {
-    private static AtomicInteger NEXT_USER_ID = new AtomicInteger();
+    @Id
+    @GeneratedValue
     protected int id;
+    @Column (unique = true)
     protected String login;
     protected String pass;
+    @Column (unique = true)
     protected String email;
     protected boolean isActivated;
 
@@ -17,7 +22,6 @@ public class User {
     }
 
     public User(String login, String pass, String email) {
-        this.id = NEXT_USER_ID.incrementAndGet();
         this.login = login;
         this.pass = pass;
         this.email = email;
@@ -51,4 +55,6 @@ public class User {
     public int getId() {
         return id;
     }
+
+    public boolean isAccessable(String reqUrl) { return false; }
 }

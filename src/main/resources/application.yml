@@ -1,16 +1,43 @@
-pathForGitProjects: courses
-pathForExternalCodeCompiling: temp
+application:
+  courses:
+    paths:
+      git: courses
+      externalCode: temp
+  profiling: true
+
+email:
+    server: "http://localhost:8080"
+    user: "studyartteam@gmail.com"
+    pass: "pass_for_study"
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      smtp:
+        auth: true
+        starttls.enable: true
 
 maven:
-  dependenciesPath: dependencies
-  goals:
-    copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
-  # path to maven directory where /bin located (/usr/share/maven)
-  home: /usr/share/maven
+    dependenciesPath: dependencies
+    goals:
+      copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
+    embedded:
+      path: /home/v21k/dev/project/StudyArt-1/mvnw
 
-serverLink: "http://localhost:8080"
-emailUsername: "studyartteam@gmail.com"
-emailPass: "pass_for_study"
+spring:
+  datasource:
+    url: jdbc:h2:file:./db/studyArt;DB_CLOSE_ON_EXIT=FALSE
+    username: root
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+  h2:
+    console:
+      enabled: true
+      # console view at localhost:8080/console
+      path: /console
 
 logging:
   level:

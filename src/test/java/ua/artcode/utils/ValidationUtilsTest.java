@@ -1,32 +1,50 @@
 package ua.artcode.utils;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
-import ua.artcode.dao.UserDB;
-import ua.artcode.dao.UserDBImpl;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
+import ua.artcode.Application;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Created by zhenia on 28.04.17.
  */
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = {Application.class})
+@WebAppConfiguration
 public class ValidationUtilsTest {
 
-    private ValidationUtils validationUtils = new ValidationUtils();
-    private UserDB<Teacher> teacherUserDB = new UserDBImpl<>();
-    private UserDB<Student> studentUserDB = new UserDBImpl<>();
+    @Autowired
+    private ValidationUtils validationUtils;
+    @Autowired
+    private TeacherRepository teachers;
+    @Autowired
+    private StudentRepository students;
 
     @Before
     public void setUp() {
         validationUtils = new ValidationUtils();
-        teacherUserDB = new UserDBImpl<>();
-        studentUserDB = new UserDBImpl<>();
 
-        teacherUserDB.add(new Teacher("teacher", "password", "teacher@gmail.com"));
-        studentUserDB.add(new Student("student", "password", "student@gmail.com"));
+        teachers.save(new Teacher("teacher", "password", "teacher@gmail.com"));
+        students.save(new Student("student", "password", "student@gmail.com"));
+    }
+
+    @After
+    public void cleanRepositories(){
+        teachers.deleteAll();
+        students.deleteAll();
     }
 
     @Test
@@ -70,15 +88,15 @@ public class ValidationUtilsTest {
 
     @Test
     public void checkLoginOriginalityTest() {
-        assertThat(validationUtils.checkLoginOriginality("teacher", teacherUserDB, studentUserDB), is(false));
-        assertThat(validationUtils.checkLoginOriginality("teacher1", teacherUserDB, studentUserDB), is(true));
-        assertThat(validationUtils.checkLoginOriginality("student", teacherUserDB, studentUserDB), is(false));
+        assertThat(validationUtils.checkLoginOriginality("teacher", teachers, students), is(false));
+        assertThat(validationUtils.checkLoginOriginality("teacher1", teachers, students), is(true));
+        assertThat(validationUtils.checkLoginOriginality("student", teachers, students), is(false));
     }
 
     @Test
     public void checkEmailOriginalityTest() {
-        assertThat(validationUtils.checkEmailOriginality("teacher@gmail.com", teacherUserDB, studentUserDB), is(false));
-        assertThat(validationUtils.checkEmailOriginality("teacher1@gmail.com", teacherUserDB, studentUserDB), is(true));
-        assertThat(validationUtils.checkEmailOriginality("student@gmail.com", teacherUserDB, studentUserDB), is(false));
+        assertThat(validationUtils.checkEmailOriginality("teacher@gmail.com", teachers, students), is(false));
+        assertThat(validationUtils.checkEmailOriginality("teacher1@gmail.com", teachers, students), is(true));
+        assertThat(validationUtils.checkEmailOriginality("student@gmail.com", teachers, students), is(false));
     }
 }

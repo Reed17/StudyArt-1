@@ -1,13 +1,15 @@
 package ua.artcode.utils.IO_utils;
 
-import org.apache.maven.shared.invoker.*;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.Invoker;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.StudyArtDB;
+import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidIDException;
@@ -32,9 +34,9 @@ import java.util.stream.Collectors;
 @Component
 public class CourseIOUtils {
 
-    @Value("${pathForGitProjects}")
+    @Value("${application.courses.paths.git}")
     private String localPathForProjects;
-    @Value("${pathForExternalCodeCompiling}")
+    @Value("${application.courses.paths.externalCode}")
     private String localPathForExternalCode;
     @Value("${maven.dependenciesPath}")
     private String mvnDependencyDownloadPath;
@@ -42,12 +44,24 @@ public class CourseIOUtils {
     private String mvnCopyToDirectory;
     @Value("${maven.home}")
     private String mvnHome;
+    @Value("${maven.embedded.path}")
+    private String embeddedMavenExecutablePath;
+
+    private final CommonIOUtils commonIOUtils;
+
+    private final CourseRepository courseRepository;
+
+    private final InvocationRequest request;
+
+    private final Invoker invoker;
 
     @Autowired
-    private CommonIOUtils commonIOUtils;
-
-    @Autowired
-    private StudyArtDB courseDB;
+    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+        this.commonIOUtils = commonIOUtils;
+        this.courseRepository = courseRepository;
+        this.request = invocationRequest;
+        this.invoker = invoker;
+    }
 
     /**
      * Downloading project from Git and save it locally
@@ -58,8 +72,8 @@ public class CourseIOUtils {
      *
      * @return path where project has been saved
      */
-    public String saveLocally(Course course) throws DirectoryCreatingException, GitAPIException {
-        String projectPath = generatePath(course);
+    public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
+        String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
             if (projectDirectory.exists()) {
@@ -67,14 +81,14 @@ public class CourseIOUtils {
             }
             Files.createDirectories(Paths.get(projectPath));
             Git.cloneRepository()
-                    .setURI(course.getUrl())
+                    .setURI(courseURL)
                     .setDirectory(projectDirectory)
                     .call()
                     .getRepository()
                     .close();
-//            clone.getRepository().close()
+
         } catch (IOException e) {
-            throw new DirectoryCreatingException("Unable to create a directory for course: " + course.getName());
+            throw new DirectoryCreatingException("Unable to create a directory for course: " + courseName);
         }
         return projectPath;
     }
@@ -103,6 +117,21 @@ public class CourseIOUtils {
                 .collect(Collectors.toList());
     }
 
+    public Lesson getLessonByID(String courseLocalPath, int id) throws IOException {
+
+        return Files.walk(Paths.get(courseLocalPath))
+                .map(Path::toString)
+                .filter(path -> path.endsWith("lesson"))
+                .filter(path -> path.contains(String.valueOf(id)))
+                .map(path -> {
+                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
+                    return new Lesson(lessonName, path);
+                })
+                .findFirst()
+                .get();
+
+    }
+
     /**
      * Save code locally
      * 1. Parse className from code (3rd word - public class NAME {...}
@@ -126,11 +155,22 @@ public class CourseIOUtils {
         return localPathForExternalCode + File.separator + javaClassName;
     }
 
-    public String[] getLessonClassPaths(int courseId, int lessonNumber, StudyArtDB db) throws InvalidIDException,
+    @Deprecated
+    public String[] getLessonClassPaths(int courseId, int lessonNumber) throws InvalidIDException,
             CourseNotFoundException, LessonNotFoundException, IOException {
-        Course course = db.getCourseByID(courseId);
-        Lesson lesson = courseDB.getLesson(lessonNumber, course);
+
+        //TODO lesson with uniqe id
+        Course course = courseRepository.findOne(courseId);
+        Lesson lesson = course.getLesson(lessonNumber - 1);
         return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
+    }
+
+    public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
+//        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
+        String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
+        return testsClassPaths;
+//        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
+//                .toArray(String[]::new);
     }
 
     /**
@@ -145,10 +185,6 @@ public class CourseIOUtils {
      * @return true if saved successfully, false otherwise
      */
     public boolean saveMavenDependenciesLocally(String projectRoot) {
-        // todo declare beans for both
-        InvocationRequest request = new DefaultInvocationRequest();
-        Invoker invoker = new DefaultInvoker();
-
         projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
 
         String pomPath = generatePomPath(projectRoot);
@@ -156,9 +192,9 @@ public class CourseIOUtils {
 
         request.setPomFile(new File(pomPath));
         request.setGoals(Collections.singletonList(mavenGoal));
-        invoker.setMavenHome(new File(mvnHome));
 
         try {
+            invoker.setMavenExecutable(new File(embeddedMavenExecutablePath));
             invoker.execute(request);
         } catch (MavenInvocationException e) {
             e.printStackTrace();
@@ -177,15 +213,15 @@ public class CourseIOUtils {
     private String generateMavenGoal(String projectRoot) {
         projectRoot = checkEndsWithSeparator(projectRoot);
         return mvnCopyToDirectory
-                + projectRoot
-                + mvnDependencyDownloadPath;
+                + '"' + projectRoot
+                + mvnDependencyDownloadPath + '"';
     }
 
     private String checkEndsWithSeparator(String path) {
         return path.endsWith(File.separator) ? path : path + File.separator;
     }
 
-    private String generatePath(Course course) {
-        return localPathForProjects + File.separator + course.getId() + course.getName() + File.separator;
+    private String generatePath(String courseName, int courceID) {
+        return localPathForProjects + File.separator + courceID + courseName + File.separator;
     }
 }

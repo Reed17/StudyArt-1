@@ -2,8 +2,8 @@ package ua.artcode.utils;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 /**
  * Created by zhenia on 28.04.17.

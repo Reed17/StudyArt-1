@@ -10,6 +10,7 @@ import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
+import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
@@ -17,6 +18,7 @@ import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -39,7 +41,7 @@ public class CourseController {
             response = Course.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
-    public Course getCourseByID(@RequestParam int id) throws AppException {
+    public Course getCourseByID(@RequestParam int id, HttpServletRequest request) throws AppException {
 
         Course course = courseService.getByID(id);
         LOGGER.info("Course get - OK, id {}", id);
@@ -52,7 +54,7 @@ public class CourseController {
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course) {
+    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) {
         try {
 
             boolean result = courseService.addCourse(course);
@@ -75,7 +77,7 @@ public class CourseController {
             response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
-    public RunResults runClass(@RequestBody ExternalCode code) {
+    public RunResults runClass(@RequestBody ExternalCode code, HttpServletRequest request) {
         try {
 
             RunResults results = runService.runMain(code);
@@ -96,7 +98,8 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/run")
     public RunResults runLesson(@RequestParam int courseId,
-                                @RequestParam int lessonNumber) {
+                                @RequestParam int lessonNumber,
+                                HttpServletRequest request) {
         try {
 
             RunResults results = runService.runLesson(courseId, lessonNumber);
@@ -112,16 +115,17 @@ public class CourseController {
 
     @ApiOperation(httpMethod = "POST",
             value = "Resource to run class from lesson with solution (need to add solution before)",
-            notes = "Runs a class in certain lesson (class must have main method) which depends on Solution class",
+            notes = "Runs a tests for a certain lesson",
             response = RunResults.class,
             produces = "application/json")
-    @RequestMapping(value = "courses/lessons/send-solution-and-run", method = RequestMethod.POST)
-    public RunResults runLessonWithSolution(@RequestParam int courseId,
-                                            @RequestParam int lessonNumber,
-                                            @RequestBody ExternalCode code) {
+    @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
+    public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
+                                                 @RequestParam int lessonNumber,
+                                                 @RequestBody @Valid CourseFromUser userCourse,
+                                                 HttpServletRequest request) {
         try {
 
-            RunResults results = runService.runLessonWithSolution(courseId, lessonNumber, code);
+            RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);
             LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
             return results;
 
@@ -131,4 +135,6 @@ public class CourseController {
             return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
     }
+
+
 }

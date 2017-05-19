@@ -12,15 +12,17 @@ import static ua.artcode.utils.StringUtils.getClassNameFromClassPath;
  */
 public class PreProcessors {
 
-    public static MethodRunnerPreProcessor singleClass = ((projectRoot, sourcesRoot, classPaths) -> {
+    public static MethodRunnerPreProcessor singleClass = ((classPaths, classLoader) -> {
+
+
         String[] classNames = new String[]{getClassNameFromClassPath(classPaths[0], File.separator)};
 
         checkIfEmpty(classNames);
 
-        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
+        return RunUtils.getClass(classNames, classLoader);
     });
 
-    public static MethodRunnerPreProcessor lessonsMain = ((projectRoot, sourcesRoot, classPaths) -> {
+    public static MethodRunnerPreProcessor lessonsMain = ((classPaths, classLoader) -> {
         String classNames[] = Arrays.stream(classPaths)
                 .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
                 .filter(path -> path.toLowerCase().contains("main"))
@@ -28,19 +30,20 @@ public class PreProcessors {
 
         checkIfEmpty(classNames);
 
-        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
+        return RunUtils.getClass(classNames, classLoader);
     });
 
-    public static MethodRunnerPreProcessor lessonsTests = ((projectRoot, sourcesRoot, classPaths) -> {
+    public static MethodRunnerPreProcessor lessonsTests = ((classPaths, classLoader) -> {
 
         String[] classNames = Arrays.stream(classPaths)
                 .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
+//                .map(path -> Paths.get(path).toAbsolutePath().toString())
                 .filter(path -> path.toLowerCase().contains("test"))
                 .toArray(String[]::new);
 
         checkIfEmpty(classNames);
 
-        return RunUtils.getClass(projectRoot, sourcesRoot, classNames);
+        return RunUtils.getClass(classNames, classLoader);
     });
 
     private static void checkIfEmpty(String[] classNames) throws ClassNotFoundException {
