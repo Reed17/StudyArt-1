@@ -3,6 +3,8 @@ package ua.artcode.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 
+import javax.servlet.http.Cookie;
 import java.io.File;
 import java.io.IOException;
 
@@ -41,6 +44,9 @@ public class CourseControllerTest {
     @Value("${test.git.URL}")
     private String GitURL;
 
+    private String teacherKey;
+    private String studentKey;
+
     @AfterClass
     public static void removeTempDir() throws IOException {
         File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);
@@ -61,6 +67,15 @@ public class CourseControllerTest {
         tempPathForExternalCodeCompiling = path;
     }
 
+    @Before
+    public void registerTestUsers() throws Exception{
+        mockMvc.perform(post("/register?login=Username1&email=42004200zhenia@gmail.com&pass=password1&type=teacher"));
+        mockMvc.perform(post("/register?login=Username2&email=zheniatrochun@ukr.net&pass=password1&type=student"));
+
+        teacherKey = mockMvc.perform(post("/login?login=Username1&pass=password1")).andReturn().getResponse().getContentAsString();
+        studentKey = mockMvc.perform(post("/login?login=Username2&pass=password1")).andReturn().getResponse().getContentAsString();
+    }
+
     @Test
     public void testAddPositive() throws Exception {
         addCourse();
@@ -76,6 +91,7 @@ public class CourseControllerTest {
                 null,
                 null);
         mockMvc.perform(post("/courses/add")
+                .cookie(new Cookie("Access-Key", teacherKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))
@@ -85,7 +101,8 @@ public class CourseControllerTest {
     @Test
     public void testGetPositive() throws Exception {
         addCourse();
-        mockMvc.perform(get("/courses/get?id=1"))
+        mockMvc.perform(get("/courses/get?id=1")
+                .cookie(new Cookie("Access-Key", teacherKey)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("someCourse"))
@@ -96,7 +113,8 @@ public class CourseControllerTest {
     @Test
     public void testGetNegative() throws Exception {
         try {
-            mockMvc.perform(get("/courses/get?id=1"));
+            mockMvc.perform(get("/courses/get?id=1")
+                    .cookie(new Cookie("Access-Key", teacherKey)));
         } catch (Exception e) {
             System.out.println(e.getMessage());
             assertThat(e.getMessage(), containsString("No course found with id: 1"));
@@ -110,6 +128,7 @@ public class CourseControllerTest {
                 "{\nSystem.out.print(2+2);\n}\n}\n");
 
         mockMvc.perform(post("/run-class")
+                .cookie(new Cookie("Access-Key", studentKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(code))
                 .accept(MediaType.APPLICATION_JSON))
@@ -124,6 +143,7 @@ public class CourseControllerTest {
                 "{\nSystem.out.println(2+2;\n}\n}\n");
 
         mockMvc.perform(post("/run-class")
+                .cookie(new Cookie("Access-Key", teacherKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(code)))
                 .andExpect(jsonPath("$.generalResponse.message").value(containsString("error")));
@@ -133,7 +153,8 @@ public class CourseControllerTest {
     public void testRunLessonPositive() throws Exception {
         addCourse();
 
-        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=3"))
+        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=3")
+                .cookie(new Cookie("Access-Key", teacherKey)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.methodResult.systemOut").value("SOME INFO" + System.getProperty("line.separator")));
     }
@@ -142,9 +163,10 @@ public class CourseControllerTest {
     public void testRunLessonNegative() throws Exception {
         addCourse();
 
-        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=1"))
+        mockMvc.perform(get("/courses/lessons/run?courseId=1&lessonNumber=1")
+                .cookie(new Cookie("Access-Key", teacherKey)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("error")));
+                .andExpect(content().string(containsString("ERROR")));
     }
 
     private void addCourse() throws Exception {
@@ -155,6 +177,7 @@ public class CourseControllerTest {
                 null,
                 null);
         mockMvc.perform(post("/courses/add")
+                .cookie(new Cookie("Access-Key", teacherKey))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(course))
                 .accept(MediaType.APPLICATION_JSON))

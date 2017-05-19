@@ -18,6 +18,7 @@ import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 @RestController
@@ -40,7 +41,7 @@ public class CourseController {
             response = Course.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
-    public Course getCourseByID(@RequestParam int id) throws AppException {
+    public Course getCourseByID(@RequestParam int id, HttpServletRequest request) throws AppException {
 
         Course course = courseService.getByID(id);
         LOGGER.info("Course get - OK, id {}", id);
@@ -53,7 +54,7 @@ public class CourseController {
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course) {
+    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) {
         try {
 
             boolean result = courseService.addCourse(course);
@@ -76,7 +77,7 @@ public class CourseController {
             response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
-    public RunResults runClass(@RequestBody ExternalCode code) {
+    public RunResults runClass(@RequestBody ExternalCode code, HttpServletRequest request) {
         try {
 
             RunResults results = runService.runMain(code);
@@ -97,7 +98,8 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/run")
     public RunResults runLesson(@RequestParam int courseId,
-                                @RequestParam int lessonNumber) {
+                                @RequestParam int lessonNumber,
+                                HttpServletRequest request) {
         try {
 
             RunResults results = runService.runLesson(courseId, lessonNumber);
@@ -119,7 +121,8 @@ public class CourseController {
     @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
                                                  @RequestParam int lessonNumber,
-                                                 @RequestBody @Valid CourseFromUser userCourse) {
+                                                 @RequestBody @Valid CourseFromUser userCourse,
+                                                 HttpServletRequest request) {
         try {
 
             RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);

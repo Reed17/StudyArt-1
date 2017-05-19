@@ -27,7 +27,9 @@ public class MailUtils {
         message.setSubject(subject);
         message.setText(msg);
 
-        mailSender.send(message);
+
+        // todo resolve conflict with emails limit
+//        mailSender.send(message);
     }
 
     public String getActivationLink(User user) {
