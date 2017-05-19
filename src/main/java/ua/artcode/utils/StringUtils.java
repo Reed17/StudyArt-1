@@ -14,7 +14,7 @@ public class StringUtils {
         return classPath.substring(0, classPath.lastIndexOf(delimiter)) + delimiter;
     }
 
-    public static String getClassNameFromClassPath(String classPath, String delimiter) {
+    public static String substringAfterDelimiter(String classPath, String delimiter) {
         return classPath.substring(classPath.lastIndexOf(delimiter) + delimiter.length(),
                 classPath.lastIndexOf(".")).replace(File.separator, ".");
     }
@@ -36,6 +36,10 @@ public class StringUtils {
     public static String parseString(String source, String before, String after) {
         return source.substring(source.indexOf(before) + before.length(),
                 source.indexOf(after) - after.length()).trim();
+    }
+
+    public static String normalizePath(String path) {
+        return path.replace(File.separator + File.separator, File.separator);
     }
 
     // todo replace by some template engine

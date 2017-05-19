@@ -20,10 +20,6 @@ import java.util.Properties;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class Application {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
-
     @Value("${email.host}")
     private String mailHost;
     @Value("${email.port}")
@@ -36,6 +32,10 @@ public class Application {
     private String mailSmtpAuth;
     @Value("${email.properties.smtp.starttls.enable}")
     private String mailSmtpStartTLS;
+
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
 
     @Bean
     public Docket api() {

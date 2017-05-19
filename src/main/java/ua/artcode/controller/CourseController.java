@@ -1,14 +1,11 @@
 package ua.artcode.controller;
 
 import io.swagger.annotations.ApiOperation;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -71,16 +68,16 @@ public class CourseController {
         // Course JSON with required name, author, URL, description
 //        try {
         int result = courseService.addCourse(course);
-            if (result != -1) {
-                LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
-                        course.getName(),
-                        course.getAuthor(),
-                        course.getUrl());
-                return new GeneralResponse(ResponseType.INFO, "Course add - OK");
-            } else {
-                LOGGER.error("Course add - FAILED", "Course already exists!");
-                return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
-            }
+        if (result != -1) {
+            LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
+                    course.getName(),
+                    course.getAuthor(),
+                    course.getUrl());
+            return new GeneralResponse(ResponseType.INFO, "Course add - OK");
+        } else {
+            LOGGER.error("Course add - FAILED", "Course already exists!");
+            return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
+        }
 //        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
 //
 
@@ -136,11 +133,11 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/add", method = RequestMethod.POST)
     public GeneralResponse addLessonToCourse(@RequestParam int courseId,
-                                                 @RequestBody @Valid Lesson lesson) {
+                                             @RequestBody @Valid Lesson lesson) {
         try {
 
             // todo return Lesson(co, not int
-            int result = courseService.addLesson(lesson,courseId);
+            int result = courseService.addLesson(lesson, courseId);
 
             LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
             return new GeneralResponse(ResponseType.INFO, "Lesson add - OK");

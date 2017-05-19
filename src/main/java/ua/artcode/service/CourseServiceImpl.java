@@ -6,10 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
-import ua.artcode.exceptions.*;
+import ua.artcode.exceptions.AppException;
+import ua.artcode.exceptions.CourseNotFoundException;
+import ua.artcode.exceptions.InvalidIDException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
+import ua.artcode.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -58,34 +61,42 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public int addLesson(Lesson lesson, int courseID) throws LessonsParsingException, GitAPIException, DirectoryCreatingException, IOException, LessonClassPathsException {
+    public int addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException {
 
         // todo if we already have this lesson, what should we do?
         // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = courseRepository.findOne(courseID);
 
-
-        // todo extract to method (setters and update)
-        // save course and set roots
+        // save locally
         String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
-        if(!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
-            course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
-            course.setTestsRoot(courseLocalPath + course.getTestsRoot());
 
-            // update course so we can use roots later in RunService
-            courseRepository.updateCourse(course.getSourcesRoot(), course.getTestsRoot(), course.getId());
+        // todo extract somewhere??? (not sure)
+        if (!lesson.getSourcesRoot().isEmpty()) {
+            String newPath = StringUtils.normalizePath(courseLocalPath + lesson.getSourcesRoot());
+            lesson.setSourcesRoot(newPath);
+        } else if (!lesson.getTestsRoot().isEmpty()) {
+            String newPath = StringUtils.normalizePath(courseLocalPath + lesson.getTestsRoot());
+            lesson.setTestsRoot(newPath);
         }
 
+        // update root packages
+        courseIOUtils.updateCoursePaths(courseLocalPath, course);
 
+        // update dependencies
+        courseIOUtils.updateCourseDependencies(courseLocalPath, course);
+
+        // todo maybe there is another solution, more simple?
         Pair<List<String>, String> baseClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getBaseClasses(),
-                        lesson.getSourcesRoot());
+                        lesson.getSourcesRoot(),
+                        courseLocalPath);
 
         Pair<List<String>, String> testClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getTestsClasses(),
-                        lesson.getTestsRoot());
+                        lesson.getTestsRoot(),
+                        courseLocalPath);
 
 
         lesson.setBaseClasses(baseClasses.getKey());
@@ -94,7 +105,7 @@ public class CourseServiceImpl implements CourseService {
         lesson.setTestsClasses(testClasses.getKey());
         lesson.setTestsRoot(testClasses.getValue());
 
-        // todo validation
+        // todo validation (test and base classes MUST exist in corresponding folders)
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) {

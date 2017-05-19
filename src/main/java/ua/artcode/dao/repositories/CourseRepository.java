@@ -16,6 +16,12 @@ public interface CourseRepository extends CrudRepository<Course, Integer> {
     @Transactional
     @Modifying
     @Query("update Course c set c.sourcesRoot  = ?1, c.testsRoot = ?2 where c.id = ?3")
-    int updateCourse(String sourcesRoot, String testsRoot, int courseId);
+    int updateSourcesAndTestsRoot(String sourcesRoot, String testsRoot, int courseId);
+
+    @Transactional
+    @Modifying
+    @Query("update Course c set c.dependencies = ?1 where c.id = ?2")
+    int updateDependencies(String[] dependencies, int courseId);
+
 
 }

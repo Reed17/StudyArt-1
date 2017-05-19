@@ -51,6 +51,7 @@ public class RunServiceImpl implements RunService {
         return runCore.run(sourcesRoot,
                 new String[]{sourcesRoot},
                 classes,
+                new String[]{},
                 PreProcessors.singleClass,
                 MethodCheckers.main,
                 Runners.main,
@@ -66,6 +67,7 @@ public class RunServiceImpl implements RunService {
         Lesson lesson = lessonDB.findOne(lessonID);
         Course course = courseDB.findOne(courseID);
 
+
         String[] classPaths =
                 courseIOUtils.getLessonClassAndTestsPaths(
                         lesson.getBaseClasses(),
@@ -79,6 +81,7 @@ public class RunServiceImpl implements RunService {
                 new String[]{sourcesRoot,
                         testsRoot},
                 classPaths,
+                course.getDependencies(),
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
                 Runners.test,

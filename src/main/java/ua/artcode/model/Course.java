@@ -32,6 +32,8 @@ public class Course {
     @NotNull
     private String testsRoot;
 
+    private String[] dependencies;
+
     public Course() {
     }
 
@@ -143,6 +145,14 @@ public class Course {
 
     public void setTestsRoot(String testsRoot) {
         this.testsRoot = testsRoot;
+    }
+
+    public String[] getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(String[] dependencies) {
+        this.dependencies = dependencies;
     }
 
     @Override

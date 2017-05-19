@@ -35,7 +35,8 @@ public class Lesson implements Comparable<Lesson> {
     private String sourcesRoot;
     private String testsRoot;
     private String description;
-//    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+
+    //    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
 //    private LocalDateTime date;
 // todo date
     public Lesson() {

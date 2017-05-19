@@ -18,8 +18,9 @@ email:
 application:
   courses:
     paths:
-      git: courses_test
-      externalCode: temp_test
+      git: courses
+      externalCode: temp
+      dependencies: dependencies
   profiling: true
 
 maven:
