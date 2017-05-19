@@ -1,5 +1,9 @@
 package ua.artcode;
 
+import org.apache.maven.shared.invoker.DefaultInvocationRequest;
+import org.apache.maven.shared.invoker.DefaultInvoker;
+import org.apache.maven.shared.invoker.InvocationRequest;
+import org.apache.maven.shared.invoker.Invoker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -62,5 +66,16 @@ public class Application {
 
         return mailSender;
     }
+
+    @Bean
+    public InvocationRequest invocationRequest(){
+        return new DefaultInvocationRequest();
+    }
+
+    @Bean
+    public Invoker invoker(){
+        return new DefaultInvoker();
+    }
+
 
 }

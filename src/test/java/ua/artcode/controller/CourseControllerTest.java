@@ -53,13 +53,6 @@ public class CourseControllerTest {
     @Value("${test.git.URL}")
     private String gitURL;
 
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private LessonRepository lessonRepository;
-
-
-
     @AfterClass
     public static void removeTempDir() throws IOException {
         File externalCodeCompiling = new File(tempPathForExternalCodeCompiling);

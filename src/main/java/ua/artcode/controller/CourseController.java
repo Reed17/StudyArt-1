@@ -63,8 +63,8 @@ public class CourseController {
             value = "Resource to get all esson",
             response = List.class,
             produces = "application/json")
-    @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
-    public List<Lesson> getLessonByID() throws AppException {
+    @RequestMapping(value = "/courses/lessons/getAll", method = RequestMethod.GET)
+    public List<Lesson> getAllLessons() throws AppException {
         List<Lesson> lessons = courseService.getAllLessons();
         LOGGER.info("Lesson get all - OK");
         return lessons;

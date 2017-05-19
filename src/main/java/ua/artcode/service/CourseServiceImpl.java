@@ -16,6 +16,7 @@ import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.ValidationUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,13 +110,13 @@ public class CourseServiceImpl implements CourseService {
         lesson.setTestsClasses(testClasses.getKey());
         lesson.setTestsRoot(testClasses.getValue());
 
-        // check if exists
+/*        // check if exists
         validationUtils.validateFiles(Stream.of(
                 lesson.getBaseClasses(),
                 lesson.getTestsClasses(),
                 lesson.getRequiredClasses())
                 .flatMap(Collection::stream)
-                .toArray(String[]::new));
+                .toArray(String[]::new));*/
 
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) { // todo check equals and hash
