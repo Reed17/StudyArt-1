@@ -16,7 +16,7 @@ import java.util.List;
  * Created by v21k on 15.04.17.
  */
 public interface CourseService {
-    int addCourse(Course course);
+    Course addCourse(Course course);
 
     Course getByID(int id) throws InvalidIDException, CourseNotFoundException;
 
@@ -24,7 +24,7 @@ public interface CourseService {
 
     Collection<Course> getAll();
 
-    int addLesson(Lesson lesson, int courceID) throws GitAPIException, IOException, AppException, ValidationException;
+    Lesson addLesson(Lesson lesson, int courceID) throws GitAPIException, IOException, AppException, ValidationException;
 
     Lesson getLessonByID(int id);
 

@@ -89,7 +89,8 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("first_lesson"))
                 .andExpect(jsonPath("$.courseID").value(1))
-                .andExpect(jsonPath("$.sourcesRoot").value("courses/1someCourse/src/main/java/_02_lesson"))
+                .andExpect(jsonPath("$.sourcesRoot").value("courses"+File.separator+"1someCourse"+
+                        File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+"_02_lesson"))
                 .andExpect(jsonPath("$.description").value("First test lesson"));
     }
 
@@ -211,13 +212,13 @@ public class CourseControllerTest {
     private void addLesson() throws Exception {
 
         List<String> testClassPaths = new ArrayList<>(1);
-        testClassPaths.add("/src/test/java/_02_lesson/SolutionTests.java");
+        testClassPaths.add("src/test/java/_02_lesson/SolutionTests.java");
 
         Lesson lesson = new Lesson();
         lesson.setName("first_lesson");
         lesson.setDescription("First test lesson");
         lesson.setCourseID(1);
-        lesson.setSourcesRoot("/src/main/java/_02_lesson");
+        lesson.setSourcesRoot("src/main/java/_02_lesson");
         lesson.setTestsClasses(testClassPaths);
         lesson.setLocalPath("_02_lesson");
 

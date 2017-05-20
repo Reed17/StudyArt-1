@@ -78,8 +78,8 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course) {
-        int result = courseService.addCourse(course);
-        if (result != -1) {
+        Course result = courseService.addCourse(course);
+        if (course == null) {
             LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
                     course.getName(),
                     course.getAuthor(),
@@ -143,8 +143,7 @@ public class CourseController {
                                              @RequestBody @Valid Lesson lesson) {
         try {
 
-            // todo return Lesson, not int
-            int result = courseService.addLesson(lesson, courseId);
+            Lesson result = courseService.addLesson(lesson, courseId);
 
             LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
             return new GeneralResponse(ResponseType.INFO, "Lesson add - OK");
