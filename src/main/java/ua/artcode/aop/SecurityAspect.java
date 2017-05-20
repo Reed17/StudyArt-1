@@ -46,7 +46,7 @@ public class SecurityAspect {
             throw new InvalidUserSessionException("No user with this session id");
         }
 
-        User user = sessionDB.findByKey(sessionKey).getUser();
+        User user = sessionDB.findOne(sessionKey).getUser();
 
         if(user == null) throw new InvalidUserSessionException("No user with this session id");
 

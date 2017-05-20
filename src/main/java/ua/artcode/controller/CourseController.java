@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.SuchCourseAlreadyExists;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -81,22 +82,14 @@ public class CourseController {
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) {
-
-
+    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) throws SuchCourseAlreadyExists {
         Course result = courseService.addCourse(course);
-        // don't understand :(
-        if(course == null) {
-//            Course result = courseService.addCourse(course);
-            LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
-                    course.getName(),
-                    course.getAuthor(),
-                    course.getUrl());
-            return new GeneralResponse(ResponseType.INFO, "Course add - OK");
-        } else {
-            LOGGER.error("Course add - FAILED", "Course already exists!");
-            return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
-        }
+
+        LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
+                result.getName(),
+                result.getAuthor(),
+                result.getUrl());
+        return new GeneralResponse(ResponseType.INFO, "Course add - OK");
     }
 
     @ApiOperation(httpMethod = "POST",

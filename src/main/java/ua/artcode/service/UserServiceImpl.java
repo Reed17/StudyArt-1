@@ -2,21 +2,20 @@ package ua.artcode.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
-import ua.artcode.exceptions.InvalidLoginInfo;
-import ua.artcode.exceptions.InvalidUserEmailException;
-import ua.artcode.exceptions.InvalidUserLoginException;
-import ua.artcode.exceptions.InvalidUserPassException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Session;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 import ua.artcode.model.User;
 import ua.artcode.utils.MailUtils;
+import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
@@ -30,18 +29,24 @@ public class UserServiceImpl implements UserService{
     private final SecurityUtils securityUtils;
     private final SessionRepository sessionDB;
     private final MailUtils mu;
+    private final ResultChecker resultChecker;
+
+    @Value("${email.user}")
+    private String emailUsername;
 
     private static Logger LOGGER = Logger.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils,
-                           SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu) {
+                           SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu,
+                           ResultChecker resultChecker) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
         this.securityUtils = securityUtils;
         this.sessionDB = sessionDB;
         this.mu = mu;
+        this.resultChecker = resultChecker;
     }
 
     @Override
@@ -62,16 +67,18 @@ public class UserServiceImpl implements UserService{
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-        mu.sendEmail("${emailUsername}", newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
+        mu.sendEmail(emailUsername, newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
 
         return newUser;
     }
 
     @Override
-    public User activate(int userId) {
+    public User activate(int userId) throws UnexpectedNullException {
         User user = teacherDB.findOne(userId);
 
         user = user == null ? studentDB.findOne(userId) : user;
+
+        resultChecker.checkNull(user, "User with this id doesn't exists");
 
         user.activate();
 
@@ -84,9 +91,9 @@ public class UserServiceImpl implements UserService{
 
         boolean validatedPass = validationUtils.passValidation(pass);
 
-        pass = securityUtils.encryptPass(pass);
-
         if(validationUtils.emailValidation(login) && validatedPass) {
+            pass = securityUtils.encryptPass(pass);
+
             User tmp = teacherDB.findByEmail(login);
             loginResult = tmp == null ? studentDB.findByEmail(login) : tmp;
 
@@ -98,9 +105,13 @@ public class UserServiceImpl implements UserService{
                 else
                     return session.getAccessKey();
             }
+
+            throw new InvalidLoginInfo("User doesn't exists");
         }
 
         if(validationUtils.loginValidation(login) && validatedPass) {
+            pass = securityUtils.encryptPass(pass);
+
             User tmp = teacherDB.findByLogin(login);
             loginResult = tmp == null ? studentDB.findByLogin(login) : tmp;
 
@@ -112,6 +123,8 @@ public class UserServiceImpl implements UserService{
                 else
                     return session.getAccessKey();
             }
+
+            throw new InvalidLoginInfo("User doesn't exists");
         }
 
         throw new InvalidLoginInfo("User doesn't exists");

@@ -16,6 +16,7 @@ import ua.artcode.model.Lesson;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
+import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
@@ -31,14 +32,17 @@ public class RunServiceImpl implements RunService {
     private final LessonRepository lessonDB;
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
+    private final ResultChecker resultChecker;
 
     @Autowired
-    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, LessonRepository lessonDB, CourseIOUtils courseIOUtils, RunCore runCore) {
+    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, LessonRepository lessonDB,
+                          CourseIOUtils courseIOUtils, RunCore runCore, ResultChecker resultChecker) {
         this.commonIOUtils = commonIOUtils;
         this.courseDB = courseDB;
         this.lessonDB = lessonDB;
         this.courseIOUtils = courseIOUtils;
         this.runCore = runCore;
+        this.resultChecker = resultChecker;
     }
 
     @Override
@@ -67,6 +71,8 @@ public class RunServiceImpl implements RunService {
         Lesson lesson = lessonDB.findOne(lessonID);
         Course course = courseDB.findOne(courseID);
 
+        resultChecker.checkNull(lesson, "Lesson not found!");
+        resultChecker.checkNull(course, "Course not found!");
 
         String[] classPaths =
                 courseIOUtils.getLessonClassAndTestsPaths(

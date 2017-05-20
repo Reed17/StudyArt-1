@@ -1,18 +1,20 @@
 package ua.artcode.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Component;
 import ua.artcode.model.User;
 
-/**
- * Created by zhenia on 24.04.17.
- */
+
 @Component
 public class MailUtils {
 
     private final MailSender mailSender;
+
+    @Value("${email.server}")
+    private String serverLink;
 
     @Autowired
     public MailUtils(MailSender mailSender) {
@@ -33,7 +35,7 @@ public class MailUtils {
     }
 
     public String getActivationLink(User user) {
-        return user.getLogin() + ", to activate your account go to: ${serverLink} + /activate&id=" + user.getId();
+        return user.getLogin() + ", to activate your account go to: " + serverLink + "/activate&id=" + user.getId();
     }
 
     public MailSender getMailSender() {

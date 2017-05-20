@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ua.artcode.dao.repositories.SessionRepository;
+import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
 import ua.artcode.service.UserServiceImpl;
 
@@ -88,7 +89,7 @@ public class UserController {
                              HttpServletRequest request) throws Throwable {
         String newUserKey = userService.login(login, pass);
 
-        LOGGER.info("Login - OK, id = " + sessionDB.findByKey(newUserKey).getUser().getId());
+        LOGGER.info("Login - OK, id = " + sessionDB.findOne(newUserKey).getUser().getId());
 
 
         return newUserKey;
@@ -101,7 +102,7 @@ public class UserController {
             produces = "application/json")
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
     // todo use the id as String
-    public User activateUser(@RequestParam int id) {
+    public User activateUser(@RequestParam int id) throws UnexpectedNullException {
         User activatedUser = userService.activate(id);
 
         LOGGER.info("Activation - OK, id = " + activatedUser.getId());
