@@ -2,11 +2,9 @@ package ua.artcode.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -46,12 +44,15 @@ public class CourseControllerTest {
 
     private static String tempPathForGitProjects;
     private static String tempPathForExternalCodeCompiling;
+
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper mapper;
     @Value("${test.git.URL}")
     private String gitURL;
+    @Value("${application.courses.paths.dependencies}")
+    private String dependenciesPath;
 
     @AfterClass
     public static void removeTempDir() throws IOException {
@@ -63,7 +64,13 @@ public class CourseControllerTest {
             FileUtils.deleteDirectory(gitProjects);
     }
 
-
+    @Before
+    public void setUp() throws Exception {
+        File dependencies = new File(dependenciesPath);
+        if(!dependencies.exists()){
+            dependencies.mkdir();
+        }
+    }
 
     @Value("${application.courses.paths.git}")
     public void setPathForGitProjects(String path) {

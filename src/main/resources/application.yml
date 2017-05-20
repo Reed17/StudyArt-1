@@ -3,6 +3,7 @@ application:
     paths:
       git: courses
       externalCode: temp
+      dependencies : dependencies
   profiling: true
 
 email:
