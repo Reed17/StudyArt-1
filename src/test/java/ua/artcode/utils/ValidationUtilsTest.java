@@ -56,7 +56,7 @@ public class ValidationUtilsTest {
 
     @Test
     public void loginValidationNegativeTest() {
-        assertThat(validationUtils.loginValidation("user"), is(false));
+        assertThat(validationUtils.loginValidation("uф"), is(false));
         assertThat(validationUtils.loginValidation("?USERNAME"), is(false));
         assertThat(validationUtils.loginValidation("too_long_username"), is(false));
     }
