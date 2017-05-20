@@ -21,12 +21,14 @@ public class Teacher extends User {
     private static Map<String,Boolean> createRightsMap() {
         Map<String, Boolean> map = new ConcurrentHashMap<>();
 
-        map.put("/lesson-add", true);
+        map.put("/courses/lessons/get", true);
         map.put("/courses/get", true);
+        map.put("/courses/lessons/getAll", true);
         map.put("/courses/add", true);
         map.put("/run-class", true);
         map.put("/courses/lessons/run", true);
-        map.put("courses/lessons/send-solution-and-run", true);
+        map.put("/courses/lessons/add", true);
+        map.put("/courses/lessons/send-solution-and-run-tests", true);
 
         return map;
     }

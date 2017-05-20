@@ -12,6 +12,7 @@ import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
+import ua.artcode.model.Lesson;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
@@ -20,6 +21,7 @@ import ua.artcode.service.RunService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 public class CourseController {
@@ -48,6 +50,31 @@ public class CourseController {
         return course;
     }
 
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get a lesson",
+            response = Lesson.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
+    public Lesson getLessonByID(@RequestParam int id, HttpServletRequest request) throws AppException {
+
+        Lesson lesson = courseService.getLessonByID(id);
+        LOGGER.info("Lesson get - OK, id {}", id);
+        return lesson;
+
+    }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get all lesson",
+            response = List.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/getAll", method = RequestMethod.GET)
+    public List<Lesson> getAllLessons(HttpServletRequest request) throws AppException {
+        List<Lesson> lessons = courseService.getAllLessons();
+        LOGGER.info("Lesson get all - OK");
+        return lessons;
+    }
+
+
     @ApiOperation(httpMethod = "POST",
             value = "Resource to add a course",
             notes = "ID, lessons and localPath will be generated on server side, so you can pass 0/null or default values",
@@ -55,19 +82,20 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
     public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) {
-        try {
 
-            boolean result = courseService.addCourse(course);
+
+        Course result = courseService.addCourse(course);
+        // don't understand :(
+        if(course == null) {
+//            Course result = courseService.addCourse(course);
             LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
                     course.getName(),
                     course.getAuthor(),
                     course.getUrl());
             return new GeneralResponse(ResponseType.INFO, "Course add - OK");
-
-        } catch (GitAPIException | DirectoryCreatingException | LessonsParsingException e) {
-
-            LOGGER.error("Course add - FAILED", e);
-            return new GeneralResponse(ResponseType.ERROR, e.getMessage());
+        } else {
+            LOGGER.error("Course add - FAILED", "Course already exists!");
+            return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
         }
     }
 
@@ -91,34 +119,12 @@ public class CourseController {
         }
     }
 
-    @ApiOperation(httpMethod = "GET",
-            value = "Resource to run class from lesson",
-            notes = "Runs a class in certain lesson (class must have main method)",
-            response = RunResults.class,
-            produces = "application/json")
-    @RequestMapping(value = "/courses/lessons/run")
-    public RunResults runLesson(@RequestParam int courseId,
-                                @RequestParam int lessonNumber,
-                                HttpServletRequest request) {
-        try {
-
-            RunResults results = runService.runLesson(courseId, lessonNumber);
-            LOGGER.info("Run class (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
-            return results;
-
-        } catch (Exception e) {
-
-            LOGGER.error("Run class from lesson - FAILED", e);
-            return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
-        }
-    }
-
     @ApiOperation(httpMethod = "POST",
             value = "Resource to run class from lesson with solution (need to add solution before)",
             notes = "Runs a tests for a certain lesson",
-            response = RunResults.class,
+            response = GeneralResponse.class,
             produces = "application/json")
-    @RequestMapping(value = "courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
+    @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
                                                  @RequestParam int lessonNumber,
                                                  @RequestBody @Valid CourseFromUser userCourse,
@@ -136,5 +142,27 @@ public class CourseController {
         }
     }
 
+    @ApiOperation(httpMethod = "POST",
+            value = "Resource to add lesson classes and description to course",
+            notes = "Need to pass description, courseID, source and tests class paths and roots, name",
+            response = RunResults.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/add", method = RequestMethod.POST)
+    public GeneralResponse addLessonToCourse(@RequestParam int courseId,
+                                             @RequestBody @Valid Lesson lesson,
+                                             HttpServletRequest request) {
+        try {
+
+            Lesson result = courseService.addLesson(lesson, courseId);
+
+            LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
+            return new GeneralResponse(ResponseType.INFO, "Lesson add - OK");
+
+        } catch (Exception e) {
+
+            LOGGER.error("Add lesson to course - FAILED", e);
+            return new GeneralResponse(ResponseType.ERROR, "Lesson already exists!");
+        }
+    }
 
 }
