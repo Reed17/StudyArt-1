@@ -8,6 +8,7 @@ import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.dao.repositories.CourseRepository;
+import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -27,13 +28,15 @@ public class RunServiceImpl implements RunService {
 
     private final CommonIOUtils commonIOUtils;
     private final CourseRepository courseDB;
+    private final LessonRepository lessonDB;
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
 
     @Autowired
-    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, CourseIOUtils courseIOUtils, RunCore runCore) {
+    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, LessonRepository lessonDB, CourseIOUtils courseIOUtils, RunCore runCore) {
         this.commonIOUtils = commonIOUtils;
         this.courseDB = courseDB;
+        this.lessonDB = lessonDB;
         this.courseIOUtils = courseIOUtils;
         this.runCore = runCore;
     }
@@ -48,49 +51,37 @@ public class RunServiceImpl implements RunService {
         return runCore.run(sourcesRoot,
                 new String[]{sourcesRoot},
                 classes,
+                new String[]{},
                 PreProcessors.singleClass,
                 MethodCheckers.main,
                 Runners.main,
                 ResultsProcessors.main);
     }
 
-    @Override
-    public RunResults runLesson(int courseId, int lessonNumber) throws Exception {
-
-        String[] classPaths = courseIOUtils.getLessonClassPaths(courseId, lessonNumber);
-        Course course = courseDB.findOne(courseId);
-
-        // todo 2nd arg - project sources root have to be added as fields to Course model
-        String sourcesRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
-        return runCore.run(course.getLocalPath(),
-                new String[]{sourcesRoot},
-                classPaths,
-                PreProcessors.lessonsMain,
-                MethodCheckers.main,
-                Runners.main,
-                ResultsProcessors.main);
-    }
 
     @Override
-    public RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource) throws Exception {
+    public RunResults runLessonWithSolutionTests(int courseID, int lessonID, CourseFromUser userCource) throws Exception {
 
-        String projectLocalPath = courseIOUtils.saveLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
+        String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
 
-        // todo get lesson by date (corresponding course)
-        Lesson lesson = courseIOUtils.getLessonByID(projectLocalPath, lessonNumber);
-
-        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(lesson.getLocalPath());
-
-        String srcClassRoot = StringUtils.getClassRootFromClassPath(classPaths[0], "java" + File.separator);
-        String testClassRoot = StringUtils.getClassRootFromClassPath(classPaths[classPaths.length - 1], "java" + File.separator);
+        Lesson lesson = lessonDB.findOne(lessonID);
+        Course course = courseDB.findOne(courseID);
 
 
-        // run main (tests classes)
-        // todo 1st and 2nd args - project root and sources root have to be added as fields to Course model
+        String[] classPaths =
+                courseIOUtils.getLessonClassAndTestsPaths(
+                        lesson.getBaseClasses(),
+                        lesson.getTestsClasses(),
+                        lesson.getRequiredClasses());
+
+        String sourcesRoot = course.getSourcesRoot();
+        String testsRoot = course.getTestsRoot();
+
         RunResults results = runCore.run(projectLocalPath,
-                new String[]{srcClassRoot,
-                        testClassRoot},
+                new String[]{sourcesRoot,
+                        testsRoot},
                 classPaths,
+                course.getDependencies(),
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
                 Runners.test,

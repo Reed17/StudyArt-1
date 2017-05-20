@@ -1,6 +1,7 @@
 package ua.artcode.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.util.List;
 
@@ -23,10 +24,20 @@ public class Course {
     private String localPath;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Lesson> lessons;
+    @Pattern(regexp = "(?!(^$)|(\\s+$)).*", message = "No description")
+    private String description;
+
+    @NotNull
+    private String sourcesRoot;
+    @NotNull
+    private String testsRoot;
+
+    private String[] dependencies;
 
     public Course() {
     }
 
+    @Deprecated
     public Course(int id, String name, String author, String url, String localPath, List<Lesson> lessons) {
         this.id = id;
         this.name = name;
@@ -36,6 +47,7 @@ public class Course {
         this.lessons = lessons;
     }
 
+    @Deprecated
     public Course(String name, String author, String url, String localPath, List<Lesson> lessons) {
         this.name = name;
         this.author = author;
@@ -48,6 +60,23 @@ public class Course {
         this.name = name;
         this.author = author;
         this.url = url;
+    }
+
+    public Course(String name, String author, String url, String description, String sourcesRoot, String testsRoot) {
+        this.name = name;
+        this.author = author;
+        this.url = url;
+        this.description = description;
+        this.sourcesRoot = sourcesRoot;
+        this.testsRoot = testsRoot;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Integer getId() {
@@ -100,6 +129,30 @@ public class Course {
 
     public Lesson getLesson(int id) {
         return lessons.get(id);
+    }
+
+    public String getSourcesRoot() {
+        return sourcesRoot;
+    }
+
+    public void setSourcesRoot(String sourcesRoot) {
+        this.sourcesRoot = sourcesRoot;
+    }
+
+    public String getTestsRoot() {
+        return testsRoot;
+    }
+
+    public void setTestsRoot(String testsRoot) {
+        this.testsRoot = testsRoot;
+    }
+
+    public String[] getDependencies() {
+        return dependencies;
+    }
+
+    public void setDependencies(String[] dependencies) {
+        this.dependencies = dependencies;
     }
 
     @Override

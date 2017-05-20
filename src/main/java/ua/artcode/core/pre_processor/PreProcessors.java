@@ -5,7 +5,7 @@ import ua.artcode.utils.RunUtils;
 import java.io.File;
 import java.util.Arrays;
 
-import static ua.artcode.utils.StringUtils.getClassNameFromClassPath;
+import static ua.artcode.utils.StringUtils.substringAfterDelimiter;
 
 /**
  * Created by v21k on 17.04.17.
@@ -15,7 +15,7 @@ public class PreProcessors {
     public static MethodRunnerPreProcessor singleClass = ((classPaths, classLoader) -> {
 
 
-        String[] classNames = new String[]{getClassNameFromClassPath(classPaths[0], File.separator)};
+        String[] classNames = new String[]{substringAfterDelimiter(classPaths[0], File.separator)};
 
         checkIfEmpty(classNames);
 
@@ -24,7 +24,7 @@ public class PreProcessors {
 
     public static MethodRunnerPreProcessor lessonsMain = ((classPaths, classLoader) -> {
         String classNames[] = Arrays.stream(classPaths)
-                .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
+                .map(path -> substringAfterDelimiter(path, "java" + File.separator))
                 .filter(path -> path.toLowerCase().contains("main"))
                 .toArray(String[]::new);
 
@@ -36,7 +36,7 @@ public class PreProcessors {
     public static MethodRunnerPreProcessor lessonsTests = ((classPaths, classLoader) -> {
 
         String[] classNames = Arrays.stream(classPaths)
-                .map(path -> getClassNameFromClassPath(path, "java" + File.separator))
+                .map(path -> substringAfterDelimiter(path, "java" + File.separator))
 //                .map(path -> Paths.get(path).toAbsolutePath().toString())
                 .filter(path -> path.toLowerCase().contains("test"))
                 .toArray(String[]::new);

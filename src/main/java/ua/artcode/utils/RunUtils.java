@@ -3,6 +3,7 @@ package ua.artcode.utils;
 import com.google.common.collect.ObjectArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.tools.*;
@@ -27,78 +28,23 @@ public class RunUtils {
 
 
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
+    @Value("${application.courses.paths.dependencies}")
+    private String dependenciesPath;
 
     private static JavaCompiler getSystemJavaCompiler() {
         return ToolProvider.getSystemJavaCompiler();
-    }
-
-    // todo check concurrency
-    public static String compile(String projectRoot, String[] classPaths) throws IOException {
-        // diagnostics - to collect compilation errors
-        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-//        StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);
-
-        // .jar files (will be added to classpath) - must be concatenated with ":" delimiter
-        String jarPathsAsString = Arrays.stream(getJarPaths(projectRoot))
-                .map(path -> path + File.pathSeparator)
-                .collect(Collectors.joining());
-
-        // option list ---> "javac [options...]"
-        List<String> optionList = new ArrayList<>();
-
-        // -cp command cant be executed without args, so we make sure that jarPaths not empty
-        if (!jarPathsAsString.isEmpty()) {
-            optionList.add("-cp");
-            optionList.add(jarPathsAsString + ".");
-        }
-
-        // task for compiler
-        JavaCompiler.CompilationTask task = null;
-        try (StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);) {
-            task = COMPILER.getTask(null,
-                    fileManager,
-                    diagnostics,
-                    optionList,
-                    null,
-                    fileManager.getJavaFileObjectsFromStrings(Arrays.asList(classPaths)));
-        } catch (Exception e) {
-            LOGGER.error("Compilation task building - FAILED.", e);
-            return e.getMessage();
-        }
-
-        // task call
-        task.call();
-
-        // collect and return compilation errors
-        String errors = diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
-        return errors;
     }
 
     public static Class<?>[] getClass(String[] classNames, URLClassLoader urlClassLoader)
             throws IOException,
             ClassNotFoundException {
 
-
         Class<?>[] classes = new Class[classNames.length];
-        // no streams because of exception handling
 
-//        // getting classLoader instance
-//        URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
-
-
-//        try (
-//                // getting classLoader instance
-//                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot);
-//        ) {
         for (int i = 0; i < classNames.length; i++) {
-//                classes[i] = Class.forName(classNames[i]);
             classes[i] = Class.forName(classNames[i], true, urlClassLoader);
         }
-//        }
-
-//        classLoader.close();
 
         return classes;
     }
@@ -140,11 +86,49 @@ public class RunUtils {
     /**
      * Walks through project root dir and collects all .jar files
      */
-    private static String[] getJarPaths(String projectRoot) throws IOException {
-        return Files.walk(Paths.get(projectRoot))
+    private static String[] getJarPaths(String jarPath) throws IOException {
+        return Files.walk(Paths.get(jarPath))
                 .map(Path::toString)
                 .filter(path -> path.endsWith(".jar"))
                 .map(path -> new File(path).getAbsolutePath())
                 .toArray(String[]::new);
+    }
+
+    public String compile(String[] classPaths, String[] dependencies) throws IOException {
+        DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+
+        String jarPathsAsString = Arrays.stream(getJarPaths(dependenciesPath))
+                .filter(path -> Arrays.stream(dependencies).anyMatch(dep -> path.contains(dep)))
+                .map(path -> path + File.pathSeparator)
+                .collect(Collectors.joining());
+
+        // option list ---> "javac [options...]"
+        List<String> optionList = new ArrayList<>();
+
+        // -cp command cant be executed without args, so we make sure that jarPaths not empty
+        if (!jarPathsAsString.isEmpty()) {
+            optionList.add("-cp");
+            optionList.add(jarPathsAsString + ".");
+        }
+
+        // task for compiler
+        JavaCompiler.CompilationTask task;
+
+        try (StandardJavaFileManager fileManager = COMPILER.getStandardFileManager(diagnostics, null, null);) {
+            task = COMPILER.getTask(null,
+                    fileManager,
+                    diagnostics,
+                    optionList,
+                    null,
+                    fileManager.getJavaFileObjectsFromStrings(Arrays.asList(classPaths)));
+        } catch (Exception e) {
+            LOGGER.error("Compilation task building - FAILED.", e);
+            return e.getMessage();
+        }
+
+        task.call();
+
+        // collect and return compilation errors
+        return diagnostics.getDiagnostics().stream().map(Diagnostic::toString).collect(Collectors.joining());
     }
 }

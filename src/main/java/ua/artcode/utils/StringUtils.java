@@ -14,7 +14,7 @@ public class StringUtils {
         return classPath.substring(0, classPath.lastIndexOf(delimiter)) + delimiter;
     }
 
-    public static String getClassNameFromClassPath(String classPath, String delimiter) {
+    public static String substringAfterDelimiter(String classPath, String delimiter) {
         return classPath.substring(classPath.lastIndexOf(delimiter) + delimiter.length(),
                 classPath.lastIndexOf(".")).replace(File.separator, ".");
     }
@@ -38,9 +38,11 @@ public class StringUtils {
                 source.indexOf(after) - after.length()).trim();
     }
 
-    // todo replace by some template engine
-    public static String appendSolution(ExternalCode code, String originalContent) {
-        return originalContent.substring(0, originalContent.lastIndexOf("}")) + code.getSourceCode() + "}";
+    public static String normalizePath(String path) {
+        return path.replace(File.separator + File.separator, File.separator);
     }
 
+    public static String checkStartsWithAndAppend(String source, String startsWith){
+        return source.startsWith(startsWith) ? source : startsWith + source;
+    }
 }

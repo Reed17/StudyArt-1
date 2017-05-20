@@ -10,7 +10,5 @@ import ua.artcode.model.response.RunResults;
 public interface RunService {
     RunResults runMain(ExternalCode code) throws Exception;
 
-    RunResults runLesson(int courseId, int lessonNumber) throws Exception;
-
-    RunResults runLessonWithSolutionTests(int courseId, int lessonNumber, CourseFromUser userCource) throws Exception;
+    RunResults runLessonWithSolutionTests(int courseID, int lessonNumber, CourseFromUser userCource) throws Exception;
 }

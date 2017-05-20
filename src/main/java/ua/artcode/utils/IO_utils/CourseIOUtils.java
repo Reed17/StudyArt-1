@@ -1,29 +1,28 @@
 package ua.artcode.utils.IO_utils;
 
+import javafx.util.Pair;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.repositories.CourseRepository;
-import ua.artcode.exceptions.CourseNotFoundException;
 import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.LessonNotFoundException;
+import ua.artcode.exceptions.LessonClassPathsException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +33,7 @@ import java.util.stream.Collectors;
 @Component
 public class CourseIOUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseIOUtils.class);
     @Value("${application.courses.paths.git}")
     private String localPathForProjects;
     @Value("${application.courses.paths.externalCode}")
@@ -44,6 +44,8 @@ public class CourseIOUtils {
     private String mvnCopyToDirectory;
     @Value("${maven.home}")
     private String mvnHome;
+    @Value("${application.courses.paths.dependencies}")
+    private String dependenciesPath;
     @Value("${maven.embedded.path}")
     private String embeddedMavenExecutablePath;
 
@@ -56,9 +58,10 @@ public class CourseIOUtils {
     private final Invoker invoker;
 
     @Autowired
-    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
-        this.commonIOUtils = commonIOUtils;
-        this.courseRepository = courseRepository;
+    public CourseIOUtils( CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+
+    this.commonIOUtils = commonIOUtils;
+        this. courseRepository= courseRepository;
         this.request = invocationRequest;
         this.invoker = invoker;
     }
@@ -72,7 +75,8 @@ public class CourseIOUtils {
      *
      * @return path where project has been saved
      */
-    public String saveLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
+
+    public String saveCourseLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
@@ -102,7 +106,7 @@ public class CourseIOUtils {
      *
      * @return List of lessons
      **/
-
+    @Deprecated
     public List<Lesson> getLessons(Course course) throws IOException {
         String courseLocalPath = course.getLocalPath();
 
@@ -115,21 +119,6 @@ public class CourseIOUtils {
                 })
                 .sorted()
                 .collect(Collectors.toList());
-    }
-
-    public Lesson getLessonByID(String courseLocalPath, int id) throws IOException {
-
-        return Files.walk(Paths.get(courseLocalPath))
-                .map(Path::toString)
-                .filter(path -> path.endsWith("lesson"))
-                .filter(path -> path.contains(String.valueOf(id)))
-                .map(path -> {
-                    String lessonName = path.substring(path.lastIndexOf(File.separator) + 1);
-                    return new Lesson(lessonName, path);
-                })
-                .findFirst()
-                .get();
-
     }
 
     /**
@@ -155,22 +144,46 @@ public class CourseIOUtils {
         return localPathForExternalCode + File.separator + javaClassName;
     }
 
-    @Deprecated
-    public String[] getLessonClassPaths(int courseId, int lessonNumber) throws InvalidIDException,
-            CourseNotFoundException, LessonNotFoundException, IOException {
 
-        //TODO lesson with uniqe id
-        Course course = courseRepository.findOne(courseId);
-        Lesson lesson = course.getLesson(lessonNumber - 1);
-        return commonIOUtils.parseFilePaths(lesson.getLocalPath(), ".java");
+    public Pair<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths, String sourceRoot, String courseRoot) throws IOException, LessonClassPathsException {
+
+        if (sourceRoot == null) {
+            if (classPaths == null || classPaths.size() == 0) {
+                throw new LessonClassPathsException("No classes in lesson or not valid class path");
+            } else {
+                // todo delimiter must be not hardcoded - we can have another project structures, no only maven. Also /java is not enough
+                // todo because user can have his custom package with name 'java'. In this case everything will crash :)
+                classPaths = classPaths.stream()
+                        .map(path -> path.startsWith(courseRoot) ? path : StringUtils.normalizePath(courseRoot + path))
+                        .collect(Collectors.toList());
+
+                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0).replace("/", File.separator), "java" + File.separator);
+            }
+        } else {
+            if (classPaths == null || classPaths.size() == 0) {
+                try {
+                    classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot.replace("/", File.separator), "java"));
+                } catch (IOException e) {
+                    e.printStackTrace(); // todo why catch if we throw IOExc?
+                }
+            }
+        }
+
+        classPaths = classPaths.stream().
+                map(path -> path.replace("/", File.separator))
+                .collect(Collectors.toList());
+
+        return new Pair<>(classPaths, sourceRoot.replace("/", File.separator));
     }
 
-    public String[] getLessonClassAndTestsPaths(String lessonLocalPath) throws IOException {
-//        String[] srcClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath, ".java");
-        String[] testsClassPaths = commonIOUtils.parseFilePaths(lessonLocalPath.replace("main", "test"), ".java");
-        return testsClassPaths;
-//        return Stream.concat(Arrays.stream(srcClassPaths), Arrays.stream(testsClassPaths))
-//                .toArray(String[]::new);
+    public String[] getLessonClassAndTestsPaths
+            (List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws
+            IOException {
+        lessonSourceClasses.addAll(lessonTestsClasses);
+        lessonSourceClasses.addAll(lessonRequiredClasses);
+        return lessonSourceClasses.stream()
+                .filter(lesson -> lesson.endsWith(".java"))
+                .toArray(String[]::new);
     }
 
     /**
@@ -184,6 +197,7 @@ public class CourseIOUtils {
      * @param projectRoot root folder for project (not src/ or java/, just regular project folder
      * @return true if saved successfully, false otherwise
      */
+
     public boolean saveMavenDependenciesLocally(String projectRoot) {
         projectRoot = Paths.get(projectRoot).toAbsolutePath().toString();
 
@@ -202,6 +216,74 @@ public class CourseIOUtils {
         }
 
         return true;
+    }
+
+    /**
+     * Create folder where all dependencies will be located (if doesn't exist),
+     * then copy certain course dependencies to it.
+     * Existing dependencies will not be copied.
+     *
+     * @return array with dependencies names (.jar) which will be saved in Course
+     */
+    public String[] copyDependencies(String projectPath) throws IOException, DirectoryCreatingException {
+        File globalDep = new File(dependenciesPath);
+        if (!globalDep.exists() && !globalDep.mkdir()) {
+            throw new DirectoryCreatingException("Can't create directory for dependencies");
+        }
+
+        File[] allDependencies = globalDep.listFiles();
+
+        return Files.walk(Paths.get(projectPath))
+                .map(Path::toString)
+                .filter(path -> path.endsWith(".jar"))
+                .filter(path -> {
+                    String jarName = StringUtils.substringAfterDelimiter(path, File.separator);
+                    return allDependencies == null || Arrays.stream(allDependencies)
+                            .noneMatch(dep -> dep.getAbsolutePath()
+                                    .contains(jarName));
+                })
+                .peek(path -> {
+                            try {
+                                Files.copy(
+                                        Paths.get(path),
+                                        Paths.get(globalDep.getAbsolutePath() +
+                                                File.separator +
+                                                StringUtils.substringAfterDelimiter(path, File.separator) +
+                                                ".jar"),
+                                        StandardCopyOption.REPLACE_EXISTING);
+                            } catch (IOException e) {
+                                LOGGER.error("Copying dependencies - FAILED.", e);
+                            }
+                        }
+                )
+                .map(path -> StringUtils.substringAfterDelimiter(path, File.separator) + ".jar")
+                .toArray(String[]::new);
+    }
+
+    /**
+     * Download dependencies, copy them to folder where all dependencies located
+     * and update course with new dependencies array in DB
+     */
+    public void updateCourseDependencies(String courseLocalPath, Course course) throws IOException, DirectoryCreatingException {
+        saveMavenDependenciesLocally(courseLocalPath);
+        String[] dependencies = copyDependencies(courseLocalPath);
+
+        course.setDependencies(dependencies);
+        courseRepository.updateDependencies(dependencies, course.getId());
+
+    }
+
+    /**
+     * If course root paths doesnt exist - set them and update course in DB
+     */
+    public void updateCoursePaths(String courseLocalPath, Course course) {
+        if (!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
+            course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
+            course.setTestsRoot(courseLocalPath + course.getTestsRoot());
+
+            // update course so we can use roots later in RunService
+            courseRepository.updateSourcesAndTestsRoot(course.getSourcesRoot(), course.getTestsRoot(), course.getId());
+        }
     }
 
     private String generatePomPath(String projectRoot) {

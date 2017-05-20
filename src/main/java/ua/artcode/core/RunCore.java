@@ -34,17 +34,18 @@ public class RunCore {
 
     private final CommonIOUtils ioUtils;
 
-    private final CourseIOUtils courseIOUtils;
+    private final RunUtils runUtils;
 
     @Autowired
-    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils) {
+    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils, RunUtils runUtils) {
         this.ioUtils = ioUtils;
-        this.courseIOUtils = courseIOUtils;
+        this.runUtils = runUtils;
     }
 
     public RunResults run(String projectRoot,
-                          String[] sourcesRoot,
+                          String[] rootPackages,
                           String[] classPaths,
+                          String[] dependencies,
                           MethodRunnerPreProcessor preProcessor,
                           MethodChecker checker,
                           MethodRunner runner,
@@ -54,18 +55,8 @@ public class RunCore {
             NoSuchMethodException,
             IllegalAccessException {
 
-        // todo this step must be extracted somewhere else - it reduces performance dramatically
-        // download and save maven dependencies
-        if (!courseIOUtils.saveMavenDependenciesLocally(projectRoot)) {
-            LOGGER.error("Maven dependencies download - FAILED");
-            return new RunResults(
-                    new GeneralResponse(ResponseType.ERROR, "Maven dependencies download - FAILED. Please, check(or add) pom.xml"));
-        }
-        LOGGER.info("Maven dependencies download - OK.");
-
-
         // compile, save results and return it if there are any errors
-        String compilationErrors = RunUtils.compile(projectRoot, classPaths);
+        String compilationErrors = runUtils.compile(classPaths, dependencies);
 
         // checking for compilation errors
         if (compilationErrors.length() > 0) {
@@ -76,7 +67,7 @@ public class RunCore {
 
         try (
                 // getting classLoader instance
-                URLClassLoader classLoader = getUrlClassLoader(projectRoot, sourcesRoot)
+                URLClassLoader classLoader = getUrlClassLoader(projectRoot, rootPackages)
         ) {
             // prepare array with classes
             Class<?>[] classes = preProcessor.getClasses(classPaths, classLoader);

@@ -16,6 +16,7 @@ import ua.artcode.core.method_runner.Runners;
 import ua.artcode.core.post_processor.ResultsProcessors;
 import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.model.response.RunResults;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,6 +42,9 @@ public class RunCoreTest {
 
     @Autowired
     private RunCore core;
+
+    @Autowired
+    private CourseIOUtils courseIOUtils;
 
     @Before
     public void setUp() throws Exception {
@@ -87,6 +91,7 @@ public class RunCoreTest {
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -103,6 +108,7 @@ public class RunCoreTest {
         core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -117,6 +123,7 @@ public class RunCoreTest {
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -133,6 +140,7 @@ public class RunCoreTest {
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -148,6 +156,7 @@ public class RunCoreTest {
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -169,9 +178,14 @@ public class RunCoreTest {
                 classBody,
                 false);
 
+        courseIOUtils.saveMavenDependenciesLocally(projectRoot);
+        courseIOUtils.copyDependencies(projectRoot);
+
+
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesRoot},
                 new String[]{classPath},
+                new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -197,9 +211,14 @@ public class RunCoreTest {
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
+        courseIOUtils.saveMavenDependenciesLocally(projectRoot);
+        courseIOUtils.copyDependencies(projectRoot);
+
+
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesTestRoot},
                 new String[]{classPath},
+                new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
                 Runners.test,
@@ -224,9 +243,13 @@ public class RunCoreTest {
 
         String classPath = generateAndSaveClass(1, imports, className, tests, true);
 
+        courseIOUtils.saveMavenDependenciesLocally(projectRoot);
+        courseIOUtils.copyDependencies(projectRoot);
+
         RunResults results = core.run(projectRoot,
                 new String[]{sourcesTestRoot},
                 new String[]{classPath},
+                new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
                 PreProcessors.lessonsTests,
                 MethodCheckers.testChecker,
                 Runners.test,
