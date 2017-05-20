@@ -5,8 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
-import ua.artcode.dao.SessionDB;
-import ua.artcode.dao.SessionDBImpl;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
@@ -31,17 +29,19 @@ public class UserServiceImpl implements UserService{
     private final ValidationUtils validationUtils;
     private final SecurityUtils securityUtils;
     private final SessionRepository sessionDB;
+    private final MailUtils mu;
 
     private static Logger LOGGER = Logger.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils,
-                           SecurityUtils securityUtils, SessionRepository sessionDB) {
+                           SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
         this.securityUtils = securityUtils;
         this.sessionDB = sessionDB;
+        this.mu = mu;
     }
 
     @Override
@@ -62,11 +62,7 @@ public class UserServiceImpl implements UserService{
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-//        ApplicationContext context = new ClassPathXmlApplicationContext("Spring-Mail.xml");
-
-       // MailUtils mu = (MailUtils) context.getBean("mailUtils");
-
-        //mu.sendEmail("${emailUsername}", newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
+        mu.sendEmail("${emailUsername}", newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
 
         return newUser;
     }
@@ -88,18 +84,34 @@ public class UserServiceImpl implements UserService{
 
         boolean validatedPass = validationUtils.passValidation(pass);
 
+        pass = securityUtils.encryptPass(pass);
+
         if(validationUtils.emailValidation(login) && validatedPass) {
             User tmp = teacherDB.findByEmail(login);
             loginResult = tmp == null ? studentDB.findByEmail(login) : tmp;
 
-            if(loginResult != null && loginResult.getPass().equals(pass)) return sessionDB.save(new Session(loginResult)).getAccessKey();
+            if(loginResult != null && loginResult.getPass().equals(pass)) {
+                Session session = sessionDB.findByUser(loginResult);
+
+                if(session == null)
+                    return sessionDB.save(new Session(loginResult)).getAccessKey();
+                else
+                    return session.getAccessKey();
+            }
         }
 
         if(validationUtils.loginValidation(login) && validatedPass) {
             User tmp = teacherDB.findByLogin(login);
             loginResult = tmp == null ? studentDB.findByLogin(login) : tmp;
 
-            if(loginResult != null && loginResult.getPass().equals(pass)) return sessionDB.save(new Session(loginResult)).getAccessKey();
+            if(loginResult != null && loginResult.getPass().equals(pass)) {
+                Session session = sessionDB.findByUser(loginResult);
+
+                if(session == null)
+                    return sessionDB.save(new Session(loginResult)).getAccessKey();
+                else
+                    return session.getAccessKey();
+            }
         }
 
         throw new InvalidLoginInfo("User doesn't exists");

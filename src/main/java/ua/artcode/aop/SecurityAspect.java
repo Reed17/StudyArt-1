@@ -9,8 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.SessionDB;
-import ua.artcode.dao.SessionDBImpl;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.exceptions.InvalidUserSessionException;
 import ua.artcode.model.User;

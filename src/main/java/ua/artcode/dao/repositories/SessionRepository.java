@@ -9,5 +9,5 @@ import ua.artcode.model.User;
  */
 public interface SessionRepository extends CrudRepository<Session, Integer> {
     Session findByKey(String key);
-
+    Session findByUser(User user);
 }
