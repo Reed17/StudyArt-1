@@ -92,14 +92,14 @@ public class UserServiceImpl implements UserService{
             User tmp = teacherDB.findByEmail(login);
             loginResult = tmp == null ? studentDB.findByEmail(login) : tmp;
 
-            if(loginResult != null) return sessionDB.save(new Session(loginResult)).getAccessKey();
+            if(loginResult != null && loginResult.getPass().equals(pass)) return sessionDB.save(new Session(loginResult)).getAccessKey();
         }
 
         if(validationUtils.loginValidation(login) && validatedPass) {
             User tmp = teacherDB.findByLogin(login);
             loginResult = tmp == null ? studentDB.findByLogin(login) : tmp;
 
-            if(loginResult != null) return sessionDB.save(new Session(loginResult)).getAccessKey();
+            if(loginResult != null && loginResult.getPass().equals(pass)) return sessionDB.save(new Session(loginResult)).getAccessKey();
         }
 
         throw new InvalidLoginInfo("User doesn't exists");

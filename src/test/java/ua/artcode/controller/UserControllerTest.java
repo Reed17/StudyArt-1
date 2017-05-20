@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -20,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-public class RegistrationControllerTest {
+public class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -63,6 +65,42 @@ public class RegistrationControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
+    }
+
+    @Test
+    public void testLoginPositive() throws Exception {
+        mockMvc.perform(post("/register?login=Username71&email=42004200zhenia71@gmail.com&pass=password1&type=student")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        assertThat(mockMvc.perform(post("/login?login=Username71&pass=password1"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(), notNullValue());
+
+        assertThat(mockMvc.perform(post("/login?login=42004200zhenia71@gmail.com&pass=password1"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(), notNullValue());
+    }
+
+    @Test
+    public void testLoginNegative() throws Exception {
+        mockMvc.perform(post("/register?login=Username72&email=42004200zhenia72@gmail.com&pass=password1&type=student")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        assertThat(mockMvc.perform(post("/login?login=Username72&pass=password2"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(), isEmptyOrNullString());
+
+        assertThat(mockMvc.perform(post("/login?login=Username72&pass=pas"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString(), isEmptyOrNullString());
     }
 
 }
