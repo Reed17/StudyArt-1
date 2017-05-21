@@ -98,7 +98,8 @@ public class RunUtils {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
         String jarPathsAsString = Arrays.stream(getJarPaths(dependenciesPath))
-                .filter(path -> Arrays.stream(dependencies).anyMatch(dep -> path.contains(dep)))
+                .filter(path -> Arrays.stream(dependencies)
+                        .anyMatch(path::contains))
                 .map(path -> path + File.pathSeparator)
                 .collect(Collectors.joining());
 

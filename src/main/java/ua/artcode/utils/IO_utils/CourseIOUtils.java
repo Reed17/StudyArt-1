@@ -208,7 +208,6 @@ public class CourseIOUtils {
         request.setGoals(Collections.singletonList(mavenGoal));
 
         try {
-            invoker.setMavenExecutable(new File(embeddedMavenExecutablePath));
             invoker.execute(request);
         } catch (MavenInvocationException e) {
             e.printStackTrace();
