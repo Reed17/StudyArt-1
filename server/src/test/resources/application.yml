@@ -29,7 +29,7 @@ maven:
     goals:
       copyToDirectory: dependency:copy-dependencies -DoutputDirectory=
     embedded:
-          path: /home/v21k/dev/project/StudyArt-1/mvnw
+          path: /home/v21k/dev/projects/StudyArt/server/mvnw
 
 spring:
   datasource:
