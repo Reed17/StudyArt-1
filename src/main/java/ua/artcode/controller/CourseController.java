@@ -1,11 +1,15 @@
 package ua.artcode.controller;
 
 import io.swagger.annotations.ApiOperation;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
+import ua.artcode.exceptions.DirectoryCreatingException;
+import ua.artcode.exceptions.LessonsParsingException;
+import ua.artcode.exceptions.SuchCourseAlreadyExists;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
@@ -16,6 +20,7 @@ import ua.artcode.model.response.RunResults;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -39,7 +44,7 @@ public class CourseController {
             response = Course.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
-    public Course getCourseByID(@RequestParam int id) throws AppException {
+    public Course getCourseByID(@RequestParam int id, HttpServletRequest request) throws AppException {
 
         Course course = courseService.getByID(id);
         LOGGER.info("Course get - OK, id {}", id);
@@ -51,7 +56,7 @@ public class CourseController {
             response = Lesson.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
-    public Lesson getLessonByID(@RequestParam int id) throws AppException {
+    public Lesson getLessonByID(@RequestParam int id, HttpServletRequest request) throws AppException {
 
         Lesson lesson = courseService.getLessonByID(id);
         LOGGER.info("Lesson get - OK, id {}", id);
@@ -60,11 +65,11 @@ public class CourseController {
     }
 
     @ApiOperation(httpMethod = "GET",
-            value = "Resource to get all esson",
+            value = "Resource to get all lesson",
             response = List.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/getAll", method = RequestMethod.GET)
-    public List<Lesson> getAllLessons() throws AppException {
+    public List<Lesson> getAllLessons(HttpServletRequest request) throws AppException {
         List<Lesson> lessons = courseService.getAllLessons();
         LOGGER.info("Lesson get all - OK");
         return lessons;
@@ -77,18 +82,14 @@ public class CourseController {
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course) {
+    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) throws SuchCourseAlreadyExists {
         Course result = courseService.addCourse(course);
-        if (course == null) {
-            LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
-                    course.getName(),
-                    course.getAuthor(),
-                    course.getUrl());
-            return new GeneralResponse(ResponseType.INFO, "Course add - OK");
-        } else {
-            LOGGER.error("Course add - FAILED", "Course already exists!");
-            return new GeneralResponse(ResponseType.ERROR, "Course already exists!");
-        }
+
+        LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
+                result.getName(),
+                result.getAuthor(),
+                result.getUrl());
+        return new GeneralResponse(ResponseType.INFO, "Course add - OK");
     }
 
     @ApiOperation(httpMethod = "POST",
@@ -97,7 +98,7 @@ public class CourseController {
             response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
-    public RunResults runClass(@RequestBody ExternalCode code) {
+    public RunResults runClass(@RequestBody ExternalCode code, HttpServletRequest request) {
         try {
 
             RunResults results = runService.runMain(code);
@@ -119,7 +120,8 @@ public class CourseController {
     @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
                                                  @RequestParam int lessonNumber,
-                                                 @RequestBody @Valid CourseFromUser userCourse) {
+                                                 @RequestBody @Valid CourseFromUser userCourse,
+                                                 HttpServletRequest request) {
         try {
 
             RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);
@@ -140,7 +142,8 @@ public class CourseController {
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/add", method = RequestMethod.POST)
     public GeneralResponse addLessonToCourse(@RequestParam int courseId,
-                                             @RequestBody @Valid Lesson lesson) {
+                                             @RequestBody @Valid Lesson lesson,
+                                             HttpServletRequest request) {
         try {
 
             Lesson result = courseService.addLesson(lesson, courseId);

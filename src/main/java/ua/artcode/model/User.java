@@ -55,4 +55,6 @@ public class User {
     public int getId() {
         return id;
     }
+
+    public boolean isAccessable(String reqUrl) { return false; }
 }

@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
-import ua.artcode.exceptions.AppException;
-import ua.artcode.exceptions.CourseNotFoundException;
-import ua.artcode.exceptions.InvalidIDException;
-import ua.artcode.exceptions.SuchLessonAlreadyExist;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
+import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.ValidationUtils;
 
 import java.io.IOException;
@@ -35,26 +33,33 @@ public class CourseServiceImpl implements CourseService {
     private final LessonRepository lessonRepository;
     private final CourseIOUtils courseIOUtils;
     private final ValidationUtils validationUtils;
+    private final ResultChecker resultChecker;
 
     @Autowired
-    public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository, CourseIOUtils courseIOUtils, CommonIOUtils commonIOUtils, ValidationUtils validateFiles) {
+    public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository,
+                             CourseIOUtils courseIOUtils, CommonIOUtils commonIOUtils,
+                             ValidationUtils validateFiles, ResultChecker resultChecker) {
         this.courseRepository = courseRepository;
         this.lessonRepository = lessonRepository;
         this.courseIOUtils = courseIOUtils;
         this.validationUtils = validateFiles;
+        this.resultChecker = resultChecker;
     }
 
     @Override
-    public Course addCourse(Course course) {
+    public Course addCourse(Course course) throws SuchCourseAlreadyExists {
         if (courseRepository.findByNameAndAuthor(course.getName(), course.getAuthor()) != null) {
-            return null;
+            throw new SuchCourseAlreadyExists("This course already in database!");
         }
         return courseRepository.save(course);
     }
 
     @Override
-    public Course getByID(int id) throws InvalidIDException, CourseNotFoundException {
-        return courseRepository.findOne(id);
+    public Course getByID(int id) throws UnexpectedNullException {
+        Course result = courseRepository.findOne(id);
+        resultChecker.checkNull(result, "No course found with id: " + id);
+
+        return result;
     }
 
     @Override
@@ -73,7 +78,7 @@ public class CourseServiceImpl implements CourseService {
 
         // todo if we already have this lesson, what should we do?
         // todo think about updateLesson method and corresponding query in LessonRepo
-        Course course = courseRepository.findOne(courseID);
+        Course course = getByID(courseID);
 
         // save locally for further operations
         String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
@@ -130,8 +135,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Lesson getLessonByID(int id) {
-        return lessonRepository.findOne(id);
+    public Lesson getLessonByID(int id) throws UnexpectedNullException {
+        Lesson result = lessonRepository.findOne(id);
+        resultChecker.checkNull(result, "Lesson not found!");
+
+        return result;
     }
 
     @Override
