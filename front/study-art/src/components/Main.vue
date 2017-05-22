@@ -1,5 +1,5 @@
 <template>
-  <div id="main col s6">
+  <div id="main">
     <app-bar></app-bar>
   </div>
 </template>
