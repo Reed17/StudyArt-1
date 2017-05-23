@@ -1,3 +1,4 @@
+/*
 package ua.artcode.aop;
 
 import org.aspectj.lang.JoinPoint;
@@ -18,9 +19,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Enumeration;
 
+*/
 /**
  * Created by zhenia on 19.05.17.
- */
+ *//*
+
 @Aspect
 @Component
 public class SecurityAspect {
@@ -55,3 +58,4 @@ public class SecurityAspect {
 
 
 }
+*/

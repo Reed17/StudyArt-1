@@ -147,4 +147,10 @@ public class CourseServiceImpl implements CourseService {
         return StreamSupport.stream(lessonRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Course> getAllCourses() {
+        return StreamSupport.stream(courseRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+    }
 }

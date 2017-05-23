@@ -52,6 +52,18 @@ public class CourseController {
     }
 
     @ApiOperation(httpMethod = "GET",
+            value = "Resource to get all courses",
+            response = List.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/getAll", method = RequestMethod.GET)
+    public List<Course> getAllCourses(HttpServletRequest request) throws AppException {
+
+        List<Course> courses = courseService.getAllCourses();
+        LOGGER.info("Course get all - OK");
+        return courses;
+    }
+
+    @ApiOperation(httpMethod = "GET",
             value = "Resource to get a lesson",
             response = Lesson.class,
             produces = "application/json")

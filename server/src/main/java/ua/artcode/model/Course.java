@@ -12,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "course")
 public class Course {
+    // todo check patterns - add course doesn't work sometimes
     @Id
     @GeneratedValue
     private Integer id;

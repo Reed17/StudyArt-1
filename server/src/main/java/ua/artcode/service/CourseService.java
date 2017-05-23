@@ -27,4 +27,6 @@ public interface CourseService {
     Lesson getLessonByID(int id) throws UnexpectedNullException;
 
     List<Lesson> getAllLessons();
+
+    List<Course> getAllCourses();
 }
