@@ -3,7 +3,7 @@
     <app-bar></app-bar>
 
     <div>
-      <router-view></router-view>
+      <router-view></router-view> <!--todo how to extract this?-->
     </div>
 
   </div>
@@ -13,6 +13,7 @@
   import AppBar from "./components/AppBar";
   export default {
     components: {AppBar},
-    name: 'app'
+    name: 'app',
+
   }
 </script>
