@@ -19,3 +19,4 @@ logs
 courses
 db
 dependencies
+npm-debug.log*

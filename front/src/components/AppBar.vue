@@ -4,6 +4,9 @@
     <mu-flat-button color="white" label="Courses" slot="left"></mu-flat-button>
     <mu-flat-button color="white" label="Contacts" slot="left"></mu-flat-button>
     <mu-flat-button color="white" label="About" slot="left"></mu-flat-button>
+
+    <mu-flat-button color="white" label="Test" slot="left" to="test"></mu-flat-button>
+
     <mu-flat-button color="white" label="Find" slot="right"></mu-flat-button>
     <mu-flat-button label="Login" slot="right"></mu-flat-button>
     <mu-flat-button label="Register" slot="right"></mu-flat-button>
