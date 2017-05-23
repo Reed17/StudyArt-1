@@ -16,16 +16,16 @@ public class Course {
     @Id
     @GeneratedValue
     private Integer id;
-    @Pattern(regexp = "\\w{2,}", message = "Invalid course name")
+//    @Pattern(regexp = "\\w+", message = "Invalid course name")
     private String name;
-    @Pattern(regexp = "\\w{2,}", message = "Invalid author name")
+//    @Pattern(regexp = "\\w+", message = "Invalid author name")
     private String author;
     @Pattern(regexp = "^http(s?):.+\\.git$", message = "Invalid git URL")
     private String url;
     private String localPath;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Lesson> lessons;
-    @Pattern(regexp = "(?!(^$)|(\\s+$)).*", message = "No description")
+//    @Pattern(regexp = "\\w+", message = "No description")
     private String description;
 
     @NotNull
