@@ -23,10 +23,17 @@
       }
     },
     mounted() {
-      axios.get('http://localhost:8080/courses/getAll')
-        .then((response) => {
-          this.courseData = response.data;
-        });
+      this.fetchCourses();
     },
+    methods: {
+      fetchCourses(){
+        setInterval(() => {
+          axios.get('http://localhost:8080/courses/getAll')
+            .then((response) => {
+              this.courseData = response.data;
+            })
+        }, 10000)
+      },
+    }
   }
 </script>
