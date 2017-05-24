@@ -18,7 +18,7 @@
 
 <script>
   export default{
-    name: 'course',
+    name: 'course-card',
     props: {
       course: {
         required: true,

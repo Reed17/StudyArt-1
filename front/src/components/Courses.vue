@@ -7,7 +7,7 @@
     <br/>
 
     <div class="wrapper">
-      <course v-for="course in filteredCourses" :course="course" :key="course.id"></course>
+      <course-card v-for="course in filteredCourses" :course="course" :key="course.id"></course-card>
     </div>
 
   </div>
@@ -15,9 +15,9 @@
 
 <script>
   import axios from "axios";
-  import Course from "./Course";
+  import CourseCard from "./CourseСard";
   export default {
-    components: {Course},
+    components: {CourseCard},
     name: 'courses',
 
     data() {
@@ -33,8 +33,7 @@
       }
     },
 
-    mounted()
-    {
+    mounted() {
       this.fetchCourses();
     },
 
@@ -53,7 +52,11 @@
         return courses.filter((course) =>
           course.name.toLowerCase().includes(filterKeyIgnoreCase) ||
           course.description.toLowerCase().includes(filterKeyIgnoreCase)
-        );
+        ).sort(this.sortCoursesComparator);
+      },
+
+      sortCoursesComparator(course1, course2){
+        return course1.name.localeCompare(course2.name) > 0;
       },
     }
   }
