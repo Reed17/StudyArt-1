@@ -1,5 +1,5 @@
 <template>
-  <mu-appbar title="Welcome to StudyArt!" align="center">
+  <mu-appbar id="container" title="Welcome to StudyArt!" align="center">
     <mu-flat-button color="white" label="Courses" slot="left" to="courses"></mu-flat-button>
     <mu-flat-button color="white" label="Contacts" slot="left"></mu-flat-button>
     <mu-flat-button color="white" label="About" slot="left"></mu-flat-button>

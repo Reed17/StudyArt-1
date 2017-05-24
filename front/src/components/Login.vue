@@ -1,5 +1,5 @@
 <template>
-  <div align="center">
+  <div id="container" align="center">
 
     <!--inputs-->
     <br>
