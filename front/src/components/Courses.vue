@@ -1,25 +1,23 @@
 <template>
-  <div>
+  <div id="container">
     <div align="center">
       <mu-text-field v-model="filterKey" hintText="enter filter key"></mu-text-field>
     </div>
+
     <br/>
-    <div v-for="course in filteredCourses" align="center">
-      <mu-card>
-        <mu-card-header :title=course.author :subTitle=course.url>
-        </mu-card-header>
-        <mu-card-title :title=course.name></mu-card-title>
-        <mu-card-text>
-          Description : {{course.description}}
-        </mu-card-text>
-      </mu-card>
+
+    <div class="wrapper">
+      <course v-for="course in filteredCourses" :course="course" :key="course.id"></course>
     </div>
+
   </div>
 </template>
 
 <script>
   import axios from "axios";
+  import Course from "./Course";
   export default {
+    components: {Course},
     name: 'courses',
 
     data() {
@@ -56,7 +54,16 @@
           course.name.toLowerCase().includes(filterKeyIgnoreCase) ||
           course.description.toLowerCase().includes(filterKeyIgnoreCase)
         );
-      }
+      },
     }
   }
 </script>
+
+<style>
+  .wrapper > div {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 25%;
+    letter-spacing: normal;
+  }
+</style>
