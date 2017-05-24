@@ -3,7 +3,7 @@
     <app-bar></app-bar>
 
     <div>
-      <router-view></router-view> <!--todo how to extract this?-->
+      <router-view></router-view>
     </div>
 
   </div>

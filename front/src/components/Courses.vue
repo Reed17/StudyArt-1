@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-for="course in courseData">
+    <div align="center">
+      <mu-text-field v-model="filterKey" hintText="enter filter key"></mu-text-field>
+    </div>
+    <br/>
+    <div v-for="course in filteredCourses" align="center">
       <mu-card>
         <mu-card-header :title=course.author :subTitle=course.url>
         </mu-card-header>
@@ -17,23 +21,42 @@
   import axios from "axios";
   export default {
     name: 'courses',
+
     data() {
       return {
-        courseData: []
+        courseData: [],
+        filterKey: '',
       }
     },
-    mounted() {
+
+    computed: {
+      filteredCourses: function () {
+        return this.filterCourses()
+      }
+    },
+
+    mounted()
+    {
       this.fetchCourses();
     },
+
     methods: {
-      fetchCourses(){
-        setInterval(() => {
-          axios.get('http://localhost:8080/courses/getAll')
-            .then((response) => {
-              this.courseData = response.data;
-            })
-        }, 10000)
+      fetchCourses() {
+        axios.get('http://localhost:8080/courses/getAll') // todo extract to props
+          .then((response) => {
+            this.courseData = response.data;
+          });
       },
+
+      filterCourses() {
+        let courses = this.courseData;
+        let filterKeyIgnoreCase = this.filterKey.toLowerCase();
+
+        return courses.filter((course) =>
+          course.name.toLowerCase().includes(filterKeyIgnoreCase) ||
+          course.description.toLowerCase().includes(filterKeyIgnoreCase)
+        );
+      }
     }
   }
 </script>
