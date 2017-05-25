@@ -10,22 +10,24 @@ import java.util.List;
  * Created by v21k on 15.04.17.
  */
 @Entity
-@Table(name = "course")
 public class Course {
     // todo check patterns - add course doesn't work sometimes
     @Id
     @GeneratedValue
+    @Column(name = "COURSE_ID")
     private Integer id;
-//    @Pattern(regexp = "\\w+", message = "Invalid course name")
+
+    // todo validation
     private String name;
-//    @Pattern(regexp = "\\w+", message = "Invalid author name")
     private String author;
+
     @Pattern(regexp = "^http(s?):.+\\.git$", message = "Invalid git URL")
     private String url;
     private String localPath;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Lesson> lessons;
-//    @Pattern(regexp = "\\w+", message = "No description")
+
     private String description;
 
     @NotNull
@@ -126,10 +128,6 @@ public class Course {
 
     public void setLessons(List<Lesson> lessons) {
         this.lessons = lessons;
-    }
-
-    public Lesson getLesson(int id) {
-        return lessons.get(id);
     }
 
     public String getSourcesRoot() {

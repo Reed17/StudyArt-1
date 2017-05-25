@@ -245,7 +245,6 @@ public class CourseControllerTest {
         Lesson lesson = new Lesson();
         lesson.setName("first_lesson");
         lesson.setDescription("First test lesson");
-        lesson.setCourseID(1);
         lesson.setSourcesRoot("src/main/java/_02_lesson");
         lesson.setTestsClasses(testClassPaths);
         lesson.setLocalPath("_02_lesson");

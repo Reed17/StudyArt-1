@@ -1,9 +1,6 @@
 package ua.artcode.model;
 
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -15,10 +12,11 @@ public class Lesson implements Comparable<Lesson> {
 
     @Id
     @GeneratedValue
+    @Column(name = "LESSON_ID")
     private Integer id;
 
-    @NotNull
-    private Integer courseID;
+    private int courseID;
+
     @NotNull
     private String name;
     @NotNull
@@ -31,14 +29,11 @@ public class Lesson implements Comparable<Lesson> {
     @ElementCollection
     private List<String> testsClasses;
 
-    // todo sourcesRoot here - is only directory for lesson with .java files. For RunCore we need PROJECT sources root (src/main/java), not path to lesson dir
     private String sourcesRoot;
     private String testsRoot;
     private String description;
 
-    //    @Column(name="timestamp", columnDefinition="TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-//    private LocalDateTime date;
-// todo date
+    // todo date
     public Lesson() {
     }
 
@@ -95,14 +90,6 @@ public class Lesson implements Comparable<Lesson> {
         this.description = description;
     }
 
-//    public LocalDateTime getDate() {
-//        return date;
-//    }
-//
-//    public void setDate(LocalDateTime date) {
-//        this.date = date;
-//    }
-
     public Integer getId() {
         return id;
     }
@@ -127,12 +114,12 @@ public class Lesson implements Comparable<Lesson> {
         this.localPath = localPath;
     }
 
-    public Integer getCourseID() {
+    public int getCourseID() {
         return courseID;
     }
 
-    public void setCourseID(Integer courseID) {
-        this.courseID = courseID;
+    public void setCourseID(int course) {
+        this.courseID = course;
     }
 
     @Override
@@ -142,15 +129,14 @@ public class Lesson implements Comparable<Lesson> {
 
         Lesson lesson = (Lesson) o;
 
-        if (courseID != null ? !courseID.equals(lesson.courseID) : lesson.courseID != null) return false;
-        if (name != null ? !name.equals(lesson.name) : lesson.name != null) return false;
-        return description != null ? description.equals(lesson.description) : lesson.description == null;
+        if (courseID != lesson.courseID) return false;
+        return id != null ? id.equals(lesson.id) : lesson.id == null;
     }
 
     @Override
     public int hashCode() {
-        int result = courseID != null ? courseID.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + courseID;
         return result;
     }
 
@@ -163,13 +149,8 @@ public class Lesson implements Comparable<Lesson> {
     public String toString() {
         return "Lesson{" +
                 "id=" + id +
-                ", courseID=" + courseID +
                 ", name='" + name + '\'' +
-                ", baseClasses=" + baseClasses +
-                ", requiredClasses=" + requiredClasses +
-                ", testsClasses=" + testsClasses +
                 ", description='" + description + '\'' +
-                ", date=" + /*date**/ +
                 '}';
     }
 }

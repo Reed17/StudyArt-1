@@ -15,14 +15,14 @@ import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.ValidationUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static ua.artcode.utils.StringUtils.*;
+import static ua.artcode.utils.StringUtils.checkStartsWithAndAppend;
+import static ua.artcode.utils.StringUtils.normalizePath;
+
 /**
  * Created by v21k on 15.04.17.
  */
@@ -80,6 +80,7 @@ public class CourseServiceImpl implements CourseService {
         // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = getByID(courseID);
 
+
         // save locally for further operations
         String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
@@ -124,13 +125,13 @@ public class CourseServiceImpl implements CourseService {
         List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
         if (courseLessons.contains(lesson)) { // todo check equals and hash
             throw new SuchLessonAlreadyExist("Such lesson already exist!");
+        } else {
+            lesson.setCourseID(course.getId());
+            courseLessons.add(lesson);
+            course.setLessons(courseLessons);
         }
 
-        lesson.setCourseID(courseID);
-
-        // todo did we update course? add lesson to it? and update in DB? see above my example update method for course
-        courseLessons.add(lessonRepository.save(lesson));
-
+        courseRepository.save(course);
         return lesson;
     }
 
@@ -143,7 +144,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<Lesson> getAllLessons(){
+    public List<Lesson> getAllLessons() {
         return StreamSupport.stream(lessonRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());
     }

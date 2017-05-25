@@ -58,10 +58,10 @@ public class CourseIOUtils {
     private final Invoker invoker;
 
     @Autowired
-    public CourseIOUtils( CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
 
-    this.commonIOUtils = commonIOUtils;
-        this. courseRepository= courseRepository;
+        this.commonIOUtils = commonIOUtils;
+        this.courseRepository = courseRepository;
         this.request = invocationRequest;
         this.invoker = invoker;
     }
@@ -232,16 +232,19 @@ public class CourseIOUtils {
 
         File[] allDependencies = globalDep.listFiles();
 
-        return Files.walk(Paths.get(projectPath))
+        String[] jarfiles = Files.walk(Paths.get(projectPath))
                 .map(Path::toString)
                 .filter(path -> path.endsWith(".jar"))
+                .toArray(String[]::new);
+
+        Arrays.stream(jarfiles)
                 .filter(path -> {
                     String jarName = StringUtils.substringAfterDelimiter(path, File.separator);
                     return allDependencies == null || Arrays.stream(allDependencies)
                             .noneMatch(dep -> dep.getAbsolutePath()
                                     .contains(jarName));
                 })
-                .peek(path -> {
+                .forEach(path -> {
                             try {
                                 Files.copy(
                                         Paths.get(path),
@@ -254,7 +257,10 @@ public class CourseIOUtils {
                                 LOGGER.error("Copying dependencies - FAILED.", e);
                             }
                         }
-                )
+                );
+
+
+        return Arrays.stream(jarfiles)
                 .map(path -> StringUtils.substringAfterDelimiter(path, File.separator) + ".jar")
                 .toArray(String[]::new);
     }
@@ -266,8 +272,6 @@ public class CourseIOUtils {
     public void updateCourseDependencies(String courseLocalPath, Course course) throws IOException, DirectoryCreatingException {
         saveMavenDependenciesLocally(courseLocalPath);
         String[] dependencies = copyDependencies(courseLocalPath);
-
-        course.setDependencies(dependencies);
         courseRepository.updateDependencies(dependencies, course.getId());
 
     }
