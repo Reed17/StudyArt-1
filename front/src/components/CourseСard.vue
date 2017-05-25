@@ -9,7 +9,7 @@
       <mu-card-text>Description : {{course.description}}</mu-card-text>
 
       <mu-card-actions>
-        <mu-flat-button label="Learn more"/>
+        <mu-flat-button label="Learn more" :to="link"/>
       </mu-card-actions>
 
     </mu-card>
@@ -19,6 +19,11 @@
 <script>
   export default{
     name: 'course-card',
+    computed: {
+        link: function () {
+          return '/course/' + this.course.id;
+        }
+    },
     props: {
       course: {
         required: true,

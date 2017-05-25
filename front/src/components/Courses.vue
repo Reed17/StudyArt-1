@@ -1,7 +1,7 @@
 <template>
   <div id="container">
     <div align="center">
-      <mu-text-field v-model="filterKey" hintText="enter filter key"></mu-text-field>
+      <mu-text-field v-model="filterKey" hintText="filter"></mu-text-field>
     </div>
 
     <br/>

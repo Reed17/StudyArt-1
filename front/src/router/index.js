@@ -3,6 +3,7 @@ import Router from "vue-router";
 import Login from "@/components/Login";
 import Register from "@/components/Register";
 import Courses from "@/components/Courses";
+import Course from "@/components/Course";
 
 
 Vue.use(Router);
@@ -18,6 +19,11 @@ export default new Router({
       path: '/courses',
       name: 'Courses',
       component: Courses,
+    },
+    {
+      path: '/course/:id',
+      name: 'Course',
+      component: Course,
     },
     {
       path: '/register',
