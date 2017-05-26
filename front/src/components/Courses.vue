@@ -1,13 +1,18 @@
 <template>
   <div id="container">
     <div align="center">
-      <mu-text-field v-model="filterKey" hintText="filter"></mu-text-field>
+      <v-text-field
+        label="Filter key"
+        v-model="filterKey"
+      ></v-text-field>
     </div>
 
-    <br/>
-
     <div class="wrapper">
-      <course-card v-for="course in filteredCourses" :course="course" :key="course.id"></course-card>
+      <course-card
+        v-for="course in filteredCourses"
+        :course="course"
+        :key="course.id"
+      ></course-card>
     </div>
 
   </div>
