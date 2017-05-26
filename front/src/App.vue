@@ -100,7 +100,7 @@
 </template>
 
 <script>
-  import AppNavbar from "./components/main/NabBar";
+  import AppNavbar from "./components/NavBar";
   export default {
     components: {AppNavbar},
     data () {
@@ -109,7 +109,7 @@
         drawer: true,
         fixed: false,
 
-        miniVariant: false,
+        miniVariant: true,
         right: true,
         rightDrawer: false,
         title: 'StudyArt'

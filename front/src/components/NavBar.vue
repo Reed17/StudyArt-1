@@ -9,6 +9,7 @@
       <v-list-item
         v-for="(item, i) in items"
         :key="i"
+        icon
       >
         <v-list-tile router value="true" :href="item.path">
           <v-list-tile-action>
@@ -28,9 +29,9 @@
     data(){
       return {
         items: [
-          {title: 'Courses', path: '/courses'},
-          {title: 'About', path: '/about'},
-          {title: 'Contacts', path: '/contacts'},
+          {title: 'Courses', path: '/courses', icon: 'list'},
+          {title: 'About', path: '/about', icon: 'info'},
+          {title: 'Contacts', path: '/contacts', icon: 'contacts'},
         ],
       }
     },
