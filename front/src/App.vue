@@ -8,6 +8,7 @@
 
     <v-toolbar>
       <v-toolbar-side-icon @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
+
       <v-btn
         icon
         @click.native.stop="miniVariant = !miniVariant"
@@ -15,26 +16,56 @@
       >
         <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
       </v-btn>
-      <v-btn router
+
+      <v-btn
         icon
         @click.native.stop="clipped = !clipped"
       >
         <v-icon>web</v-icon>
       </v-btn>
+
       <v-btn
         icon
         @click.native.stop="fixed = !fixed"
       >
         <v-icon>remove</v-icon>
       </v-btn>
-      <v-toolbar-title router href='/' v-text="title"></v-toolbar-title>
+
+      <v-btn
+        flat
+        large
+        router
+        href="/"
+      >
+        {{title}}
+      </v-btn>
+
       <v-spacer></v-spacer>
+      <v-btn
+        align-right
+        flat
+        router
+        href="/login"
+      >
+        Login
+      </v-btn>
+
+      <v-btn
+        align-right
+        flat
+        router
+        href="/register"
+      >
+        Register
+      </v-btn>
+
       <v-btn
         icon
         @click.native.stop="rightDrawer = !rightDrawer"
       >
         <v-icon>menu</v-icon>
       </v-btn>
+
     </v-toolbar>
 
     <main>

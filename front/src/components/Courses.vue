@@ -30,6 +30,9 @@
     computed: {
       filteredCourses: function () {
         return this.filterCourses()
+      },
+      filterKeyLowerCase: function () {
+        return this.filterKey.toLowerCase();
       }
     },
 
@@ -47,11 +50,9 @@
 
       filterCourses() {
         let courses = this.courseData;
-        let filterKeyIgnoreCase = this.filterKey.toLowerCase();
-
         return courses.filter((course) =>
-          course.name.toLowerCase().includes(filterKeyIgnoreCase) ||
-          course.description.toLowerCase().includes(filterKeyIgnoreCase)
+          course.name.toLowerCase().includes(this.filterKeyLowerCase) ||
+          course.description.toLowerCase().includes(this.filterKeyLowerCase)
         ).sort(this.sortCoursesComparator);
       },
 
