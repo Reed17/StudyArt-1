@@ -4,20 +4,26 @@
 
       <mu-card-title :title=course.name></mu-card-title>
 
+      <mu-divider/>
+
       <mu-card-header :title=course.author :subTitle=course.url></mu-card-header>
 
+      <mu-divider/>
+
       <mu-list>
-
         <mu-sub-header>Lessons:</mu-sub-header>
-
-        <mu-list-item v-for="lesson in course.lessons">
+        <mu-list-item v-for="lesson in course.lessons" :key="lesson.id">
           Lesson name: {{lesson.name}}
           <br/>
           Description: {{lesson.description}}
         </mu-list-item>
-
       </mu-list>
+
+      <mu-divider/>
+
       <mu-card-text>Course description : {{course.description}}</mu-card-text>
+
+      <mu-divider/>
 
       <mu-card-actions>
         <mu-flat-button label="START"/>
@@ -41,7 +47,7 @@
     },
     methods: {
       fetchCourse() {
-          axios.get('http://localhost:8080/courses/get?id=' + this.$route.params.id)
+        axios.get('http://localhost:8080/courses/get?id=' + this.$route.params.id)
           .then((response) => {
             this.course = response.data;
           });

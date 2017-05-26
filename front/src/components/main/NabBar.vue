@@ -1,0 +1,40 @@
+<template>
+  <v-navigation-drawer
+    persistent
+    :mini-variant="miniVariant"
+    :clipped="clipped"
+    v-model="drawer"
+  >
+    <v-list>
+      <v-list-item
+        v-for="(item, i) in items"
+        :key="i"
+      >
+        <v-list-tile router value="true" :href="item.path">
+          <v-list-tile-action>
+            <v-icon light v-html="item.icon"></v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
+</template>
+
+<script>
+  export default{
+    data(){
+      return {
+        items: [
+          {title: 'Courses', path: '/courses'},
+          {title: 'About', path: '/about'},
+          {title: 'Contacts', path: '/contacts'},
+        ],
+      }
+    },
+    props: ['miniVariant', 'clipped', 'drawer'],
+    name: "app-navbar"
+  }
+</script>
