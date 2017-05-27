@@ -21,6 +21,7 @@
 <script>
   import axios from "axios";
   import CourseCard from "./CourseСard";
+  import properties from "../properties"
   export default {
     components: {CourseCard},
     name: 'courses',
@@ -47,7 +48,7 @@
 
     methods: {
       fetchCourses() {
-        axios.get('http://localhost:8080/courses/getAll') // todo extract to props
+        axios.get(properties.host + '/courses/getAll') // todo extract to props
           .then((response) => {
             this.courseData = response.data;
           });
