@@ -1,112 +1,105 @@
-Hi there
+# StudyArt
 
-**TODO:**
-1. Dependencies
-2. Picture with lifecycle of app
+Dependencies:
+* Maven
+* Spring boot
 
-**First of all you have to**
-1. Set path for git project and for external code (if you want to send a class) in resources/app.properties
-2. Create git repository if you want to run "lessons" or send solutions. You can use my test repo https://github.com/v21k/TestGitProject.git
-3. Install Postman or another app to send GET/POST requests
-4. Change maven.embedded.path in application.yml (for main and test)
 
-**Git repo**
+Before:
+* Edit properties (application.yml) Set:
+  * paths for downloading course from Git, for saving dependencies and external code
+* Use [test git repository](https://github.com/v21k/TestGitProject.git) - it's already in test properties
+* Main and test props must be the same (except test properties)
+* to use API you can use [Swagger](http://localhost:8080/swagger-ui.html) (http://localhost:8080/swagger-ui.html) or Postman
 
-If you want to test all features with your own repo, here are few conventions:
-1. sources root package - src/
-2. lessons MUST be located in ```src/_LESSON-NUMBER_lesson. Example - src/_01_lesson/```
-3. in order to run lesson you need Main class in it. Class must contain word "main". Example: mainclass, MAIN, class_main
-4. in order to run lesson with solution you need Solution class. Class name must contain word "solution". Same to previous example
-
-See my example to understand - https://github.com/v21k/TestGitProject.git
-
-**Algorithm of using app**
-0. You can use Swagger UI to test app - http://localhost:8080/swagger-ui.html
-1. Run ua.artcode.Application class
-2. Add git repo by using POST request to http://localhost:8080/courses/add with next content:
+Lifecycle:
+1. Login/Register POST `/login`, `/register`. Example:
 ```json
 {
-	"id" : 0,
-	"name" : "Primitives",
-	"author" : "VK",
-	"url" : "https://github.com/v21k/TestGitProject.git",
-	"localPath:" : null,
-	"lessons" : null
+  "login": "string",
+  "pass": "string"
 }
 ```
-<br> id, localPath and lessons will be generated on server side
-
-3. You can check if everything is ok by sending GET requests: 
-* http://localhost:8080/courses/get?id=1
-
-4. After this you have 3 ways to use app:
-* send any class and run it (it must contain "main" method) <br>
-POST http://localhost:8080/run-class <br>
-example for request body
 ```json
 {
-	"sourceCode" : "public class test {\npublic static void main(String[] args) {\nSystem.out.println(2+2);\n}\n}\n"
+  "email": "string",
+  "login": "string",
+  "pass": "string"
 }
 ```
-* run main class from any lesson you want <br>
-GET http://localhost:8080/courses/lessons/run?courseId=COURSE_ID&lessonNumber=LESSON_NUMBER <br>
-for example, if you want use my repo - use this localhost:8080/courses/lessons/run?courseId=1&lessonNumber=3
-* run lesson with solution <br>
-POST http://localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 <br>
-request body example: 
-```json
-{
-	"sourceCode" : "public static int sum(int a, int b){return a+2;}"
-}
-```
-<br> or example, if you want use my repo - use this http://localhost:8080/courses/lessons/send-solution-and-run?courseId=1&lessonNumber=2 
-<br> and request body from above
-
-
-
-
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-
-TODO: 
-  
-// add tests using "spring boot test" - 50% --- need to test exceptions
-    test created endpoints , send some data and check actual result
-    look at the example src/test/java/ua/artcode/controller/GreetingControllerTests.java
-    
-    
-// Validation - 100%
-
-// Exceptions - 100%
-
-// Consider all TOODs - 100%
-
-// Add next func. - 100%
-Pass class with main method which will be ran with our system
-
-public class A {
-
-    //
-    //
-    // 
-    //
-    //
-    //
-
-    // will be processed
-    main(...){
-        
-    
+2. For teacher
+	* add course POST `/courses/add`. Dependencies, id, lessons, localpath will be generated on server side.
+	```json
+	{
+      "author": "string",
+      "dependencies": [
+        "string"
+      ],
+      "description": "string",
+      "id": 0,
+      "lessons": [],
+      "localPath": "string",
+      "name": "string",
+      "sourcesRoot": "string",
+      "testsRoot": "string",
+      "url": "string"
     }
+    ```
+    * add lessons POST `courses/lessons/add`. ID will be generated on server side. You can set sourcesRoot or baseClasses (same for tests), not both.
+    ```json
+    {
+      "baseClasses": [
+        "string"
+      ],
+      "courseID": 0,
+      "description": "string",
+      "id": 0,
+      "localPath": "string",
+      "name": "string",
+      "requiredClasses": [
+        "string"
+      ],
+      "sourcesRoot": "string",
+      "testsClasses": [
+        "string"
+      ],
+      "testsRoot": "string"
+    }
+    ```
+3. Get all courses/lessons. GET `/courses/getAll`, `/courses/lessons/getAll`.
+4. For student. First of all you need to:
+    * get course
+    * clone it from git
+    * perform lessons
+    * push (to your own repo)
+5. Check lessons POST `/courses/lessons/send-solution-and-run-tests?courseId=ID&lessonNumber=NUMBER`. 
+* Request params: course ID and lesson ID
+* Request body:
+    ```json
+    {
+      "id": 0,
+      "name": "string",
+      "url": "string"
+    }
+    ```
+* Response:
+    ```json
+    {
+      "generalResponse": {
+        "message": "string",
+        "type": "INFO"
+      },
+      "methodResult": {
+        "systemErr": "string",
+        "systemOut": "string"
+      },
+      "methodStats": {
+        "failedTests": 0,
+        "failures": [],
+        "overallTests": 0,
+        "passedTests": 0
+      }
+    }
+    ```
 
 
-
-}
-
-
-// see how to connect swagger to the project - 0%
