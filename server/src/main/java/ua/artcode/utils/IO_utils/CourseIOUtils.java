@@ -169,6 +169,7 @@ public class CourseIOUtils {
             }
         }
 
+        // todo NPE warning
         classPaths = classPaths.stream().
                 map(path -> path.replace("/", File.separator))
                 .collect(Collectors.toList());
