@@ -1,19 +1,24 @@
 <template>
   <div id="container">
-    <div align="center">
-      <v-text-field
+
+    <v-container>
+    <v-text-field
         label="Filter key"
         v-model="filterKey"
       ></v-text-field>
-    </div>
+    </v-container>
 
-    <div class="wrapper">
-      <course-card
-        v-for="course in filteredCourses"
-        :course="course"
-        :key="course.id"
-      ></course-card>
-    </div>
+    <v-container>
+      <h3>Courses</h3>
+      <v-expansion-panel>
+        <course-card
+          v-for="course in filteredCourses"
+          :course="course"
+          :key="course.id"
+        >
+        </course-card>
+      </v-expansion-panel>
+    </v-container>
 
   </div>
 </template>
