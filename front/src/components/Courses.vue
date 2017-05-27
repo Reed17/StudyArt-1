@@ -48,7 +48,7 @@
 
     methods: {
       fetchCourses() {
-        axios.get(properties.host + '/courses/getAll') // todo extract to props
+        axios.get(properties.host + '/courses/getAll')
           .then((response) => {
             this.courseData = response.data;
           });
