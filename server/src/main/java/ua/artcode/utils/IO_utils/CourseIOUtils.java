@@ -232,11 +232,13 @@ public class CourseIOUtils {
 
         File[] allDependencies = globalDep.listFiles();
 
+        // get all .jar files
         String[] jarfiles = Files.walk(Paths.get(projectPath))
                 .map(Path::toString)
                 .filter(path -> path.endsWith(".jar"))
                 .toArray(String[]::new);
 
+        // copy .jars to global dependencies directory (filter before, if we already have them)
         Arrays.stream(jarfiles)
                 .filter(path -> {
                     String jarName = StringUtils.substringAfterDelimiter(path, File.separator);
@@ -259,34 +261,10 @@ public class CourseIOUtils {
                         }
                 );
 
-
+        // return array (dependencyName.jar)
         return Arrays.stream(jarfiles)
                 .map(path -> StringUtils.substringAfterDelimiter(path, File.separator) + ".jar")
                 .toArray(String[]::new);
-    }
-
-    /**
-     * Download dependencies, copy them to folder where all dependencies located
-     * and update course with new dependencies array in DB
-     */
-    public void updateCourseDependencies(String courseLocalPath, Course course) throws IOException, DirectoryCreatingException {
-        saveMavenDependenciesLocally(courseLocalPath);
-        String[] dependencies = copyDependencies(courseLocalPath);
-        courseRepository.updateDependencies(dependencies, course.getId());
-
-    }
-
-    /**
-     * If course root paths doesnt exist - set them and update course in DB
-     */
-    public void updateCoursePaths(String courseLocalPath, Course course) {
-        if (!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
-            course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
-            course.setTestsRoot(courseLocalPath + course.getTestsRoot());
-
-            // update course so we can use roots later in RunService
-            courseRepository.updateSourcesAndTestsRoot(course.getSourcesRoot(), course.getTestsRoot(), course.getId());
-        }
     }
 
     private String generatePomPath(String projectRoot) {

@@ -1,6 +1,7 @@
 package ua.artcode.service;
 
 import javafx.util.Pair;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.ValidationUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -80,23 +82,27 @@ public class CourseServiceImpl implements CourseService {
         // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = getByID(courseID);
 
-
         // save locally for further operations
         String courseLocalPath = courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId());
 
+        // update source and test root paths for lesson
         if (!lesson.getSourcesRoot().isEmpty()) {
             lesson.setSourcesRoot(normalizePath(checkStartsWithAndAppend(lesson.getSourcesRoot(), courseLocalPath)));
         } else if (!lesson.getTestsRoot().isEmpty()) {
             lesson.setTestsRoot(normalizePath(checkStartsWithAndAppend(lesson.getTestsRoot(), courseLocalPath)));
         }
 
-        // update root packages
-        courseIOUtils.updateCoursePaths(courseLocalPath, course);
+        // update source and test root paths for course
+        if (!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
+            course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
+            course.setTestsRoot(courseLocalPath + course.getTestsRoot());
+        }
 
-        // update dependencies
-        courseIOUtils.updateCourseDependencies(courseLocalPath, course);
+        // save dependencies, parse and update in course
+        courseIOUtils.saveMavenDependenciesLocally(courseLocalPath);
+        course.setDependencies(courseIOUtils.copyDependencies(courseLocalPath));
 
-        // todo maybe there is another solution, more simple?
+        // parse base and test classes
         Pair<List<String>, String> baseClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getBaseClasses(),
@@ -116,13 +122,13 @@ public class CourseServiceImpl implements CourseService {
         lesson.setTestsClasses(testClasses.getKey());
         lesson.setTestsRoot(testClasses.getValue());
 
-        // check if exists
+        // check if files exist
         validationUtils.validateFiles(
                 lesson.getBaseClasses(),
                 lesson.getTestsClasses(),
                 lesson.getRequiredClasses());
 
-        List<Lesson> courseLessons = courseRepository.findOne(courseID).getLessons();
+        List<Lesson> courseLessons = course.getLessons();
         if (courseLessons.contains(lesson)) { // todo check equals and hash
             throw new SuchLessonAlreadyExist("Such lesson already exist!");
         } else {
@@ -130,6 +136,9 @@ public class CourseServiceImpl implements CourseService {
             courseLessons.add(lesson);
             course.setLessons(courseLessons);
         }
+
+        // delete all downloaded files
+        FileUtils.deleteDirectory(new File(courseLocalPath));
 
         courseRepository.save(course);
         return lesson;

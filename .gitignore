@@ -16,5 +16,5 @@ README.html
 .idea
 logs
 courses
-dependencies
+dependencies/*
 npm-debug.log*
