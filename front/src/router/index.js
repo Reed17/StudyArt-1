@@ -5,6 +5,7 @@ import Register from "@/components/Register";
 import Courses from "@/components/Courses";
 import Course from "@/components/Course";
 import AceEditor from "@/components/AceEditor";
+import LessonCard from "@/components/LessonCard"
 
 
 Vue.use(Router);
@@ -35,6 +36,11 @@ export default new Router({
       path: '/editor',
       name: 'AceEditor',
       component: AceEditor
+    },
+    {
+      path: '/lessonCard/:id',
+      name: 'LessonCard',
+      component: LessonCard
     },
   ],
   mode: 'history'
