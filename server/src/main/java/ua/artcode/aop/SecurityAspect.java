@@ -1,4 +1,4 @@
-/*
+
 package ua.artcode.aop;
 
 import org.aspectj.lang.JoinPoint;
@@ -19,11 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Enumeration;
 
-*/
-/**
- * Created by zhenia on 19.05.17.
- *//*
-
 @Aspect
 @Component
 public class SecurityAspect {
@@ -37,7 +32,9 @@ public class SecurityAspect {
     public void securityCheck(JoinPoint joinPoint) throws Throwable {
         Object[] args = joinPoint.getArgs();
 
-        HttpServletRequest req = (HttpServletRequest) args[args.length - 1];
+        HttpServletRequest req = (HttpServletRequest) Arrays.stream(args).filter(a -> a.getClass().equals(HttpServletRequest.class)).findFirst().orElse(null);
+
+        if(req == null) return;
 
         LOGGER.info(req.getRequestURI());
 
@@ -58,4 +55,3 @@ public class SecurityAspect {
 
 
 }
-*/
