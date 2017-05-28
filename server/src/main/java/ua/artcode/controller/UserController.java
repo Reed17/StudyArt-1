@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
+import ua.artcode.model.dto.LoginRequestDTO;
 import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.service.UserServiceImpl;
 
@@ -48,6 +49,7 @@ public class UserController {
 
         LOGGER.info("Registration - OK, id = " + newUser.getId());
 
+
         return newUser;
     }
 
@@ -59,9 +61,10 @@ public class UserController {
     // todo usecure passing of params
     // return general response
     // see how to throw an exception to client, ExceptionHandler
-    public String loginUser(@RequestParam String login, @RequestParam String pass,
-                             HttpServletRequest request) throws Throwable {
-        String newUserKey = userService.login(login, pass);
+    public String loginUser(@RequestBody LoginRequestDTO loginRequestDTO,
+                            HttpServletRequest request) throws Throwable {
+        String newUserKey = userService.login(loginRequestDTO.login,
+                loginRequestDTO.password);
 
         LOGGER.info("Login - OK, id = " + sessionDB.findOne(newUserKey).getUser().getId());
 
