@@ -3,15 +3,12 @@
 import Vue from "vue";
 import App from "./App";
 import router from "./router";
-import MuseUI from "muse-ui";
-import "muse-ui/dist/muse-ui.css";
-import 'muse-ui/dist/theme-light.css'
 import Vuetify from 'vuetify';
+import VueCookie from 'vue-cookie'
 
 Vue.config.productionTip = false;
-Vue.use(MuseUI);
 Vue.use(Vuetify);
-
+Vue.use(VueCookie);
 
 /* eslint-disable no-new */
 new Vue({

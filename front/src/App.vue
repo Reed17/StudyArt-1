@@ -22,13 +22,16 @@
       </v-btn>
 
       <v-spacer></v-spacer>
-      <v-btn align-right flat router href="/login">
+
+      <v-btn v-if="!this.$cookie.get('accessKey')" flat router href="/login">
         Login
       </v-btn>
 
-      <v-btn align-right flat router href="/register">
+      <v-btn v-if="!this.$cookie.get('accessKey')" flat router href="/register">
         Register
       </v-btn>
+
+      <v-btn v-if="this.$cookie.get('accessKey')" flat router href="/user">{{this.$cookie.get('username')}}</v-btn>
 
       <v-btn icon @click.native.stop="rightDrawer = !rightDrawer">
         <v-icon>menu</v-icon>
@@ -78,7 +81,7 @@
         rightDrawer: false,
         title: 'StudyArt'
       }
-    }
+    }, // todo try watcher
   }
 </script>
 

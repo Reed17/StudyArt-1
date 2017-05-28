@@ -2,14 +2,24 @@
   <v-container fluid class="px-3">
     <v-layout row wrap>
       <v-flex sm6 offset-sm3>
-        <v-flex xs12>
-          <v-text-field label="Login" counter v-model="login" max="16"></v-text-field>
-        </v-flex>
-        <v-flex xs12>
-          <v-text-field label="Password" counter v-model="pass" max="30"></v-text-field>
-          <app-modal buttonName='submit' title='Result' text='OK' agreeButton='OK'></app-modal>
-        </v-flex>
+        <form>
+          <v-flex xs12>
+            <v-text-field label="Login" type="text" v-model="login" max="16"></v-text-field>
+          </v-flex>
+          <v-flex xs12>
+            <v-text-field label="Password" type="password" counter v-model="pass" max="30"></v-text-field>
+          </v-flex>
+          <v-btn primary @click.native="submitLogin">Submit</v-btn>
+        </form>
+        <v-alert v-if="loginOk" success v-bind:value="true">
+          {{loginOkText}}
+          <v-btn flat white router href="/">To main page</v-btn>
+        </v-alert>
+        <v-alert v-if="loginFail" error v-bind:value="true">
+          {{loginFailText}}
+        </v-alert>
       </v-flex>
+
     </v-layout>
   </v-container>
 </template>
@@ -17,28 +27,40 @@
 <script>
   import axios from 'axios';
   import properties from '../properties'
-  import AppModal from "./Modal";
   export default {
 
-    components: {AppModal},
     data () {
       return {
         login: '',
         pass: '',
-        responseText: ''
+        text: 'Logged in!',
+        loginOk: false,
+        loginFail: false,
+        loginFailText: 'Wrong info. Please, try again.',
+        loginOkText: 'Welcome to StudyArt!'
       }
     },
     methods: {
       submitLogin(){
+        if (this.loginOk) {
+          this.loginOkText = "Already logged in!";
+          return;
+        }
+
         axios.post(properties.host + '/login', {
-          username: this.login,
+          login: this.login,
           password: this.pass
+        }).then((response) => {
+          // todo cookies
+          this.$cookie.set('accessKey', response.data);
+          this.$cookie.set('username', this.login);
+          this.loginFail = false;
+          this.loginOk = true;
+        }).catch(() => {
+          this.loginFail = true;
+          this.loginOk = false;
         })
-      }
+      },
     }
   }
 </script>
-
-<style lang="stylus">
-  @import '../stylus/main'
-</style>

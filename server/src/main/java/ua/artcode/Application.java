@@ -4,7 +4,9 @@ import org.apache.maven.shared.invoker.DefaultInvocationRequest;
 import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -19,13 +21,15 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import ua.artcode.controller.UserController;
+import ua.artcode.model.dto.RegisterRequestDTO;
 
 import java.util.Properties;
 
 @SpringBootApplication(scanBasePackages = {"ua.artcode"})
 @EnableSwagger2 // http://localhost:8080/swagger-ui.html
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-public class Application {
+public class Application{
 
     @Value("${email.host}")
     private String mailHost;
@@ -39,6 +43,9 @@ public class Application {
     private String mailSmtpAuth;
     @Value("${email.properties.smtp.starttls.enable}")
     private String mailSmtpStartTLS;
+
+    @Autowired
+    private UserController userController;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -91,4 +98,16 @@ public class Application {
     }
 
 
+    @Bean
+    public CommandLineRunner commandLineRunner() {
+        return strings -> {
+            try {
+                userController.registerUser(
+                        new RegisterRequestDTO("testuser",
+                                "testuser@gmail.com",
+                                "testpass",
+                                "student"));
+            } catch (Throwable ignored) {}
+        };
+    }
 }
