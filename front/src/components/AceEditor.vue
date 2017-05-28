@@ -47,7 +47,7 @@
       },
 
       runCode() {
-        axios.post('http://localhost:8080/courses/run-code', this.input)
+        axios.post(properties.host + '/run-code', this.input)
           .then((response) => {
             this.response = response.data;
           });
