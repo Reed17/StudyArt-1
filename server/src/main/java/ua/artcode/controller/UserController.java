@@ -3,13 +3,11 @@ package ua.artcode.controller;
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
+import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.service.UserServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,34 +43,10 @@ public class UserController {
     // todo usecure passing of params
     // return general response
     // see how to throw an exception to client, ExceptionHandler
-    public User registerUser(@RequestParam String login, @RequestParam String email, @RequestParam String pass,
-                             @RequestParam String type,
-                             HttpServletRequest request) throws Throwable {
-        User newUser = userService.register(login, pass, email, type);
+    public User registerUser(@RequestBody RegisterRequestDTO dto) throws Throwable {
+        User newUser = userService.register(dto.login, dto.pass, dto.email, dto.type);
 
         LOGGER.info("Registration - OK, id = " + newUser.getId());
-
-//        try {
-//            if (type.toLowerCase().equals("teacher")) {
-//                newUser = teacherService.register(login, pass, email);
-//            } else {
-//                newUser = studentService.register(login, pass, email);
-//            }
-
-//            LOGGER.info("Registration - OK, id = " + newUser.getId());
-//        } catch (Throwable e) {
-//            LOGGER.warn("Registration - FAILED, msg = " + e.getMessage());
-//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//
-//            try {
-//                response.getWriter().write(e.getMessage());
-//                response.getWriter().flush();
-//                response.getWriter().close();
-//            } catch (IOException e1) {
-//                // todo logger
-//                e1.printStackTrace();
-//            }
-//        }
 
         return newUser;
     }

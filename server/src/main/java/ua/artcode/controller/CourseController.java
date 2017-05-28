@@ -44,7 +44,7 @@ public class CourseController {
             response = Course.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/get", method = RequestMethod.GET)
-    public Course getCourseByID(@RequestParam int id, HttpServletRequest request) throws AppException {
+    public Course getCourseByID(@RequestParam int id) throws AppException {
 
         Course course = courseService.getByID(id);
         LOGGER.info("Course get - OK, id {}", id);
@@ -56,7 +56,7 @@ public class CourseController {
             response = List.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/getAll", method = RequestMethod.GET)
-    public List<Course> getAllCourses(HttpServletRequest request) throws AppException {
+    public List<Course> getAllCourses() throws AppException {
 
         List<Course> courses = courseService.getAllCourses();
         LOGGER.info("Course get all - OK");
@@ -68,7 +68,7 @@ public class CourseController {
             response = Lesson.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
-    public Lesson getLessonByID(@RequestParam int id, HttpServletRequest request) throws AppException {
+    public Lesson getLessonByID(@RequestParam int id) throws AppException {
 
         Lesson lesson = courseService.getLessonByID(id);
         LOGGER.info("Lesson get - OK, id {}", id);
@@ -81,7 +81,7 @@ public class CourseController {
             response = List.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/getAll", method = RequestMethod.GET)
-    public List<Lesson> getAllLessons(HttpServletRequest request) throws AppException {
+    public List<Lesson> getAllLessons() throws AppException {
         List<Lesson> lessons = courseService.getAllLessons();
         LOGGER.info("Lesson get all - OK");
         return lessons;
