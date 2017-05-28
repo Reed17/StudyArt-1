@@ -56,7 +56,7 @@ public class UserController {
     @ApiOperation(httpMethod = "POST",
             value = "Resource to register new user",
             response = User.class,
-            produces = "application/json")
+            produces = "text/plain")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     // todo usecure passing of params
     // return general response
