@@ -73,12 +73,3 @@
     }
   }
 </script>
-
-<style>
-  .wrapper > div {
-    display: inline-block;
-    box-sizing: border-box;
-    width: 25%;
-    letter-spacing: normal;
-  }
-</style>

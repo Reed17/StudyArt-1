@@ -17,19 +17,33 @@
             v-model="pass"
             max="30"
           ></v-text-field>
+          <app-modal buttonName='submit' title='Result' text='OK' agreeButton='OK'></app-modal>
         </v-flex>
-        <v-btn primary light>Submit</v-btn>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
 
 <script>
+  import axios from 'axios';
+  import properties from '../properties'
+  import AppModal from "./Modal";
   export default {
+
+    components: {AppModal},
     data () {
       return {
         login: '',
-        pass: ''
+        pass: '',
+        responseText: ''
+      }
+    },
+    methods: {
+      submitLogin(){
+        axios.post(properties.host + '/login', {
+          username: this.login,
+          password: this.pass
+        })
       }
     }
   }
