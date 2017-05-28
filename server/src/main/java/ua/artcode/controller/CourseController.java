@@ -1,14 +1,11 @@
 package ua.artcode.controller;
 
 import io.swagger.annotations.ApiOperation;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
-import ua.artcode.exceptions.DirectoryCreatingException;
-import ua.artcode.exceptions.LessonsParsingException;
 import ua.artcode.exceptions.SuchCourseAlreadyExists;
 import ua.artcode.model.Course;
 import ua.artcode.model.CourseFromUser;
@@ -112,13 +109,11 @@ public class CourseController {
     @RequestMapping(value = "/run-class", method = RequestMethod.POST)
     public RunResults runClass(@RequestBody ExternalCode code, HttpServletRequest request) {
         try {
-
             RunResults results = runService.runMain(code);
             LOGGER.info("Run class (external source code) - OK");
             return results;
 
         } catch (Exception e) {
-
             LOGGER.error("Run class (external source code) - FAILED.", e);
             return new RunResults(new GeneralResponse(ResponseType.INFO, e.getMessage()));
         }
@@ -135,13 +130,10 @@ public class CourseController {
                                                  @RequestBody @Valid CourseFromUser userCourse,
                                                  HttpServletRequest request) {
         try {
-
             RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);
             LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
             return results;
-
         } catch (Exception e) {
-
             LOGGER.error("Run class from lesson with solution - FAILED", e);
             return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
         }
@@ -157,14 +149,11 @@ public class CourseController {
                                              @RequestBody @Valid Lesson lesson,
                                              HttpServletRequest request) {
         try {
-
             Lesson result = courseService.addLesson(lesson, courseId);
-
             LOGGER.info("Add lesson (course ID: {}, lesson name: {}) - OK", courseId, lesson.getName());
             return new GeneralResponse(ResponseType.INFO, "Lesson add - OK");
 
         } catch (Exception e) {
-
             LOGGER.error("Add lesson to course - FAILED", e);
             return new GeneralResponse(ResponseType.ERROR, "Lesson already exists!");
         }

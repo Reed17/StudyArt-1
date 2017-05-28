@@ -3,8 +3,6 @@ package ua.artcode.service;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
@@ -87,6 +85,7 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public String login(String login, String pass) throws InvalidLoginInfo {
+
         User loginResult;
 
         boolean validatedPass = validationUtils.passValidation(pass);
