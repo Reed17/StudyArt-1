@@ -63,7 +63,6 @@ public class UserServiceImpl implements UserService {
         // checking does user with this parameters already exist
         validationUtils.checkOriginality(login, email, teacherDB, studentDB);
 
-        // todo type as enum +
         if (TEACHER.equals(type))
             newUser = teacherDB.save(new Teacher(login, securityUtils.encryptPass(pass), email));
         else
@@ -87,8 +86,6 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    // todo logging +
-    // todo duplicated code +
     @Override
     public String login(String login, String pass) throws InvalidLoginInfo {
 

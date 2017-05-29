@@ -44,7 +44,7 @@ public class UserController {
     // todo usecure passing of params
     // return general response
     // see how to throw an exception to client, ExceptionHandler
-    public User registerUser(@RequestBody RegisterRequestDTO dto) throws Throwable { // todo do not throw, send error to front
+    public User registerUser(@RequestBody RegisterRequestDTO dto) throws Throwable { // todo not throwable, more readable exceptions, not only error code
         User newUser = userService.register(dto.login, dto.pass, dto.email, dto.type);
 
         LOGGER.info("Registration - OK, id = " + newUser.getId());
@@ -62,7 +62,7 @@ public class UserController {
     // return general response
     // see how to throw an exception to client, ExceptionHandler
     public String loginUser(@RequestBody LoginRequestDTO loginRequestDTO,
-                            HttpServletRequest request) throws Throwable { // todo do not throw, use readable exceptions, not throwable
+                            HttpServletRequest request) throws Throwable { // todo not throwable, more readable exceptions, not only error code
         String newUserKey = userService.login(loginRequestDTO.login,
                 loginRequestDTO.password);
 
@@ -79,7 +79,7 @@ public class UserController {
             produces = "application/json")
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
     // todo use the id as String
-    public User activateUser(@RequestParam int id) throws UnexpectedNullException { // todo handle exception, we can't throw it all time :)
+    public User activateUser(@RequestParam int id) throws UnexpectedNullException {
         User activatedUser = userService.activate(id);
 
         LOGGER.info("Activation - OK, id = " + activatedUser.getId());
