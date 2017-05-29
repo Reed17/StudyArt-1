@@ -24,14 +24,24 @@
       <v-spacer></v-spacer>
 
       <v-btn v-if="!this.$cookie.get('accessKey')" flat router href="/login">
-        Login
+        Sign in
       </v-btn>
 
-      <v-btn v-if="!this.$cookie.get('accessKey')" flat router href="/register">
-        Register
-      </v-btn>
-
-      <v-btn v-if="this.$cookie.get('accessKey')" flat router href="/user">{{this.$cookie.get('username')}}</v-btn>
+      <v-menu v-if="this.$cookie.get('accessKey')" >
+        <v-btn primary slot="activator">{{this.$cookie.get('username')}}</v-btn>
+        <v-list>
+          <v-list-item>
+            <v-list-tile router href="/user">
+              <v-list-tile-title>Info</v-list-tile-title>
+            </v-list-tile>
+          </v-list-item>
+          <v-list-item>
+            <v-list-tile @click.native="logout">
+              <v-list-tile-title>Log out</v-list-tile-title>
+            </v-list-tile>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
       <v-btn icon @click.native.stop="rightDrawer = !rightDrawer">
         <v-icon>menu</v-icon>
@@ -81,7 +91,14 @@
         rightDrawer: false,
         title: 'StudyArt'
       }
-    }, // todo try watcher
+    },
+    methods: {
+        logout(){
+            this.$cookie.delete('accessKey');
+            this.$cookie.delete('username');
+            this.$forceUpdate();
+        }
+    },
   }
 </script>
 

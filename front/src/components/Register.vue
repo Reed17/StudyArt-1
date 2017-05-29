@@ -1,49 +1,83 @@
 <template>
   <v-container fluid class="px-3">
+
     <v-layout row wrap>
+
       <v-flex sm6 offset-sm3>
-        <v-flex xs12>
-          <v-text-field
-            label="Login"
-            counter
-            v-model="login"
-            max="16"
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs12>
-          <v-text-field
-            label="Email"
-            counter
-            v-model="email"
-            max="30"
-          ></v-text-field>
-        </v-flex>
-        <v-flex xs12>
-          <v-text-field
-            label="Password"
-            counter
-            v-model="pass"
-            max="16"
-          ></v-text-field>
-        </v-flex>
-        <v-btn primary light>Submit</v-btn>
+        <form>
+          <v-flex xs12>
+            <v-text-field label="Login" counter v-model="login" max="16"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12>
+            <v-text-field label="Email" counter v-model="email" max="30"
+            ></v-text-field>
+          </v-flex>
+          <v-flex xs12>
+            <v-text-field type="password" label="Password" counter v-model="pass" max="16"
+            ></v-text-field>
+          </v-flex>
+
+          <v-flex xs12>
+            <v-select v-bind:items="types" v-model="userType" label="User type" dark single-line auto></v-select>
+          </v-flex>
+
+          <v-btn primary @click.native="submitRegister">Submit</v-btn>
+          <v-btn primary router href="/login">Back</v-btn>
+        </form>
+
+          <v-alert v-if="registerOk" success v-bind:value="true">
+            {{registerOkText}}
+            <v-btn flat white router href="/login">To login page</v-btn>
+          </v-alert>
+
+          <v-alert v-if="registerFail" error v-bind:value="true">
+            {{registerFailText}}
+          </v-alert>
+
       </v-flex>
+
     </v-layout>
+
   </v-container>
 </template>
 
 <script>
+  import axios from 'axios';
+  import properties from '../properties'
   export default {
     data () {
       return {
         login: '',
         email: '',
-        pass: ''
+        pass: '',
+        userType: '',
+        types: ['Student', 'Teacher'],
+        registerOk: false,
+        registerFail: false,
+        registerOkText: '',
+        registerFailText: '',
+      }
+    },
+
+    methods: {
+      submitRegister(){
+        axios.post(properties.host + '/register',
+          {
+            login: this.login,
+            email: this.email,
+            pass: this.pass,
+            type: this.userType.toLowerCase(),
+          }).then(() => {
+          this.registerOkText = 'Register done.';
+          this.registerFail = false;
+          this.registerOk = true;
+        }).catch((reason) => {
+          this.registerFailText = 'Failed. Reason: ' + reason;
+          this.registerFail = true;
+          this.registerOk = false;
+        })
       }
     }
   }
 </script>
-
-<style lang="stylus">
-  @import '../stylus/main'
-</style>

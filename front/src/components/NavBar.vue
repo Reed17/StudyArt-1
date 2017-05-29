@@ -32,6 +32,7 @@
           {title: 'Courses', path: '/courses', icon: 'list'},
           {title: 'About', path: '/about', icon: 'info'},
           {title: 'Contacts', path: '/contacts', icon: 'contacts'},
+          {title: 'AceEditor', path: '/editor', icon: 'contacts'},
         ],
       }
     },

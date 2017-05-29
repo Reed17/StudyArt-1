@@ -10,6 +10,7 @@
             <v-text-field label="Password" type="password" counter v-model="pass" max="30"></v-text-field>
           </v-flex>
           <v-btn primary @click.native="submitLogin">Submit</v-btn>
+          <v-btn primary router href="/register">Register</v-btn>
         </form>
         <v-alert v-if="loginOk" success v-bind:value="true">
           {{loginOkText}}
@@ -37,12 +38,13 @@
         loginOk: false,
         loginFail: false,
         loginFailText: 'Wrong info. Please, try again.',
-        loginOkText: 'Welcome to StudyArt!'
+        loginOkText: ''
       }
     },
     methods: {
       submitLogin(){
-        if (this.loginOk) {
+        if (this.$cookie.get('accessKey')) {
+          this.loginOk = true;
           this.loginOkText = "Already logged in!";
           return;
         }
@@ -51,9 +53,10 @@
           login: this.login,
           password: this.pass
         }).then((response) => {
-          // todo cookies
           this.$cookie.set('accessKey', response.data);
           this.$cookie.set('username', this.login);
+
+          this.loginOkText = 'Welcome to StudyArt!';
           this.loginFail = false;
           this.loginOk = true;
         }).catch(() => {
