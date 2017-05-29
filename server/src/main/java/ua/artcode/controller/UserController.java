@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.dao.repositories.SessionRepository;
+import ua.artcode.exceptions.InvalidUserSessionException;
 import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
 import ua.artcode.model.dto.LoginRequestDTO;
@@ -86,4 +87,18 @@ public class UserController {
 
         return activatedUser;
     }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Get user by access key",
+            response = User.class,
+            produces = "application/json")
+    @RequestMapping(value = "/getUserByAccessKey", method = RequestMethod.GET)
+    public User getUserByAccessKey(@RequestParam String key) throws InvalidUserSessionException {
+        User found = userService.find(key);
+
+        LOGGER.info("User find by access key - OK, id = " + found.getId());
+
+        return found;
+    }
+
 }

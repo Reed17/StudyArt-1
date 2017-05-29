@@ -22,7 +22,12 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import ua.artcode.controller.UserController;
+import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.dao.repositories.TeacherRepository;
+import ua.artcode.dao.repositories.UserRepository;
 import ua.artcode.enums.UserType;
+import ua.artcode.model.Student;
+import ua.artcode.model.Teacher;
 import ua.artcode.model.dto.RegisterRequestDTO;
 
 import java.util.Properties;
@@ -47,6 +52,10 @@ public class Application{
 
     @Autowired
     private UserController userController;
+    @Autowired
+    private StudentRepository studentUserRepository;
+    @Autowired
+    private TeacherRepository teacherUserRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -104,7 +113,7 @@ public class Application{
         return strings -> {
             try {
                 userController.registerUser(
-                        new RegisterRequestDTO("testuser",
+                        new RegisterRequestDTO("test_user",
                                 "testuser@gmail.com",
                                 "testpass",
                                 UserType.STUDENT));

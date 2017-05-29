@@ -7,7 +7,7 @@ import ua.artcode.model.User;
 import java.util.List;
 @Repository
 public interface UserRepository<T extends User> extends CrudRepository<T, Integer> {
-    User findByEmail(String email);
-    User findByLogin(String login);
+    T findByEmail(String email);
+    T findByLogin(String login);
 
 }

@@ -40,8 +40,7 @@ public class Teacher extends User {
     private List<Course> courses;
 
     public Teacher(String login, String pass, String email) {
-        super(login, pass, email);
-        userType = TEACHER;
+        super(login, pass, email, TEACHER);
         courses = new ArrayList<>();
     }
 

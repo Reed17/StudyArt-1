@@ -120,4 +120,13 @@ public class UserServiceImpl implements UserService {
         LOGGER.error(String.format("User with login %s doesn't exist", login));
         throw new InvalidLoginInfo("User doesn't exists");
     }
+
+    @Override
+    public User find(String accessKey) throws InvalidUserSessionException {
+        Session session = sessionDB.findOne(accessKey);
+        if(session == null) {
+            throw new InvalidUserSessionException("Session not found.");
+        }
+        return session.getUser();
+    }
 }

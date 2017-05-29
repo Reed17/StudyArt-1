@@ -48,8 +48,7 @@ public class Student extends User {
     ;
 
     public Student(String login, String pass, String email) {
-        super(login, pass, email);
-        userType = STUDENT;
+        super(login, pass, email, STUDENT);
         subscribed = new ArrayList<>();
         completed = new ArrayList<>();
     }

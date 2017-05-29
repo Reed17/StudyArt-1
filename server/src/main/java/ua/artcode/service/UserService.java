@@ -31,4 +31,6 @@ public interface UserService<T extends User> {
     T activate(int userId) throws UnexpectedNullException;
 
     String login(String login, String pass) throws InvalidLoginInfo;
+
+    T find(String accessKey) throws InvalidUserSessionException;
 }

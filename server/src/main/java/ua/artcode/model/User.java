@@ -24,10 +24,11 @@ public class User {
     public User() {
     }
 
-    public User(String login, String pass, String email) {
+    public User(String login, String pass, String email, UserType userType) {
         this.login = login;
         this.pass = pass;
         this.email = email;
+        this.userType = userType;
         this.isActivated = false;
     }
 
@@ -57,6 +58,22 @@ public class User {
 
     public int getId() {
         return id;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     public boolean isAccessable(String reqUrl) { return false; }
