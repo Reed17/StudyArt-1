@@ -113,10 +113,15 @@ public class Application{
         return strings -> {
             try {
                 userController.registerUser(
-                        new RegisterRequestDTO("test_user",
-                                "testuser@gmail.com",
-                                "testpass",
+                        new RegisterRequestDTO("student",
+                                "student@gmail.com",
+                                "password",
                                 UserType.STUDENT));
+                userController.registerUser(
+                        new RegisterRequestDTO("teacher",
+                                "teacher@gmail.com",
+                                "password",
+                                UserType.TEACHER));
             } catch (Throwable ignored) {}
         };
     }
