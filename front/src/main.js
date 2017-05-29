@@ -3,14 +3,21 @@
 import Vue from "vue";
 import App from "./App";
 import router from "./router";
-import Vuetify from 'vuetify';
-import VueCookie from 'vue-cookie'
+import Vuetify from "vuetify";
+import VueCookie from "vue-cookie";
 
 Vue.config.productionTip = false;
 Vue.use(Vuetify);
 Vue.use(VueCookie);
 
-/* eslint-disable no-new */
+const routesForGuests = ['/', '/login', '/register', '/editor', '/about', '/contacts'];
+
+// redirect to login page (if path not available for guests)
+router.beforeEach((to, from, next) => {
+  const accessKey = Vue.cookie.get('accessKey');
+  routesForGuests.includes(to.path) ? next() : accessKey ? next() : next('/login');
+});
+
 new Vue({
   el: '#app',
   router,
