@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ua.artcode.enums.UserType.TEACHER;
+
 /**
  * Created by zhenia on 23.04.17.
  */
@@ -39,10 +41,12 @@ public class Teacher extends User {
 
     public Teacher(String login, String pass, String email) {
         super(login, pass, email);
+        userType = TEACHER;
         courses = new ArrayList<>();
     }
 
     public Teacher() {
+        userType = TEACHER;
     }
 
     ;
