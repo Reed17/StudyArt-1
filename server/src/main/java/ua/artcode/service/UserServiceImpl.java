@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
+import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Session;
 import ua.artcode.model.Student;
@@ -17,9 +18,11 @@ import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
+import static ua.artcode.enums.UserType.TEACHER;
+
 
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements UserService {
 
     private final TeacherRepository teacherDB;
     private final StudentRepository studentDB;
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User register(String login, String pass, String email, String type)
+    public User register(String login, String pass, String email, UserType type)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException {
         User newUser;
 
@@ -60,8 +63,8 @@ public class UserServiceImpl implements UserService{
         // checking does user with this parameters already exist
         validationUtils.checkOriginality(login, email, teacherDB, studentDB);
 
-        // todo type as enum
-        if("teacher".equals(type))
+        // todo type as enum +
+        if (TEACHER.equals(type))
             newUser = teacherDB.save(new Teacher(login, securityUtils.encryptPass(pass), email));
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));
@@ -84,7 +87,8 @@ public class UserServiceImpl implements UserService{
         return user;
     }
 
-    // todo logging
+    // todo logging +
+    // todo duplicated code +
     @Override
     public String login(String login, String pass) throws InvalidLoginInfo {
 
@@ -92,43 +96,31 @@ public class UserServiceImpl implements UserService{
 
         boolean validatedPass = validationUtils.passValidation(pass);
 
-        if(validationUtils.emailValidation(login) && validatedPass) {
+        if (!validationUtils.emailValidation(login) && !validationUtils.loginValidation(login)) {
+            LOGGER.error(String.format("Login %s has wrong format", login));
+            throw new InvalidLoginInfo("Wrong login format");
+
+        }
+        if (validatedPass) {
             pass = securityUtils.encryptPass(pass);
 
-            User tmp = teacherDB.findByEmail(login);
-            loginResult = tmp == null ? studentDB.findByEmail(login) : tmp;
+            loginResult = teacherDB.findByEmail(login) == null ?
+                    studentDB.findByEmail(login) : teacherDB.findByEmail(login);
+            if (loginResult == null) {
+                loginResult = teacherDB.findByLogin(login) == null ?
+                        studentDB.findByLogin(login) : teacherDB.findByLogin(login);
+            }
 
-            // todo duplicated code
-            if(loginResult != null && loginResult.getPass().equals(pass)) {
+            if (loginResult != null && loginResult.getPass().equals(pass)) {
                 Session session = sessionDB.findByUser(loginResult);
 
-                if(session == null)
+                if (session == null)
                     return sessionDB.save(new Session(loginResult)).getAccessKey();
                 else
                     return session.getAccessKey();
             }
-
-            throw new InvalidLoginInfo("User doesn't exists");
         }
-
-        if(validationUtils.loginValidation(login) && validatedPass) {
-            pass = securityUtils.encryptPass(pass);
-
-            User tmp = teacherDB.findByLogin(login);
-            loginResult = tmp == null ? studentDB.findByLogin(login) : tmp;
-
-            if(loginResult != null && loginResult.getPass().equals(pass)) {
-                Session session = sessionDB.findByUser(loginResult);
-
-                if(session == null)
-                    return sessionDB.save(new Session(loginResult)).getAccessKey();
-                else
-                    return session.getAccessKey();
-            }
-
-            throw new InvalidLoginInfo("User doesn't exists");
-        }
-
+        LOGGER.error(String.format("User with login %s doesn't exist", login));
         throw new InvalidLoginInfo("User doesn't exists");
     }
 }

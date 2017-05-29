@@ -1,5 +1,6 @@
 package ua.artcode.service;
 
+import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.User;
 
@@ -17,7 +18,7 @@ public interface UserService<T extends User> {
      * @param email - user email
      * @return new User with inputed fields
      */
-    T register(String login, String pass, String email, String type)
+    T register(String login, String pass, String email, UserType type)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException;
 
 

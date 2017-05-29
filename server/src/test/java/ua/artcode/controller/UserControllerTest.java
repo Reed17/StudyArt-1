@@ -14,7 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
+import static ua.artcode.enums.UserType.*;
 
 /**
  * Created by zhenia on 27.04.17.
@@ -33,7 +33,7 @@ public class UserControllerTest {
 
     @Test
     public void testRegistrationTeacher() throws Exception {
-        mockMvc.perform(post("/register?login=Username1&email=42004200zhenia@gmail.com&pass=password1&type=teacher")
+        mockMvc.perform(post("/register?login=Username1&email=42004200zhenia@gmail.com&pass=password1&type=TEACHER")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -42,7 +42,7 @@ public class UserControllerTest {
 
     @Test
     public void testRegistrationStudent() throws Exception {
-        mockMvc.perform(post("/register?login=Username51&email=42004200zhenia1@gmail.com&pass=password1&type=student")
+        mockMvc.perform(post("/register?login=Username51&email=42004200zhenia1@gmail.com&pass=password1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -50,18 +50,18 @@ public class UserControllerTest {
 
     @Test
     public void testRegistrationNegative() throws Exception {
-        mockMvc.perform(post("/register?login=Us&email=42004200zhenia2@gmail.com&pass=password1&type=student")
+        mockMvc.perform(post("/register?login=Us&email=42004200zhenia2@gmail.com&pass=password1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
 
 
-        mockMvc.perform(post("/register?login=Username2&email=42004200zheniagmail.com&pass=password1&type=student")
+        mockMvc.perform(post("/register?login=Username2&email=42004200zheniagmail.com&pass=password1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
 
-        mockMvc.perform(post("/register?login=Username3&email=42004200zhenia@gmail.com&pass=p1&type=student")
+        mockMvc.perform(post("/register?login=Username3&email=42004200zhenia@gmail.com&pass=p1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().is(400));
@@ -69,7 +69,7 @@ public class UserControllerTest {
 
     @Test
     public void testLoginPositive() throws Exception {
-        mockMvc.perform(post("/register?login=Username71&email=42004200zhenia71@gmail.com&pass=password1&type=student")
+        mockMvc.perform(post("/register?login=Username71&email=42004200zhenia71@gmail.com&pass=password1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -87,7 +87,7 @@ public class UserControllerTest {
 
     @Test
     public void testLoginNegative() throws Exception {
-        mockMvc.perform(post("/register?login=Username72&email=42004200zhenia72@gmail.com&pass=password1&type=student")
+        mockMvc.perform(post("/register?login=Username72&email=42004200zhenia72@gmail.com&pass=password1&type=STUDENT")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

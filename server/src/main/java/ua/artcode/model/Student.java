@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ua.artcode.enums.UserType.STUDENT;
+
 /**
  * Created by zhenia on 23.04.17.
  */
@@ -40,12 +42,14 @@ public class Student extends User {
     private List<Course> completed;
 
     public Student() {
+        userType = STUDENT;
     }
 
     ;
 
     public Student(String login, String pass, String email) {
         super(login, pass, email);
+        userType = STUDENT;
         subscribed = new ArrayList<>();
         completed = new ArrayList<>();
     }

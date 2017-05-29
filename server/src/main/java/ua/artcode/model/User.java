@@ -1,5 +1,7 @@
 package ua.artcode.model;
 
+import ua.artcode.enums.UserType;
+
 import javax.persistence.*;
 
 /**
@@ -17,6 +19,7 @@ public class User {
     @Column (unique = true)
     protected String email;
     protected boolean isActivated;
+    protected UserType userType;
 
     public User() {
     }
