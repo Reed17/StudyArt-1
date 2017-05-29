@@ -24,7 +24,7 @@ public class ValidationUtils {
     private static final Pattern VALID_PASSWORD_PATTERN =
             Pattern.compile("^[a-z0-9_-]{6,15}$", Pattern.CASE_INSENSITIVE);
 
-
+    // todo logging!!!
     public boolean loginValidation(String login) {
         return login != null &&
                 VALID_LOGIN_PATTERN.matcher(login).matches();
@@ -40,6 +40,7 @@ public class ValidationUtils {
                 VALID_PASSWORD_PATTERN.matcher(pass).matches();
     }
 
+    // todo logging!!!
     public void validateAllUserFields(String login, String email, String pass)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException {
 
@@ -65,7 +66,7 @@ public class ValidationUtils {
                 && studentRepository.findByEmail(email) == null);
     }
 
-
+    // todo logging!!!
     public void checkOriginality(String login, String email, TeacherRepository teacherRepository, StudentRepository studentRepository)
             throws InvalidUserLoginException, InvalidUserEmailException {
 
