@@ -67,7 +67,7 @@
             login: this.login,
             email: this.email,
             pass: this.pass,
-            type: this.userType.toLowerCase(),
+            type: this.userType.toUpperCase(),
           }).then(() => {
           this.registerOkText = 'Register done.';
           this.registerFail = false;

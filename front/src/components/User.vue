@@ -23,7 +23,7 @@
 
     methods: {
       fetchUserInfo(){
-        axios.get(properties.host + '/getUserByAccessKey' + '?accessKey=' + this.$cookie.get('accessKey'))
+        axios.get(properties.host + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
           .then((response) => {
             this.user = response.data;
           })
