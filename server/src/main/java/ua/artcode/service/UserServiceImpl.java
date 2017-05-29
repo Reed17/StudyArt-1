@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
+import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Session;
 import ua.artcode.model.Student;
@@ -16,6 +17,8 @@ import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
+
+import static ua.artcode.enums.UserType.TEACHER;
 
 
 @Service
@@ -48,7 +51,7 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User register(String login, String pass, String email, String type)
+    public User register(String login, String pass, String email, UserType type)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException {
         User newUser;
 
@@ -61,7 +64,7 @@ public class UserServiceImpl implements UserService{
         validationUtils.checkOriginality(login, email, teacherDB, studentDB);
 
         // todo type as enum
-        if("teacher".equals(type))
+        if(TEACHER.equals(type))
             newUser = teacherDB.save(new Teacher(login, securityUtils.encryptPass(pass), email));
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));

@@ -22,6 +22,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 import ua.artcode.controller.UserController;
+import ua.artcode.enums.UserType;
 import ua.artcode.model.dto.RegisterRequestDTO;
 
 import java.util.Properties;
@@ -106,7 +107,7 @@ public class Application{
                         new RegisterRequestDTO("testuser",
                                 "testuser@gmail.com",
                                 "testpass",
-                                "student"));
+                                UserType.STUDENT));
             } catch (Throwable ignored) {}
         };
     }
