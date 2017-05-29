@@ -6,6 +6,7 @@ import Courses from "@/components/Courses";
 import Course from "@/components/Course";
 import AceEditor from "@/components/AceEditor";
 import LessonCard from "@/components/LessonCard"
+import User from "@/components/User"
 
 
 Vue.use(Router);
@@ -42,6 +43,12 @@ export default new Router({
       name: 'LessonCard',
       component: LessonCard
     },
+    {
+      path: '/user',
+      name: 'User',
+      component: User
+    },
+
   ],
   mode: 'history'
 })

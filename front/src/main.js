@@ -10,12 +10,12 @@ Vue.config.productionTip = false;
 Vue.use(Vuetify);
 Vue.use(VueCookie);
 
-const routesForGuests = ['/', '/login', '/register', '/editor', '/about', '/contacts'];
+const routesForUsersOnly = ['/courses', '/lessonCard', '/user', '/course'];
 
 // redirect to login page (if path not available for guests)
 router.beforeEach((to, from, next) => {
   const accessKey = Vue.cookie.get('accessKey');
-  routesForGuests.includes(to.path) ? next() : accessKey ? next() : next('/login');
+  routesForUsersOnly.includes(to.path) ? accessKey ? next() : next('/login') : next();
 });
 
 new Vue({
