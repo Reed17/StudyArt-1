@@ -53,6 +53,13 @@
           login: this.login,
           password: this.pass
         }).then((response) => {
+
+          axios.get(properties.host + '/getUserByAccessKey' + '?key=' + response.data)
+            .then((response) => {
+              this.$cookie.set('userId', response.data.id);
+              this.$cookie.set('userType', response.data.userType);
+            });
+
           this.$cookie.set('accessKey', response.data);
           this.$cookie.set('username', this.login);
 

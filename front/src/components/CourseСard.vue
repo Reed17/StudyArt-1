@@ -21,23 +21,78 @@
           </v-expansion-panel>
         </v-container>
       </v-card-text>
+
+      <v-card-row v-if="userType==='STUDENT' && !subscribed.includes(course.id)" actions>
+        <v-btn @click.native="subscribe">Subscribe</v-btn>
+      </v-card-row>
+      <v-card-text v-else>
+        <p class="text-xs-center">Subscribed</p>
+      </v-card-text>
+
+      <v-alert success v-if="userType==='STUDENT'" v-bind:value="subscribeOk">
+        Subscribed.
+      </v-alert>
+
+      <v-alert error v-if="userType==='STUDENT'" v-bind:value="subscribeFailed">
+        Already subscribed
+      </v-alert>
+
     </v-card>
+
   </v-expansion-panel-content>
+
 </template>
 
 <script>
   import AppLesson from "./Lesson";
+  import axios from 'axios';
+  import properties from '../properties'
   export default{
     components: {AppLesson},
     name: 'course-card',
+    data() {
+      return {
+        subscribeOk: false,
+        subscribeFailed: false,
+        userType: this.$cookie.get('userType'),
+        subscribed: [],
+      }
+    },
     computed: {
-        link: function () {
-          return '/course/' + this.course.id;
-        }
+      link: function () {
+        return '/course/' + this.course.id;
+      }
     },
     props: {
       course: {
         required: true,
+      }
+    },
+
+    mounted(){
+      this.fetchSubscribed();
+    },
+    methods: {
+      subscribe(){
+
+        if(this.subscribeOk){
+          this.subscribeOk = false;
+          this.subscribeFailed = true;
+          return;
+        }
+
+        axios.get(properties.host +
+          '/subscribe?courseId=' + this.course.id +
+          '&userId=' + this.$cookie.get('userId'))
+          .then((response) => {
+            response.data.type === 'INFO' ?
+              this.subscribeOk = true : this.subscribeFailed = true;
+          });
+      },
+
+      fetchSubscribed(){
+        axios.get(properties.host + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
+          .then((response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id))
       }
     }
   }

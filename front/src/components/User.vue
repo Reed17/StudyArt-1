@@ -31,43 +31,54 @@
               <strong>{{user.activated ? 'Yes' : 'No'}}</strong>
             </div>
           </v-card-row>
-
-          <v-card-row v-if="user.userType==='STUDENT'" height="75px">
-            <v-icon class="mr-5" dark>subscriptions</v-icon>
-            <div>
-              <div>Subscribed</div>
-              <strong v-if="!user.subscribed.length">No courses yet</strong>
-              <app-lesson v-for="lesson in user.subscribed" :lesson="lesson" :key="lesson.id"></app-lesson>
-            </div>
-          </v-card-row>
-
-          <v-card-row v-if="user.userType==='STUDENT'" height="75px">
-            <v-icon class="mr-5" dark>done_all</v-icon>
-            <div>
-              <div>Completed</div>
-              <strong v-if="!user.completed.length">No courses yet</strong>
-              <app-lesson v-for="lesson in user.completed" :lesson="lesson" :key="lesson.id"></app-lesson>
-            </div>
-          </v-card-row>
-
-          <v-card-row v-if="user.userType==='TEACHER'" height="75px">
-            <v-icon class="mr-5" dark>list</v-icon>
-            <div>
-              <div>Courses</div>
-              <strong v-if="!user.courses.length">No courses yet</strong>
-              <app-lesson v-for="lesson in user.courses" :lesson="lesson" :key="lesson.id"></app-lesson>
-            </div>
-          </v-card-row>
-
         </v-card-text>
-
-
         <v-divider></v-divider>
         <v-card-row actions>
           <v-btn flat>Change personal info</v-btn>
           <v-btn flat>Delete account</v-btn> <!--todo modal!-->
         </v-card-row>
       </v-card>
+
+      <v-divider></v-divider>
+      <br/>
+
+      <v-container v-if="user.userType==='TEACHER' && user.courses.length">
+        <h3>Courses</h3>
+        <v-expansion-panel>
+          <v-expansion-panel-content v-for="course in user.courses" :key="course.id">
+            <div slot="header">Course name: {{course.name}}</div>
+            <v-card>
+              <v-card-text class="grey lighten-3">Descrition: {{course.description}}</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-container>
+
+      <v-container v-if="user.userType==='STUDENT' && user.subscribed.length">
+        <h5>Subscribed</h5>
+        <v-expansion-panel>
+          <v-expansion-panel-content v-for="course in user.subscribed" :key="course.id">
+            <div slot="header">Course name: {{course.name}}</div>
+            <v-card>
+              <v-card-text class="grey lighten-3">Descrition: {{course.description}}</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-container>
+
+      <v-container v-if="user.userType==='STUDENT' && user.completed.length">
+        <h5>Completed</h5>
+        <v-expansion-panel v-if="user.userType==='STUDENT' && user.completed.length">
+          <v-expansion-panel-content v-for="course in user.completed" :key="course.id">
+            <div slot="header">Course name: {{course.name}}</div>
+            <v-card>
+              <v-card-text class="grey lighten-3">Descrition: {{course.description}}</v-card-text>
+            </v-card>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-container>
+
+
     </v-flex>
   </v-layout>
 </template>
