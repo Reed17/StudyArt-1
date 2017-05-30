@@ -141,17 +141,17 @@ public class Application {
         Map<Integer, String> courseName = new HashMap<>();
         Map<Integer, String> courseDescription = new HashMap<>();
 
-        courseName.put(1, "Reflection API");
-        courseName.put(2, "JDBC, Drivers, SQL");
-        courseName.put(3, "Servlets, servlet containers, JSP");
-        courseName.put(4, "REST/SOAP");
-        courseName.put(5, "JPA, Hibernate");
-
         courseDescription.put(1, "Reflection API");
-        courseDescription.put(2, "JDBC + SQL");
-        courseDescription.put(3, "Java Servlet API");
-        courseDescription.put(4, "Web Services");
-        courseDescription.put(5, "Java JPA");
+        courseDescription.put(2, "JDBC, Drivers, SQL");
+        courseDescription.put(3, "Servlets, servlet containers, JSP");
+        courseDescription.put(4, "REST/SOAP");
+        courseDescription.put(5, "JPA, Hibernate");
+
+        courseName.put(1, "Reflection API");
+        courseName.put(2, "JDBC + SQL");
+        courseName.put(3, "Java Servlet API");
+        courseName.put(4, "Web Services");
+        courseName.put(5, "Java JPA");
 
 
         for (int i = 1; i <= courseName.size(); i++) {

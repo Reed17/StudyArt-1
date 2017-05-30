@@ -4,7 +4,7 @@ application:
       git: courses
       externalCode: temp
       dependencies : dependencies
-  profiling: true
+  profiling: false
 
 email:
     server: "http://localhost:8080"
