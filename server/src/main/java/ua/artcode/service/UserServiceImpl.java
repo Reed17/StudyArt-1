@@ -4,15 +4,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.*;
-import ua.artcode.model.Session;
-import ua.artcode.model.Student;
-import ua.artcode.model.Teacher;
-import ua.artcode.model.User;
+import ua.artcode.model.*;
 import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
@@ -31,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final SessionRepository sessionDB;
     private final MailUtils mu;
     private final ResultChecker resultChecker;
+    private final CourseRepository courseRepository;
 
     @Value("${email.user}")
     private String emailUsername;
@@ -40,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils,
                            SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu,
-                           ResultChecker resultChecker) {
+                           ResultChecker resultChecker, CourseRepository courseRepository) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
@@ -48,6 +47,7 @@ public class UserServiceImpl implements UserService {
         this.sessionDB = sessionDB;
         this.mu = mu;
         this.resultChecker = resultChecker;
+        this.courseRepository = courseRepository;
     }
 
     @Override
@@ -128,5 +128,16 @@ public class UserServiceImpl implements UserService {
             throw new InvalidUserSessionException("Session not found.");
         }
         return session.getUser();
+    }
+
+    @Override
+    public boolean subscribe(int courseId, int userId) {
+        Student student = studentDB.findOne(userId);
+        Course course = courseRepository.findOne(courseId);
+
+
+        boolean a = student.subscribeTo(course);
+        boolean b = studentDB.save(student) != null;
+        return a && b;
     }
 }

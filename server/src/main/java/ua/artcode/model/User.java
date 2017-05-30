@@ -12,11 +12,12 @@ import javax.persistence.*;
 public class User {
     @Id
     @GeneratedValue
+    @Column(name = "USER_ID")
     protected int id;
-    @Column (unique = true)
+    @Column(unique = true)
     protected String login;
     protected String pass;
-    @Column (unique = true)
+    @Column(unique = true)
     protected String email;
     protected boolean isActivated;
     protected UserType userType;
@@ -76,5 +77,7 @@ public class User {
         this.userType = userType;
     }
 
-    public boolean isAccessable(String reqUrl) { return false; }
+    public boolean isAccessable(String reqUrl) {
+        return false;
+    }
 }

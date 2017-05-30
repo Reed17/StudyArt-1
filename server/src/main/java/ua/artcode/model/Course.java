@@ -10,24 +10,19 @@ import java.util.List;
  * Created by v21k on 15.04.17.
  */
 @Entity
+@Table(name = "COURSES")
 public class Course {
-    // todo check patterns - add course doesn't work sometimes
     @Id
     @GeneratedValue
     @Column(name = "COURSE_ID")
     private Integer id;
-
-    // todo validation
     private String name;
     private String author;
-
     @Pattern(regexp = "^http(s?):.+\\.git$", message = "Invalid git URL")
     private String url;
     private String localPath;
-
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Lesson> lessons;
-
     private String description;
 
     @NotNull

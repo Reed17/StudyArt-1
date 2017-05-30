@@ -42,6 +42,25 @@ public class Lesson implements Comparable<Lesson> {
         this.localPath = localPath;
     }
 
+
+    public Lesson(String name,
+                  String localPath,
+                  List<String> baseClasses,
+                  List<String> requiredClasses,
+                  List<String> testsClasses,
+                  String sourcesRoot,
+                  String testsRoot,
+                  String description) {
+        this.name = name;
+        this.localPath = localPath;
+        this.baseClasses = baseClasses;
+        this.requiredClasses = requiredClasses;
+        this.testsClasses = testsClasses;
+        this.sourcesRoot = sourcesRoot;
+        this.testsRoot = testsRoot;
+        this.description = description;
+    }
+
     public List<String> getBaseClasses() {
         return baseClasses;
     }

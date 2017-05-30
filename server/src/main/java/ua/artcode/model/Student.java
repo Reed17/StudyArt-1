@@ -1,11 +1,9 @@
 package ua.artcode.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.*;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static ua.artcode.enums.UserType.STUDENT;
@@ -14,11 +12,12 @@ import static ua.artcode.enums.UserType.STUDENT;
  * Created by zhenia on 23.04.17.
  */
 @Entity
+@Table(name = "STUDENTS")
 public class Student extends User {
 
     private static final Map<String, Boolean> STUDENT_RIGHTS = createRightsMap();
 
-    private static Map<String,Boolean> createRightsMap() {
+    private static Map<String, Boolean> createRightsMap() {
         Map<String, Boolean> map = new ConcurrentHashMap<>();
 
         map.put("/courses/lessons/get", true);
@@ -33,44 +32,46 @@ public class Student extends User {
         return map;
     }
 
-    // list of courses, to which subscribed student
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Course> subscribed;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "STUDENT_SUBSCRIBED",
+            joinColumns = {@JoinColumn(name = "USER_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
+    private Set<Course> subscribed;
 
-    // list of completed courses
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<Course> completed;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "STUDENT_COMPLETED",
+            joinColumns = {@JoinColumn(name = "USER_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
+    private Set<Course> completed;
 
     public Student() {
         userType = STUDENT;
     }
 
-    ;
-
     public Student(String login, String pass, String email) {
         super(login, pass, email, STUDENT);
-        subscribed = new ArrayList<>();
-        completed = new ArrayList<>();
+        subscribed = new HashSet<>();
+        completed = new HashSet<>();
     }
 
-    public List<Course> getSubscribed() {
+    public Set<Course> getSubscribed() {
         return subscribed;
     }
 
-    public void setSubscribed(List<Course> subscribed) {
+    public void setSubscribed(Set<Course> subscribed) {
         this.subscribed = subscribed;
     }
 
-    public List<Course> getCompleted() {
+    public Set<Course> getCompleted() {
         return completed;
     }
 
-    public void setCompleted(List<Course> completed) {
+    public void setCompleted(Set<Course> completed) {
         this.completed = completed;
     }
 
     public boolean subscribeTo(Course course) {
-        return subscribed.add(course);
+        return !subscribed.contains(course) && subscribed.add(course);
     }
 
     @Override

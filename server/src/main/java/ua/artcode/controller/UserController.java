@@ -10,6 +10,8 @@ import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
 import ua.artcode.model.dto.LoginRequestDTO;
 import ua.artcode.model.dto.RegisterRequestDTO;
+import ua.artcode.model.response.GeneralResponse;
+import ua.artcode.model.response.ResponseType;
 import ua.artcode.service.UserServiceImpl;
 
 import javax.servlet.http.HttpServletRequest;
@@ -99,6 +101,21 @@ public class UserController {
         LOGGER.info("User find by access key - OK, id = " + found.getId());
 
         return found;
+    }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Subscribe to course",
+            produces = "application/json")
+    @RequestMapping(value = "/subscribe", method = RequestMethod.GET)
+    public GeneralResponse subscribeToCourse(@RequestParam int courseId, @RequestParam int userId) {
+        boolean result = userService.subscribe(courseId, userId);
+
+        LOGGER.info(String.format("Subscribe to course - %s, userId %d, courseId %d",
+                result ? "OK" : "FAILED",
+                userId,
+                courseId));
+
+        return new GeneralResponse(result ? ResponseType.INFO : ResponseType.ERROR, null);
     }
 
 }

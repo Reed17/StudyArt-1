@@ -1,8 +1,6 @@
 package ua.artcode.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +18,7 @@ public class Teacher extends User {
 
     private static final Map<String, Boolean> TEACHER_RIGHTS = createRightsMap();
 
-    private static Map<String,Boolean> createRightsMap() {
+    private static Map<String, Boolean> createRightsMap() {
         Map<String, Boolean> map = new ConcurrentHashMap<>();
 
         map.put("/courses/lessons/get", true);
@@ -35,8 +33,10 @@ public class Teacher extends User {
         return map;
     }
 
-    // list of courses, which created this teacher
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "TEACHER_CORSES",
+            joinColumns = {@JoinColumn(name = "USER_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
     private List<Course> courses;
 
     public Teacher(String login, String pass, String email) {
@@ -47,8 +47,6 @@ public class Teacher extends User {
     public Teacher() {
         userType = TEACHER;
     }
-
-    ;
 
     public List<Course> getCourses() {
         return courses;

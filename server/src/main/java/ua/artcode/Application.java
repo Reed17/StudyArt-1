@@ -21,21 +21,23 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import ua.artcode.controller.CourseController;
 import ua.artcode.controller.UserController;
-import ua.artcode.dao.repositories.StudentRepository;
-import ua.artcode.dao.repositories.TeacherRepository;
-import ua.artcode.dao.repositories.UserRepository;
 import ua.artcode.enums.UserType;
-import ua.artcode.model.Student;
-import ua.artcode.model.Teacher;
+import ua.artcode.exceptions.SuchCourseAlreadyExists;
+import ua.artcode.model.Course;
+import ua.artcode.model.Lesson;
 import ua.artcode.model.dto.RegisterRequestDTO;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 @SpringBootApplication(scanBasePackages = {"ua.artcode"})
 @EnableSwagger2 // http://localhost:8080/swagger-ui.html
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-public class Application{
+public class Application {
 
     @Value("${email.host}")
     private String mailHost;
@@ -53,9 +55,7 @@ public class Application{
     @Autowired
     private UserController userController;
     @Autowired
-    private StudentRepository studentUserRepository;
-    @Autowired
-    private TeacherRepository teacherUserRepository;
+    private CourseController courseController;
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
@@ -88,12 +88,12 @@ public class Application{
     }
 
     @Bean
-    public InvocationRequest invocationRequest(){
+    public InvocationRequest invocationRequest() {
         return new DefaultInvocationRequest();
     }
 
     @Bean
-    public Invoker invoker(){
+    public Invoker invoker() {
         return new DefaultInvoker();
     }
 
@@ -111,6 +111,9 @@ public class Application{
     @Bean
     public CommandLineRunner commandLineRunner() {
         return strings -> {
+
+//            createCoursesAndLessons();
+
             try {
                 userController.registerUser(
                         new RegisterRequestDTO("student",
@@ -118,11 +121,63 @@ public class Application{
                                 "password",
                                 UserType.STUDENT));
                 userController.registerUser(
+                        new RegisterRequestDTO("student2",
+                                "student2@gmail.com",
+                                "password",
+                                UserType.STUDENT));
+                userController.registerUser(
                         new RegisterRequestDTO("teacher",
                                 "teacher@gmail.com",
                                 "password",
                                 UserType.TEACHER));
-            } catch (Throwable ignored) {}
+
+            } catch (Throwable ignored) {
+            }
         };
+    }
+
+    // for test purposes - do not delete!
+    private void createCoursesAndLessons() throws SuchCourseAlreadyExists {
+        Map<Integer, String> courseName = new HashMap<>();
+        Map<Integer, String> courseDescription = new HashMap<>();
+
+        courseName.put(1, "Reflection API");
+        courseName.put(2, "JDBC, Drivers, SQL");
+        courseName.put(3, "Servlets, servlet containers, JSP");
+        courseName.put(4, "REST/SOAP");
+        courseName.put(5, "JPA, Hibernate");
+
+        courseDescription.put(1, "Reflection API");
+        courseDescription.put(2, "JDBC + SQL");
+        courseDescription.put(3, "Java Servlet API");
+        courseDescription.put(4, "Web Services");
+        courseDescription.put(5, "Java JPA");
+
+
+        for (int i = 1; i <= courseName.size(); i++) {
+
+
+            courseController.addCourse(new Course(
+                    courseName.get(i),
+                    "Vlad Kornieiev",
+                    "https://github.com/v21k/TestGitProject.git",
+                    courseDescription.get(i),
+                    "src/main/java",
+                    "src/test/java"), null);
+
+            for (int j = 0; j < 3; j++) {
+                courseController.addLessonToCourse(i, new Lesson(
+                                "Test lesson " + j,
+                                "_02_lesson",
+                                null,
+                                null,
+                                Collections.singletonList("src/test/java/_02_lesson/SolutionTests.java"),
+                                "src/main/java/_02_lesson",
+                                null,
+                                "Test description"),
+                        null
+                );
+            }
+        }
     }
 }

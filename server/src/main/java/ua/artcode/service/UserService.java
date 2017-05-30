@@ -33,4 +33,6 @@ public interface UserService<T extends User> {
     String login(String login, String pass) throws InvalidLoginInfo;
 
     T find(String accessKey) throws InvalidUserSessionException;
+
+    boolean subscribe(int courseId, int userId);
 }
