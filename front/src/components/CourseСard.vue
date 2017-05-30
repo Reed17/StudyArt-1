@@ -30,7 +30,7 @@
       </v-card-text>
 
       <v-alert success v-if="userType==='STUDENT'" v-bind:value="subscribeOk">
-        Subscribed.
+        {{subscribedOkInfo}}
       </v-alert>
 
       <v-alert error v-if="userType==='STUDENT'" v-bind:value="subscribeFailed">
@@ -53,6 +53,7 @@
     data() {
       return {
         subscribeOk: false,
+        subscribedOkInfo: 'Subscribed',
         subscribeFailed: false,
         userType: this.$cookie.get('userType'),
         subscribed: [],
@@ -72,12 +73,11 @@
     mounted(){
       this.fetchSubscribed();
     },
+
     methods: {
       subscribe(){
-
-        if(this.subscribeOk){
-          this.subscribeOk = false;
-          this.subscribeFailed = true;
+        if (this.subscribeOk) {
+          this.subscribedOkInfo = "Already subscribed.";
           return;
         }
 
@@ -91,7 +91,9 @@
       },
 
       fetchSubscribed(){
-        axios.get(properties.host + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
+        axios.get(properties.host +
+          '/getUserByAccessKey?key=' +
+          this.$cookie.get('accessKey'))
           .then((response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id))
       }
     }

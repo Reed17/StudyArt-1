@@ -1,6 +1,6 @@
 <template>
   <v-layout row wrap>
-    <v-flex xs12>
+    <v-flex xs6>
       <v-card>
         <v-card-row>
           <v-card-title>
@@ -34,17 +34,16 @@
         </v-card-text>
         <v-divider></v-divider>
         <v-card-row actions>
-          <v-btn flat>Change personal info</v-btn>
+          <v-btn flat router href='/user/change-personal-info'>Change personal info</v-btn>
           <v-btn flat>Delete account</v-btn> <!--todo modal!-->
         </v-card-row>
       </v-card>
+    </v-flex>
 
-      <v-divider></v-divider>
-      <br/>
-
-      <v-container v-if="user.userType==='TEACHER' && user.courses.length">
+    <v-flex xs6>
+      <v-container v-if="user.userType==='TEACHER'">
         <h3>Courses</h3>
-        <v-expansion-panel>
+        <v-expansion-panel v-if="user.courses.length">
           <v-expansion-panel-content v-for="course in user.courses" :key="course.id">
             <div slot="header">Course name: {{course.name}}</div>
             <v-card>
@@ -52,11 +51,15 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
+        <p class="text-xs-left" v-else>
+          No courses yet.
+          <router-link to="/courses">Create your own course!</router-link>
+        </p>
       </v-container>
 
-      <v-container v-if="user.userType==='STUDENT' && user.subscribed.length">
+      <v-container v-if="user.userType==='STUDENT'">
         <h5>Subscribed</h5>
-        <v-expansion-panel>
+        <v-expansion-panel v-if="user.subscribed.length">
           <v-expansion-panel-content v-for="course in user.subscribed" :key="course.id">
             <div slot="header">Course name: {{course.name}}</div>
             <v-card>
@@ -64,11 +67,15 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
+        <p class="text-xs-left" v-else>
+          No courses yet.
+          <router-link to="/courses">Find courses</router-link>
+        </p>
       </v-container>
 
-      <v-container v-if="user.userType==='STUDENT' && user.completed.length">
+      <v-container v-if="user.userType==='STUDENT'">
         <h5>Completed</h5>
-        <v-expansion-panel v-if="user.userType==='STUDENT' && user.completed.length">
+        <v-expansion-panel v-if="user.completed.length">
           <v-expansion-panel-content v-for="course in user.completed" :key="course.id">
             <div slot="header">Course name: {{course.name}}</div>
             <v-card>
@@ -76,6 +83,9 @@
             </v-card>
           </v-expansion-panel-content>
         </v-expansion-panel>
+        <p class="text-xs-left" v-else>
+          No courses yet.
+        </p>
       </v-container>
 
 

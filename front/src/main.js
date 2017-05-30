@@ -10,7 +10,7 @@ Vue.config.productionTip = false;
 Vue.use(Vuetify);
 Vue.use(VueCookie);
 
-const routesForUsersOnly = ['/courses', '/lessonCard', '/user', '/course'];
+const routesForUsersOnly = ['/courses', '/lessonCard', '/user', '/course', '/user/change-personal-info'];
 
 // redirect to login page (if path not available for guests)
 router.beforeEach((to, from, next) => {

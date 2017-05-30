@@ -7,6 +7,7 @@ import Course from "@/components/Course";
 import AceEditor from "@/components/AceEditor";
 import LessonCard from "@/components/LessonCard"
 import User from "@/components/User"
+import UserChangeInfo from "@/components/UserChangeInfo"
 
 
 Vue.use(Router);
@@ -47,6 +48,11 @@ export default new Router({
       path: '/user',
       name: 'User',
       component: User
+    },
+    {
+      path: '/user/change-personal-info',
+      name: 'UserChangeInfo',
+      component: UserChangeInfo
     },
 
   ],
