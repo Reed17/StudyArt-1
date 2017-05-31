@@ -35,4 +35,8 @@ public interface UserService<T extends User> {
     T find(String accessKey) throws InvalidUserSessionException;
 
     boolean subscribe(int courseId, int userId);
+
+    boolean changePersonalInfo(String oldPass, String newPass, String email, int id, UserType userType) throws InvalidUserPassException;
+
+    void deleteAccount(int userId);
 }

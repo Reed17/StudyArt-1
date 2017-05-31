@@ -124,7 +124,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User find(String accessKey) throws InvalidUserSessionException {
         Session session = sessionDB.findOne(accessKey);
-        if(session == null) {
+        if (session == null) {
             throw new InvalidUserSessionException("Session not found.");
         }
         return session.getUser();
@@ -135,9 +135,39 @@ public class UserServiceImpl implements UserService {
         Student student = studentDB.findOne(userId);
         Course course = courseRepository.findOne(courseId);
 
+        return student.subscribeTo(course) && studentDB.save(student) != null;
+    }
 
-        boolean a = student.subscribeTo(course);
-        boolean b = studentDB.save(student) != null;
-        return a && b;
+    @Override
+    public boolean changePersonalInfo(String oldPass, String newPass, String email, int userId, UserType userType) {
+        if (userType.equals(TEACHER)) {
+            Teacher teacher = teacherDB.findOne(userId);
+            if (teacher.getPass().equals(securityUtils.encryptPass(oldPass))) {
+                teacher.setPass(securityUtils.encryptPass(newPass));
+                teacher.setEmail(email.isEmpty() ? teacher.getEmail() : email);
+                return teacherDB.save(teacher) != null;
+            }
+        } else {
+            Student student = studentDB.findOne(userId);
+            if (student.getPass().equals(securityUtils.encryptPass(oldPass))) {
+                student.setPass(securityUtils.encryptPass(newPass));
+                student.setEmail(email.isEmpty() ? student.getEmail() : email);
+                return studentDB.save(student) != null;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void deleteAccount(int userId) {
+        // todo Referential integrity constraint violation
+        // todo PUBLIC.STUDENT_SUBSCRIBED FOREIGN KEY(COURSE_ID) REFERENCES PUBLIC.COURSES(COURSE_ID)
+        Teacher teacher = teacherDB.findOne(userId);
+
+        if (teacher != null) {
+            teacherDB.delete(userId);
+        } else {
+            studentDB.delete(userId);
+        }
     }
 }

@@ -12,11 +12,11 @@
           <v-btn primary @click.native="submitLogin">Submit</v-btn>
           <v-btn primary router href="/register">Register</v-btn>
         </form>
-        <v-alert v-if="loginOk" success v-bind:value="true">
+        <v-alert success v-bind:value="loginOk">
           {{loginOkText}}
           <v-btn flat white router href="/">To main page</v-btn>
         </v-alert>
-        <v-alert v-if="loginFail" error v-bind:value="true">
+        <v-alert error v-bind:value="loginFail">
           {{loginFailText}}
         </v-alert>
       </v-flex>

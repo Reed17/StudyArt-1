@@ -35,7 +35,24 @@
         <v-divider></v-divider>
         <v-card-row actions>
           <v-btn flat router href='/user/change-personal-info'>Change personal info</v-btn>
-          <v-btn flat>Delete account</v-btn> <!--todo modal!-->
+          <v-dialog v-model="deleteAccountDialog">
+            <v-btn flat slot="activator">Delete account</v-btn>
+            <v-card>
+              <v-card-row>
+                <v-card-title>Delete account</v-card-title>
+              </v-card-row>
+              <v-card-row>
+                <v-card-text>
+                  Are you sure? This action is irreversible.
+                </v-card-text>
+              </v-card-row>
+              <v-card-row actions>
+                <v-btn class="green--text darken-1" flat="flat" @click.native="deleteAccountDialog = false">Disagree
+                </v-btn>
+                <v-btn class="green--text darken-1" flat="flat" @click.native="deleteAccount">Agree</v-btn>
+              </v-card-row>
+            </v-card>
+          </v-dialog>
         </v-card-row>
       </v-card>
     </v-flex>
@@ -87,9 +104,9 @@
           No courses yet.
         </p>
       </v-container>
-
-
     </v-flex>
+
+
   </v-layout>
 </template>
 
@@ -102,6 +119,7 @@
     data(){
       return {
         user: Object,
+        deleteAccountDialog: false,
       }
     },
 
@@ -114,6 +132,19 @@
         axios.get(properties.host + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
           .then((response) => {
             this.user = response.data;
+          })
+      },
+
+      deleteAccount(){
+        axios.get(properties.host + '/user/delete' + '?userId=' + this.$cookie.get('userId'))
+          .then((response) => {
+            // delete cookies
+            this.$cookie.delete('accessKey');
+            this.$cookie.delete('userId');
+            this.$cookie.delete('userType');
+
+            // router push to new page
+            this.$router.push('/');
           })
       }
     }

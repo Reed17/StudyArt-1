@@ -77,6 +77,10 @@ public class User {
         this.userType = userType;
     }
 
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
     public boolean isAccessable(String reqUrl) {
         return false;
     }

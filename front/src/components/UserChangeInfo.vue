@@ -14,24 +14,34 @@
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
-            <v-text-field label="New password again" counter type='password' v-model="newPassAgain" max="30"
+            <v-text-field v-bind:rules="rules" label="New password again" counter type='password' v-model="newPassAgain"
+                          max="30"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
-            <v-text-field type="password" label="Email(Left blank if you don't want to change it)"
+            <v-text-field type="email" label="Email(Left blank if you don't want to change it)"
                           counter v-model="email" max="16"
             ></v-text-field>
           </v-flex>
 
-          <h6>Result: {{result}}</h6>
-
           <v-btn primary @click.native="changePersonalInfo">Submit</v-btn>
           <v-btn primary router href="/user">Back</v-btn>
+
+          <v-alert success v-bind:value="changeOk">
+            Done.
+            <v-btn flat white router href="/user">Back</v-btn>
+          </v-alert>
+
+          <v-alert error v-bind:value="changeFailed">
+            Incorrect data.
+          </v-alert>
         </form>
 
       </v-flex>
 
     </v-layout>
+
+
 
   </v-container>
 </template>
@@ -47,21 +57,34 @@
         newPassAgain: '',
         email: '',
         result: '',
+        rules: [() => this.newPass !== this.newPassAgain ? 'Passwords do not match' : true],
+        changeOk: false,
+        changeFailed: false,
       }
     },
 
     methods: {
-        changePersonalInfo(){
-            axios.post(properties.host + "/user/change-personal-info", {
-                oldPass: this.oldPass,
-                newPass: this.newPass,
-                email: this.email,
-                userId: this.$cookie.get('userId'),
-                userType: this.$cookie.get('userType')
-            }).then((response) => {
-                this.result = response.data==undefined ? "FAILED" : "OK";
-            })
-        }
+      changePersonalInfo()
+      {
+        axios.post(properties.host + "/user/change-personal-info", {
+            oldPass: this.oldPass,
+            newPass: this.newPass,
+            email: this.email,
+            userId: this.$cookie.get('userId'),
+            userType: this.$cookie.get('userType')
+          }
+        ).then((response) => {
+          if (response.data) {
+            this.changeOk = true;
+            this.changeFailed = false;
+            this.result = "FAILED";
+          } else {
+            this.changeFailed = true;
+            this.changeOk = false;
+            this.result = "OK";
+          }
+        })
+      }
     }
   }
 </script>

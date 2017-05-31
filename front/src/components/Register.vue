@@ -26,14 +26,14 @@
           <v-btn primary router href="/login">Back</v-btn>
         </form>
 
-          <v-alert v-if="registerOk" success v-bind:value="true">
-            {{registerOkText}}
-            <v-btn flat white router href="/login">To login page</v-btn>
-          </v-alert>
+        <v-alert success v-bind:value="registerOk">
+          {{registerOkText}}
+          <v-btn flat white router href="/login">To login page</v-btn>
+        </v-alert>
 
-          <v-alert v-if="registerFail" error v-bind:value="true">
-            {{registerFailText}}
-          </v-alert>
+        <v-alert error v-bind:value="registerFail">
+          {{registerFailText}}
+        </v-alert>
 
       </v-flex>
 
@@ -62,6 +62,11 @@
 
     methods: {
       submitRegister(){
+        if (this.registerOk) {
+          this.registerOkText = 'Already registered.';
+          return;
+        }
+
         axios.post(properties.host + '/register',
           {
             login: this.login,

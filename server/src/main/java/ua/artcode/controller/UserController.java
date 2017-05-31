@@ -8,6 +8,7 @@ import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.exceptions.InvalidUserSessionException;
 import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
+import ua.artcode.model.dto.ChangeUserInfoDTO;
 import ua.artcode.model.dto.LoginRequestDTO;
 import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.model.response.GeneralResponse;
@@ -117,5 +118,34 @@ public class UserController {
 
         return new GeneralResponse(result ? ResponseType.INFO : ResponseType.ERROR, null);
     }
+
+    @ApiOperation(httpMethod = "POST",
+            value = "Change pass/email",
+            produces = "application/json")
+    @RequestMapping(value = "/user/change-personal-info", method = RequestMethod.POST)
+    public boolean changePersonalInfo(@RequestBody ChangeUserInfoDTO userInfoDTO) {
+        boolean result = userService.changePersonalInfo(userInfoDTO.getOldPass(),
+                userInfoDTO.getNewPass(),
+                userInfoDTO.getEmail(),
+                userInfoDTO.getUserId(),
+                userInfoDTO.getUserType());
+
+        LOGGER.info(String.format("Change personal info - %s", result ? "OK" : "FAILED"));
+
+        return result;
+    }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Delete an account",
+            produces = "application/json")
+    @RequestMapping(value = "/user/delete", method = RequestMethod.GET)
+    public GeneralResponse deleteAccount(@RequestParam int userId) {
+        userService.deleteAccount(userId);
+
+        LOGGER.info(String.format("Delete user with ID %d - OK", userId));
+
+        return new GeneralResponse(ResponseType.INFO, "Account deleted.");
+    }
+
 
 }
