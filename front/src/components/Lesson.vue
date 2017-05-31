@@ -6,7 +6,8 @@
         <v-spacer></v-spacer>
         <v-menu id="space" bottom left origin="top right" transition="v-scale-transition">
           <v-btn icon="icon" slot="activator" class="white--text" router :href='link'>
-            <v-icon>info</v-icon></v-btn>
+            <v-icon>info</v-icon>
+          </v-btn>
         </v-menu>
       </v-card-title>
     </v-card-row>
@@ -18,8 +19,8 @@
   export default {
     name: 'app-lesson',
     computed: {
-      link: function(){
-        return "/lessonCard/"+this.lesson.id;
+      link: function () {
+        return "/lessonCard/" + this.lesson.id;
       }
     },
     props: {

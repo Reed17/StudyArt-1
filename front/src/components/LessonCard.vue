@@ -23,7 +23,7 @@
     computed: {
       compiledMarkdown: function () {
         if (this.lesson.description != undefined)
-        return marked(this.lesson.description, {sanitize: true})
+          return marked(this.lesson.description, {sanitize: true})
       }
     },
     mounted(){

@@ -2,7 +2,7 @@
   <div id="container">
 
     <v-container>
-    <v-text-field
+      <v-text-field
         label="Filter key"
         v-model="filterKey"
       ></v-text-field>

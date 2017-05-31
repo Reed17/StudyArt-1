@@ -112,7 +112,7 @@
 
 <script>
   import axios from 'axios';
-  import properties from '../properties'
+  import properties from '../../properties'
   export default {
 
     name: 'app-user',

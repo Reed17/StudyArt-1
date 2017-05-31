@@ -1,13 +1,13 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Login from "@/components/Login";
-import Register from "@/components/Register";
 import Courses from "@/components/Courses";
 import Course from "@/components/Course";
 import AceEditor from "@/components/AceEditor";
 import LessonCard from "@/components/LessonCard"
-import User from "@/components/User"
-import UserChangeInfo from "@/components/UserChangeInfo"
+import Login from "@/components/user/Login";
+import Register from "@/components/user/Register";
+import User from "@/components/user/User"
+import UserChangeInfo from "@/components/user/UserChangeInfo"
 
 
 Vue.use(Router);
