@@ -65,7 +65,7 @@
     methods: {
       changePersonalInfo()
       {
-        axios.post(properties.host + "/user/change-personal-info", {
+        axios.post(properties.HOST + "/user/change-personal-info", {
             oldPass: this.oldPass,
             newPass: this.newPass,
             email: this.email,

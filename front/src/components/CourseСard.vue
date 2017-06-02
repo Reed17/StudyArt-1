@@ -46,7 +46,7 @@
 <script>
   import AppLesson from "./Lesson";
   import axios from 'axios';
-  import properties from '../properties'
+  import PROPERTIES from '../properties'
   export default{
     components: {AppLesson},
     name: 'course-card',
@@ -81,7 +81,7 @@
           return;
         }
 
-        axios.get(properties.host +
+        axios.get(PROPERTIES.HOST +
           '/subscribe?courseId=' + this.course.id +
           '&userId=' + this.$cookie.get('userId'))
           .then((response) => {
@@ -91,7 +91,7 @@
       },
 
       fetchSubscribed(){
-        axios.get(properties.host +
+        axios.get(PROPERTIES.HOST +
           '/getUserByAccessKey?key=' +
           this.$cookie.get('accessKey'))
           .then((response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id))

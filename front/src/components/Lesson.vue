@@ -15,6 +15,7 @@
 </template>
 
 <script>
+  // todo es6
   var marked = require('marked');
   export default {
     name: 'app-lesson',

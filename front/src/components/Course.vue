@@ -35,7 +35,7 @@
 
 <script>
   import axios from "axios";
-  import properties from '../properties'
+  import PROPERTIES from '../properties'
   export default {
     name: 'course',
     data(){
@@ -48,7 +48,7 @@
     },
     methods: {
       fetchCourse() {
-        axios.get(properties.host + '/courses/get?id=' + this.$route.params.id)
+        axios.get(PROPERTIES.HOST + '/courses/get?id=' + this.$route.params.id)
           .then((response) => {
             this.course = response.data;
           });

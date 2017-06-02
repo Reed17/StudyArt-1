@@ -11,7 +11,7 @@
 
 <script>
   import axios from "axios";
-  import properties from '../properties'
+  import PROPERTIES from '../properties'
   import marked from 'marked';
   export default {
     name: 'lesson-card',
@@ -31,7 +31,7 @@
     },
     methods: {
       fetchLesson() {
-        axios.get(properties.host + '/courses/lessons/get?id=' + this.$route.params.id)
+        axios.get(PROPERTIES.HOST + '/courses/lessons/get?id=' + this.$route.params.id)
           .then((response) => {
             this.lesson = response.data;
           });

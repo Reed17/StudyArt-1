@@ -49,12 +49,12 @@
           return;
         }
 
-        axios.post(properties.host + '/login', {
+        axios.post(properties.HOST + '/login', {
           login: this.login,
           password: this.pass
         }).then((response) => {
 
-          axios.get(properties.host + '/getUserByAccessKey' + '?key=' + response.data)
+          axios.get(properties.HOST + '/getUserByAccessKey' + '?key=' + response.data)
             .then((response) => {
               this.$cookie.set('userId', response.data.id);
               this.$cookie.set('userType', response.data.userType);

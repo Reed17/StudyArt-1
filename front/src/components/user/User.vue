@@ -129,14 +129,14 @@
 
     methods: {
       fetchUserInfo(){
-        axios.get(properties.host + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
+        axios.get(properties.HOST + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
           .then((response) => {
             this.user = response.data;
           })
       },
 
       deleteAccount(){
-        axios.get(properties.host + '/user/delete' + '?userId=' + this.$cookie.get('userId'))
+        axios.get(properties.HOST + '/user/delete' + '?userId=' + this.$cookie.get('userId'))
           .then((response) => {
             // delete cookies
             this.$cookie.delete('accessKey');

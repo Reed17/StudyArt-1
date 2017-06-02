@@ -26,7 +26,7 @@
 <script>
   import axios from "axios";
   import CourseCard from "./CourseСard";
-  import properties from "../properties"
+  import PROPERTIES from "../properties"
   export default {
     components: {CourseCard},
     name: 'courses',
@@ -53,7 +53,7 @@
 
     methods: {
       fetchCourses() {
-        axios.get(properties.host + '/courses/getAll')
+        axios.get(PROPERTIES.HOST + '/courses/getAll')
           .then((response) => {
             this.courseData = response.data;
           });

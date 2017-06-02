@@ -67,7 +67,7 @@
           return;
         }
 
-        axios.post(properties.host + '/register',
+        axios.post(properties.HOST + '/register',
           {
             login: this.login,
             email: this.email,

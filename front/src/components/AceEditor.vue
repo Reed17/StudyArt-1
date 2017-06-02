@@ -47,7 +47,7 @@
       },
 
       runCode() {
-        axios.post(properties.host + '/run-code', this.input)
+        axios.post(PROPERTIES.HOST + '/run-code', this.input)
           .then((response) => {
             this.response = response.data;
           });
