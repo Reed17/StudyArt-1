@@ -17,6 +17,7 @@ import ua.artcode.utils.ValidationUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -103,13 +104,13 @@ public class CourseServiceImpl implements CourseService {
         course.setDependencies(courseIOUtils.copyDependencies(courseLocalPath));
 
         // parse base and test classes
-        Pair<List<String>, String> baseClasses =
+        AbstractMap.SimpleEntry<List<String>, String> baseClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getBaseClasses(),
                         lesson.getSourcesRoot(),
                         courseLocalPath);
 
-        Pair<List<String>, String> testClasses =
+        AbstractMap.SimpleEntry<List<String>, String>testClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getTestsClasses(),
                         lesson.getTestsRoot(),

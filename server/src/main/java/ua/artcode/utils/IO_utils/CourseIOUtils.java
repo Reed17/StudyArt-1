@@ -22,6 +22,7 @@ import ua.artcode.utils.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -145,7 +146,7 @@ public class CourseIOUtils {
     }
 
 
-    public Pair<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths, String sourceRoot, String courseRoot) throws IOException, LessonClassPathsException {
+    public AbstractMap.SimpleEntry<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths, String sourceRoot, String courseRoot) throws IOException, LessonClassPathsException {
 
         if (sourceRoot == null) {
             if (classPaths == null || classPaths.size() == 0) {
@@ -174,7 +175,7 @@ public class CourseIOUtils {
                 map(path -> path.replace("/", File.separator))
                 .collect(Collectors.toList());
 
-        return new Pair<>(classPaths, sourceRoot.replace("/", File.separator));
+        return new AbstractMap.SimpleEntry<>(classPaths, sourceRoot.replace("/", File.separator));
     }
 
     public String[] getLessonClassAndTestsPaths
