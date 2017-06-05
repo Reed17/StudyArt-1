@@ -10,7 +10,6 @@ import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.model.Course;
-import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.response.RunResults;
@@ -64,16 +63,14 @@ public class RunServiceImpl implements RunService {
 
 
     @Override
-    public RunResults runLessonWithSolutionTests(int courseID, int lessonID, CourseFromUser userCource) throws Exception {
+    public RunResults runLessonWithSolutionTests(int lessonID, String url) throws Exception {
 
         Lesson lesson = lessonDB.findOne(lessonID);
-        Course course = courseDB.findOne(courseID);
-
-        String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), course.getName(), userCource.getId());
-
-
         resultChecker.checkNull(lesson, "Lesson not found!");
+        Course course = courseDB.findOne(lesson.getCourseID());
         resultChecker.checkNull(course, "Course not found!");
+
+        String projectLocalPath = courseIOUtils.saveCourseLocally(url, course.getName(), course.getId());
 
         String[] classPaths =
                 courseIOUtils.getLessonClassAndTestsPaths(

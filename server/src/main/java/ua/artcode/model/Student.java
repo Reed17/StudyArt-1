@@ -16,28 +16,11 @@ import static ua.artcode.enums.UserType.STUDENT;
 public class Student extends User {
 
     private static final Map<String, Boolean> STUDENT_RIGHTS = createRightsMap();
-
-    private static Map<String, Boolean> createRightsMap() {
-        Map<String, Boolean> map = new ConcurrentHashMap<>();
-
-        map.put("/courses/lessons/get", true);
-        map.put("/courses/get", true);
-        map.put("/courses/lessons/getAll", true);
-        map.put("/courses/add", false);
-        map.put("/run-class", true);
-        map.put("/courses/lessons/run", true);
-        map.put("/courses/lessons/add", false);
-        map.put("/courses/lessons/send-solution-and-run-tests", true);
-
-        return map;
-    }
-
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "STUDENT_SUBSCRIBED",
             joinColumns = {@JoinColumn(name = "USER_ID")},
             inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
     private Set<Course> subscribed;
-
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "STUDENT_COMPLETED",
             joinColumns = {@JoinColumn(name = "USER_ID")},
@@ -52,6 +35,21 @@ public class Student extends User {
         super(login, pass, email, STUDENT);
         subscribed = new HashSet<>();
         completed = new HashSet<>();
+    }
+
+    private static Map<String, Boolean> createRightsMap() {
+        Map<String, Boolean> map = new ConcurrentHashMap<>();
+
+        map.put("/courses/lessons/get", true);
+        map.put("/courses/get", true);
+        map.put("/courses/lessons/getAll", true);
+        map.put("/courses/add", false);
+        map.put("/run-class", true);
+        map.put("/courses/lessons/run", true);
+        map.put("/courses/lessons/add", false);
+        map.put("/courses/lessons/send-solution-and-run-tests", true);
+
+        return map;
     }
 
     public Set<Course> getSubscribed() {

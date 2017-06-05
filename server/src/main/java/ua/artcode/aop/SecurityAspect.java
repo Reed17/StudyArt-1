@@ -1,9 +1,6 @@
-
 package ua.artcode.aop;
 
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.Logger;
@@ -17,16 +14,14 @@ import ua.artcode.model.User;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
-import java.util.Enumeration;
 
 @Aspect
 @Component
 public class SecurityAspect {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAspect.class);
     @Autowired
     private SessionRepository sessionDB;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityAspect.class);
 
     @Before("execution(* ua.artcode.controller.CourseController.*(..))")
     public void securityCheck(JoinPoint joinPoint) throws Throwable {
@@ -34,7 +29,7 @@ public class SecurityAspect {
 
         HttpServletRequest req = (HttpServletRequest) Arrays.stream(args).filter(a -> a.getClass().equals(HttpServletRequest.class)).findFirst().orElse(null);
 
-        if(req == null) return;
+        if (req == null) return;
 
         LOGGER.info(req.getRequestURI());
 
@@ -42,15 +37,15 @@ public class SecurityAspect {
 
         String sessionKey = Arrays.stream(cookies).filter(c -> c.getName().equals("Access-Key")).findFirst().get().getValue();
 
-        if(sessionKey == null || sessionKey.equals("")) {
+        if (sessionKey == null || sessionKey.equals("")) {
             throw new InvalidUserSessionException("No user with this session id");
         }
 
         User user = sessionDB.findOne(sessionKey).getUser();
 
-        if(user == null) throw new InvalidUserSessionException("No user with this session id");
+        if (user == null) throw new InvalidUserSessionException("No user with this session id");
 
-        if(!user.isAccessable(req.getRequestURI())) throw new SecurityException("No rights for that action");
+        if (!user.isAccessable(req.getRequestURI())) throw new SecurityException("No rights for that action");
     }
 
 

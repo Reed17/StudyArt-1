@@ -15,7 +15,6 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import ua.artcode.model.Course;
-import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 
@@ -29,7 +28,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @RunWith(SpringRunner.class)
@@ -64,7 +64,7 @@ public class CourseControllerTest {
     }
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         mockMvc.perform(post("/register?login=Username1&email=42004200zhenia@gmail.com&pass=password1&type=teacher"));
         mockMvc.perform(post("/register?login=Username2&email=zheniatrochun@ukr.net&pass=password1&type=student"));
 
@@ -79,7 +79,7 @@ public class CourseControllerTest {
                 .getContentAsString();
 
         File dependencies = new File(dependenciesPath);
-        if(!dependencies.exists()){
+        if (!dependencies.exists()) {
             dependencies.mkdir();
         }
     }
@@ -109,8 +109,8 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("first_lesson"))
                 .andExpect(jsonPath("$.courseID").value(1))
-                .andExpect(jsonPath("$.sourcesRoot").value("courses"+File.separator+"1someCourse"+
-                        File.separator+"src"+File.separator+"main"+File.separator+"java"+File.separator+"_02_lesson"))
+                .andExpect(jsonPath("$.sourcesRoot").value("courses" + File.separator + "1someCourse" +
+                        File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator + "_02_lesson"))
                 .andExpect(jsonPath("$.description").value("First test lesson"));
     }
 
@@ -186,16 +186,8 @@ public class CourseControllerTest {
         addCourse();
         addLesson();
 
-        CourseFromUser courseFromUser = new CourseFromUser();
-        courseFromUser.setName("someCourse");
-        courseFromUser.setUrl(gitURL);
-        courseFromUser.setId(1);
-
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=1")
-                .cookie(new Cookie("Access-Key", studentKey))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(courseFromUser))
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/courses/lessons/send-solution-and-run-tests?lessonId=1&url=" + gitURL)
+                .cookie(new Cookie("Access-Key", studentKey)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.methodResult.systemOut").value(""))
                 .andExpect(jsonPath("$.methodStats.passedTests").value(1));
@@ -205,16 +197,9 @@ public class CourseControllerTest {
     public void testRunLessonNegative() throws Exception {
         addCourse();
 
-        CourseFromUser courseFromUser = new CourseFromUser();
-        courseFromUser.setName("someCourse");
-        courseFromUser.setUrl(gitURL);
-        courseFromUser.setId(1);
 
-        mockMvc.perform(post("/courses/lessons/send-solution-and-run-tests?courseId=1&lessonNumber=2")
-                .cookie(new Cookie("Access-Key", studentKey))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(mapper.writeValueAsString(courseFromUser))
-                .accept(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/courses/lessons/send-solution-and-run-tests?lessonId=2&url=" + gitURL)
+                .cookie(new Cookie("Access-Key", studentKey)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.generalResponse.type").value("ERROR"));
     }

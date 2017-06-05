@@ -17,6 +17,20 @@ public class Teacher extends User {
     //TODO add more cpecific fields
 
     private static final Map<String, Boolean> TEACHER_RIGHTS = createRightsMap();
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "TEACHER_CORSES",
+            joinColumns = {@JoinColumn(name = "USER_ID")},
+            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
+    private List<Course> courses;
+
+    public Teacher(String login, String pass, String email) {
+        super(login, pass, email, TEACHER);
+        courses = new ArrayList<>();
+    }
+
+    public Teacher() {
+        userType = TEACHER;
+    }
 
     private static Map<String, Boolean> createRightsMap() {
         Map<String, Boolean> map = new ConcurrentHashMap<>();
@@ -31,21 +45,6 @@ public class Teacher extends User {
         map.put("/courses/lessons/send-solution-and-run-tests", true);
 
         return map;
-    }
-
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "TEACHER_CORSES",
-            joinColumns = {@JoinColumn(name = "USER_ID")},
-            inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
-    private List<Course> courses;
-
-    public Teacher(String login, String pass, String email) {
-        super(login, pass, email, TEACHER);
-        courses = new ArrayList<>();
-    }
-
-    public Teacher() {
-        userType = TEACHER;
     }
 
     public List<Course> getCourses() {

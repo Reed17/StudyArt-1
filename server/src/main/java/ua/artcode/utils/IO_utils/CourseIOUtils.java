@@ -1,6 +1,5 @@
 package ua.artcode.utils.IO_utils;
 
-import javafx.util.Pair;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
 import org.apache.maven.shared.invoker.MavenInvocationException;
@@ -35,6 +34,10 @@ import java.util.stream.Collectors;
 public class CourseIOUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseIOUtils.class);
+    private final CommonIOUtils commonIOUtils;
+    private final CourseRepository courseRepository;
+    private final InvocationRequest request;
+    private final Invoker invoker;
     @Value("${application.courses.paths.git}")
     private String localPathForProjects;
     @Value("${application.courses.paths.externalCode}")
@@ -49,14 +52,6 @@ public class CourseIOUtils {
     private String dependenciesPath;
     @Value("${maven.embedded.path}")
     private String embeddedMavenExecutablePath;
-
-    private final CommonIOUtils commonIOUtils;
-
-    private final CourseRepository courseRepository;
-
-    private final InvocationRequest request;
-
-    private final Invoker invoker;
 
     @Autowired
     public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {

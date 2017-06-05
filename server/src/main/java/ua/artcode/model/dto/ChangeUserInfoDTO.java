@@ -6,10 +6,10 @@ import ua.artcode.enums.UserType;
  * Created by v21k on 30.05.17.
  */
 public class ChangeUserInfoDTO {
+    int userId;
     private String oldPass;
     private String newPass;
     private String email;
-    int userId;
     private UserType userType;
 
     public ChangeUserInfoDTO() {

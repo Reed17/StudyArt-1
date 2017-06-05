@@ -1,9 +1,0 @@
-front:
-  build: ./front
-  ports:
-    - "8081:8081"
-
-server:
-  build: ./server
-  ports:
-    - "8080:8080"

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.SuchCourseAlreadyExists;
 import ua.artcode.model.Course;
-import ua.artcode.model.CourseFromUser;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.response.GeneralResponse;
@@ -124,14 +123,13 @@ public class CourseController {
             notes = "Runs a tests for a certain lesson",
             response = GeneralResponse.class,
             produces = "application/json")
-    @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.POST)
-    public RunResults runLessonWithSolutionTests(@RequestParam int courseId,
-                                                 @RequestParam int lessonNumber,
-                                                 @RequestBody @Valid CourseFromUser userCourse,
+    @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.GET)
+    public RunResults runLessonWithSolutionTests(@RequestParam int lessonId,
+                                                 @RequestParam String url,
                                                  HttpServletRequest request) {
         try {
-            RunResults results = runService.runLessonWithSolutionTests(courseId, lessonNumber, userCourse);
-            LOGGER.info("Run class with solution (course ID: {}, lesson number: {}) - OK", courseId, lessonNumber);
+            RunResults results = runService.runLessonWithSolutionTests(lessonId, url);
+            LOGGER.info("Run class with solution (lesson ID: {}) - OK", lessonId);
             return results;
         } catch (Exception e) {
             LOGGER.error("Run class from lesson with solution - FAILED", e);

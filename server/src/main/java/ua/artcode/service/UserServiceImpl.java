@@ -22,6 +22,7 @@ import static ua.artcode.enums.UserType.TEACHER;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static Logger LOGGER = Logger.getLogger(UserServiceImpl.class);
     private final TeacherRepository teacherDB;
     private final StudentRepository studentDB;
     private final ValidationUtils validationUtils;
@@ -30,11 +31,8 @@ public class UserServiceImpl implements UserService {
     private final MailUtils mu;
     private final ResultChecker resultChecker;
     private final CourseRepository courseRepository;
-
     @Value("${email.user}")
     private String emailUsername;
-
-    private static Logger LOGGER = Logger.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils,

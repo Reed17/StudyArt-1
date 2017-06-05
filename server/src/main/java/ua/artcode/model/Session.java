@@ -1,6 +1,5 @@
 package ua.artcode.model;
 
-import org.hibernate.annotations.Columns;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;

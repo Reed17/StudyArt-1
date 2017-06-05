@@ -1,6 +1,5 @@
 package ua.artcode.service;
 
-import javafx.util.Pair;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +109,7 @@ public class CourseServiceImpl implements CourseService {
                         lesson.getSourcesRoot(),
                         courseLocalPath);
 
-        AbstractMap.SimpleEntry<List<String>, String>testClasses =
+        AbstractMap.SimpleEntry<List<String>, String> testClasses =
                 courseIOUtils.ensureLessonClassPathsAndRoot(
                         lesson.getTestsClasses(),
                         lesson.getTestsRoot(),

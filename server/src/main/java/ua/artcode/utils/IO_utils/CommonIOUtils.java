@@ -1,16 +1,13 @@
 package ua.artcode.utils.IO_utils;
 
 import org.springframework.stereotype.Component;
-import ua.artcode.exceptions.ValidationException;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * Created by v21k on 15.04.17.

@@ -45,12 +45,24 @@ public class User {
         return login;
     }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
     public String getPass() {
         return pass;
     }
 
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
     public boolean isActivated() {
         return isActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        isActivated = activated;
     }
 
     public void activate() {
@@ -61,24 +73,12 @@ public class User {
         return id;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public void setActivated(boolean activated) {
-        isActivated = activated;
-    }
-
     public UserType getUserType() {
         return userType;
     }
 
     public void setUserType(UserType userType) {
         this.userType = userType;
-    }
-
-    public void setPass(String pass) {
-        this.pass = pass;
     }
 
     public boolean isAccessable(String reqUrl) {

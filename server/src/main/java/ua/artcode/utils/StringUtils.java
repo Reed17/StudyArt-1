@@ -1,7 +1,5 @@
 package ua.artcode.utils;
 
-import ua.artcode.model.ExternalCode;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -42,7 +40,7 @@ public class StringUtils {
         return path.replace(File.separator + File.separator, File.separator);
     }
 
-    public static String checkStartsWithAndAppend(String source, String startsWith){
+    public static String checkStartsWithAndAppend(String source, String startsWith) {
         return source.startsWith(startsWith) ? source : startsWith + source;
     }
 }
