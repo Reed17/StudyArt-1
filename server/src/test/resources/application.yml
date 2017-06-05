@@ -9,7 +9,7 @@ application:
     paths:
       git: courses
       externalCode: temp
-      dependencies : dependencies
+      dependencies: server/dependencies
 
   profiling: true
 

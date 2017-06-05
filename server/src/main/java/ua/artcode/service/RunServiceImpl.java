@@ -66,10 +66,11 @@ public class RunServiceImpl implements RunService {
     @Override
     public RunResults runLessonWithSolutionTests(int courseID, int lessonID, CourseFromUser userCource) throws Exception {
 
-        String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), userCource.getName(), userCource.getId());
-
         Lesson lesson = lessonDB.findOne(lessonID);
         Course course = courseDB.findOne(courseID);
+
+        String projectLocalPath = courseIOUtils.saveCourseLocally(userCource.getUrl(), course.getName(), userCource.getId());
+
 
         resultChecker.checkNull(lesson, "Lesson not found!");
         resultChecker.checkNull(course, "Course not found!");
