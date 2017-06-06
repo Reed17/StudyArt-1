@@ -1,5 +1,6 @@
 package ua.artcode.service;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.core.RunCore;
@@ -90,6 +91,8 @@ public class RunServiceImpl implements RunService {
                 MethodCheckers.testChecker,
                 Runners.test,
                 ResultsProcessors.main);
+
+        FileUtils.deleteDirectory(new File(projectLocalPath));
 
         return results;
     }
