@@ -11,3 +11,6 @@ RUN npm install
 EXPOSE 8081
 
 CMD npm run dev
+
+# docker build -t front-image .
+# docker run -it -v /home/v21k/dev/projects/StudyArt/front:usr/src/study-art-front -p 8081:8081 front-image

@@ -26,10 +26,11 @@ CMD mvn clean package -DskipTests=true \
 --application.courses.paths.dependencies=/usr/src/study-art-front/dependencies \
 --spring.datasource.url=jdbc:h2:file:/usr/src/study-art-front/db/studyArt;DB_CLOSE_ON_EXIT=FALSE
 
-#docker run -it \
-#-v /home/v21k/dev/projects/StudyArt/db:/usr/src/study-art-front/db \
-#-v /home/v21k/dev/projects/StudyArt/logs:/usr/src/study-art-front/logs \
-#-v /home/v21k/dev/projects/StudyArt/server/dependencies:/usr/src/study-art-front/dependencies \
-#-v $HOME/.m2:/root/.m2 \
-#-p 8080:8080 \
-# server2
+# docker build -t server-image .
+# docker run -it \
+# -v /home/v21k/dev/projects/StudyArt/db:/usr/src/study-art-front/db \
+# -v /home/v21k/dev/projects/StudyArt/logs:/usr/src/study-art-front/logs \
+# -v /home/v21k/dev/projects/StudyArt/server/dependencies:/usr/src/study-art-front/dependencies \
+# -v $HOME/.m2:/root/.m2 \
+# -p 8080:8080 \
+# server-image
