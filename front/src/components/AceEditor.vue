@@ -11,13 +11,12 @@
            @code-change="getCode($event)">
     </brace>
     <div>
-      <v-btn dark default>Run code</v-btn>
+      <v-btn dark default @click.native="runCode()">Run code</v-btn>
 
       <v-text-field
         name="input-7-1"
         label="Result"
         :value="response"
-        @click="runCode()"
         multi-line
         disabled>
       </v-text-field>
@@ -28,6 +27,8 @@
 
 <script>
   import Brace from 'vue-bulma-brace'
+  import axios from "axios";
+  import PROPERTIES from '../properties'
 
   export default {
     data(){
@@ -47,9 +48,12 @@
       },
 
       runCode() {
-        axios.post(PROPERTIES.HOST + '/run-code', this.input)
+        var j ={"sourceCode":this.input};
+        var f= JSON.stringify(j);
+        var s =f;
+        axios.post(PROPERTIES.HOST + '/run-class', j)
           .then((response) => {
-            this.response = response.data;
+            this.response = JSON.stringify(response.data);
           });
       },
     }
