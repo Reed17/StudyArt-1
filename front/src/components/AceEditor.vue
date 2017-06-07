@@ -48,10 +48,8 @@
       },
 
       runCode() {
-        var j ={"sourceCode":this.input};
-        var f= JSON.stringify(j);
-        var s =f;
-        axios.post(PROPERTIES.HOST + '/run-class', j)
+        var code ={"sourceCode":this.input};
+        axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
             this.response = JSON.stringify(response.data);
           });
