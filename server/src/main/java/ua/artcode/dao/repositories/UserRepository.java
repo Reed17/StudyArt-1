@@ -8,6 +8,6 @@ import ua.artcode.model.User;
 public interface UserRepository<T extends User> extends CrudRepository<T, Integer> {
     T findByEmail(String email);
 
-    T findByLogin(String login);
+    T findByUsername(String username);
 
 }

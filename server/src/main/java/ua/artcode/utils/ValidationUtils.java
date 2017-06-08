@@ -57,8 +57,8 @@ public class ValidationUtils {
     }
 
     public boolean checkLoginOriginality(String login, TeacherRepository teacherRepository, StudentRepository studentRepository) {
-        return (teacherRepository.findByLogin(login) == null
-                && studentRepository.findByLogin(login) == null);
+        return (teacherRepository.findByUsername(login) == null
+                && studentRepository.findByUsername(login) == null);
     }
 
     public boolean checkEmailOriginality(String email, TeacherRepository teacherRepository, StudentRepository studentRepository) {

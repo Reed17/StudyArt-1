@@ -4,7 +4,7 @@
       <v-card>
         <v-card-row>
           <v-card-title>
-            <span>Username: {{user.login}}</span>
+            <span>Username: {{user.username}}</span>
             <v-spacer></v-spacer>
 
           </v-card-title>

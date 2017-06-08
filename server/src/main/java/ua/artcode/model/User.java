@@ -15,8 +15,8 @@ public class User {
     @Column(name = "USER_ID")
     protected int id;
     @Column(unique = true)
-    protected String login;
-    protected String pass;
+    protected String username;
+    protected String password;
     @Column(unique = true)
     protected String email;
     protected boolean isActivated;
@@ -25,9 +25,9 @@ public class User {
     public User() {
     }
 
-    public User(String login, String pass, String email, UserType userType) {
-        this.login = login;
-        this.pass = pass;
+    public User(String login, String password, String email, UserType userType) {
+        this.username = login;
+        this.password = password;
         this.email = email;
         this.userType = userType;
         this.isActivated = false;
@@ -41,20 +41,20 @@ public class User {
         this.email = email;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public String getPass() {
-        return pass;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPass(String pass) {
-        this.pass = pass;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public boolean isActivated() {

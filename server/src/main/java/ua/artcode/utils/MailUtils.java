@@ -35,7 +35,7 @@ public class MailUtils {
     }
 
     public String getActivationLink(User user) {
-        return user.getLogin() + ", to activate your account go to: " + serverLink + "/activate&id=" + user.getId();
+        return user.getUsername() + ", to activate your account go to: " + serverLink + "/activate&id=" + user.getId();
     }
 
     public MailSender getMailSender() {

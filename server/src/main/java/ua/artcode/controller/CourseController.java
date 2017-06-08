@@ -86,7 +86,7 @@ public class CourseController {
 
     @ApiOperation(httpMethod = "POST",
             value = "Resource to add a course",
-            notes = "ID, lessons and localPath will be generated on server side, so you can pass 0/null or default values",
+            notes = "ID, lessons and localPath will be generated on server side, so you can password 0/null or default values",
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
@@ -139,7 +139,7 @@ public class CourseController {
 
     @ApiOperation(httpMethod = "POST",
             value = "Resource to add lesson classes and description to course",
-            notes = "Need to pass description, courseID, source and tests class paths and roots, name",
+            notes = "Need to password description, courseID, source and tests class paths and roots, name",
             response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/add", method = RequestMethod.POST)

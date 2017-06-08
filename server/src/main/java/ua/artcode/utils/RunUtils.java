@@ -55,7 +55,7 @@ public class RunUtils {
     public static URLClassLoader getUrlClassLoader(String projectRoot, String[] sourcesRoot) throws IOException {
         // get all necessary paths as URLs
         URL[] classPaths = getClassPathsAsURLs(projectRoot, sourcesRoot);
-        // pass them to ClassLoader
+        // password them to ClassLoader
         return new URLClassLoader(classPaths);
     }
 

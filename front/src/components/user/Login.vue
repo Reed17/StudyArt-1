@@ -4,10 +4,10 @@
       <v-flex sm6 offset-sm3>
         <form>
           <v-flex xs12>
-            <v-text-field label="Login" type="text" v-model="login" max="16"></v-text-field>
+            <v-text-field label="Login" type="text" v-model="username" max="16"></v-text-field>
           </v-flex>
           <v-flex xs12>
-            <v-text-field label="Password" type="password" counter v-model="pass" max="30"></v-text-field>
+            <v-text-field label="Password" type="password" counter v-model="password" max="30"></v-text-field>
           </v-flex>
           <v-btn primary @click.native="submitLogin">Submit</v-btn>
           <v-btn primary router href="/register">Register</v-btn>
@@ -27,13 +27,15 @@
 
 <script>
   import axios from 'axios';
-  import properties from '../../properties'
+  import cryptoJS from 'crypto-js';
+  import $ from 'jquery';
+  import PROPERTIES from '../../properties'
   export default {
 
     data () {
       return {
-        login: '',
-        pass: '',
+        username: '',
+        password: '',
         text: 'Logged in!',
         loginOk: false,
         loginFail: false,
@@ -42,34 +44,75 @@
       }
     },
     methods: {
+
+      login(){
+        const pass = cryptoJS.MD5(this.password).toString();
+
+        const axiosConfig = {
+          baseURL: PROPERTIES.HOST,
+          data: {"username": this.username, "password": pass},
+          headers: {
+            'Content-Type': 'text/plain'
+          },
+          method: "post",
+          url: "/login",
+          withCredentials: true,
+        };
+        return axios(axiosConfig);
+      },
+
+
       submitLogin(){
-        if (this.$cookie.get('accessKey')) {
-          this.loginOk = true;
-          this.loginOkText = "Already logged in!";
-          return;
-        }
 
-        axios.post(properties.HOST + '/login', {
-          login: this.login,
-          password: this.pass
-        }).then((response) => {
+         /* // todo replace with token
+         if (this.$cookie.get('accessKey')) {
+         this.loginOk = true;
+         this.loginOkText = "Already logged in!";
+         return;
+         }*/
 
-          axios.get(properties.HOST + '/getUserByAccessKey' + '?key=' + response.data)
-            .then((response) => {
-              this.$cookie.set('userId', response.data.id);
-              this.$cookie.set('userType', response.data.userType);
+        this.login()
+          .then((response) => {
+
+            this.$cookie.set('token', response.headers.authorization);
+            this.$cookie.set('username', this.username);
+
+
+            const authorization = this.$cookie.get('token');
+
+            /*
+             const axiosConfig = {
+             method: 'get',
+             baseURL: PROPERTIES.HOST,
+             url: '/findByUsername?username=' + this.username,
+             withCredentials: true,
+             headers: {
+             'Authorization' : authorization
+             }
+             };
+             */
+
+            axios.get(PROPERTIES.HOST + '/findByUsername?username=' + this.username, {
+              header: {
+                Authorization: authorization
+              }
+            }).then((response) => {
+              debugger;
+
+              this.loginOkText = 'Welcome to StudyArt!';
+              this.loginFail = false;
+              this.loginOk = true;
+
+            }).catch((error) => {
+              debugger;
             });
 
-          this.$cookie.set('accessKey', response.data);
-          this.$cookie.set('username', this.login);
 
-          this.loginOkText = 'Welcome to StudyArt!';
-          this.loginFail = false;
-          this.loginOk = true;
-        }).catch(() => {
-          this.loginFail = true;
-          this.loginOk = false;
-        })
+          })
+          .catch(() => {
+            this.loginFail = true;
+            this.loginOk = false;
+          })
       },
     }
   }

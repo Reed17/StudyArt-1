@@ -71,7 +71,7 @@ public class ValidationUtilsTest {
 
     @Test
     public void passValidationNegativeTest() {
-        assertThat(validationUtils.passValidation("pass"), is(false));
+        assertThat(validationUtils.passValidation("password"), is(false));
         assertThat(validationUtils.passValidation("?password"), is(false));
         assertThat(validationUtils.passValidation("too_long_password"), is(false));
     }

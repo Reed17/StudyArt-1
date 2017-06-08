@@ -4,23 +4,23 @@ package ua.artcode.model.dto;
  * Created by Алексей on 28.05.2017.
  */
 public class LoginRequestDTO {
-    public String login;
+    public String username;
     public String password;
 
-    public LoginRequestDTO(String login, String password) {
-        this.login = login;
+    public LoginRequestDTO(String username, String password) {
+        this.username = username;
         this.password = password;
     }
 
     public LoginRequestDTO() {
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

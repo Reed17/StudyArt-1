@@ -4,18 +4,14 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.dao.repositories.SessionRepository;
-import ua.artcode.exceptions.InvalidUserSessionException;
+import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.UnexpectedNullException;
 import ua.artcode.model.User;
 import ua.artcode.model.dto.ChangeUserInfoDTO;
-import ua.artcode.model.dto.LoginRequestDTO;
 import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.service.UserServiceImpl;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by zhenia on 27.04.17.
@@ -25,19 +21,12 @@ import javax.servlet.http.HttpServletRequest;
 public class UserController {
     private static final Logger LOGGER = Logger.getLogger(UserController.class);
 
-//    private final StudentService studentService;
-//
-//    private final TeacherService teacherService;
-
-    private final UserServiceImpl userService;
-
-    private final SessionRepository sessionDB;
 
     @Autowired
-    public UserController(UserServiceImpl userService, SessionRepository sessionDB) {
+    private final UserServiceImpl userService;
+
+    public UserController(UserServiceImpl userService) {
         this.userService = userService;
-        this.sessionDB = sessionDB;
-//        this.teacherService = teacherService;
     }
 
     @ApiOperation(httpMethod = "POST",
@@ -57,26 +46,6 @@ public class UserController {
         return newUser;
     }
 
-    @ApiOperation(httpMethod = "POST",
-            value = "Resource to register new user",
-            response = User.class,
-            produces = "text/plain")
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    // todo usecure passing of params
-    // return general response
-    // see how to throw an exception to client, ExceptionHandler
-    public String loginUser(@RequestBody LoginRequestDTO loginRequestDTO,
-                            HttpServletRequest request) throws Throwable { // todo not throwable, more readable exceptions, not only error code
-        String newUserKey = userService.login(loginRequestDTO.login,
-                loginRequestDTO.password);
-
-        LOGGER.info("Login - OK, id = " + sessionDB.findOne(newUserKey).getUser().getId());
-
-
-        return newUserKey;
-    }
-
-
     @ApiOperation(httpMethod = "GET",
             value = "Resource to activate user account",
             response = User.class,
@@ -92,14 +61,15 @@ public class UserController {
     }
 
     @ApiOperation(httpMethod = "GET",
-            value = "Get user by access key",
+            value = "Get user by name",
             response = User.class,
             produces = "application/json")
-    @RequestMapping(value = "/getUserByAccessKey", method = RequestMethod.GET)
-    public User getUserByAccessKey(@RequestParam String key) throws InvalidUserSessionException {
-        User found = userService.find(key);
+    @RequestMapping(value = "/findByUsername", method = RequestMethod.GET)
+    public User getUserByAccessKey(@RequestParam String username) throws InvalidUserLoginException {
+        User found = userService.findByUserName(username);
+        found.setPassword(null);
 
-        LOGGER.info("User find by access key - OK, id = " + found.getId());
+        LOGGER.info("User find by username - OK, id = " + found.getId());
 
         return found;
     }
@@ -120,7 +90,7 @@ public class UserController {
     }
 
     @ApiOperation(httpMethod = "POST",
-            value = "Change pass/email",
+            value = "Change password/email",
             produces = "application/json")
     @RequestMapping(value = "/user/change-personal-info", method = RequestMethod.POST)
     public boolean changePersonalInfo(@RequestBody ChangeUserInfoDTO userInfoDTO) {

@@ -23,11 +23,11 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn v-if="!this.$cookie.get('accessKey')" flat router href="/login">
+      <v-btn v-if="!this.$cookie.get('token')" flat router href="/login">
         Sign in
       </v-btn>
 
-      <v-menu v-if="this.$cookie.get('accessKey')" >
+      <v-menu v-if="this.$cookie.get('token')" >
         <v-btn primary slot="activator">{{this.$cookie.get('username')}}</v-btn>
         <v-list>
           <v-list-item>
@@ -94,7 +94,7 @@
     },
     methods: {
         logout(){
-            this.$cookie.delete('accessKey');
+            this.$cookie.delete('token');
             this.$cookie.delete('username');
             this.$forceUpdate();
         }

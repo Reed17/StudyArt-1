@@ -65,15 +65,15 @@ public class CourseControllerTest {
 
     @Before
     public void setUp() throws Exception {
-        mockMvc.perform(post("/register?login=Username1&email=42004200zhenia@gmail.com&pass=password1&type=teacher"));
-        mockMvc.perform(post("/register?login=Username2&email=zheniatrochun@ukr.net&pass=password1&type=student"));
+        mockMvc.perform(post("/register?username=Username1&email=42004200zhenia@gmail.com&password=password1&type=teacher"));
+        mockMvc.perform(post("/register?username=Username2&email=zheniatrochun@ukr.net&password=password1&type=student"));
 
-        teacherKey = mockMvc.perform(post("/login?login=Username1&pass=password1"))
+        teacherKey = mockMvc.perform(post("/username?username=Username1&password=password1"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
 
-        studentKey = mockMvc.perform(post("/login?login=Username2&pass=password1"))
+        studentKey = mockMvc.perform(post("/username?username=Username2&password=password1"))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();

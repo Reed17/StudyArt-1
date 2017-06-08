@@ -9,8 +9,14 @@ import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.enums.UserType;
-import ua.artcode.exceptions.*;
-import ua.artcode.model.*;
+import ua.artcode.exceptions.InvalidUserEmailException;
+import ua.artcode.exceptions.InvalidUserLoginException;
+import ua.artcode.exceptions.InvalidUserPassException;
+import ua.artcode.exceptions.UnexpectedNullException;
+import ua.artcode.model.Course;
+import ua.artcode.model.Student;
+import ua.artcode.model.Teacher;
+import ua.artcode.model.User;
 import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
@@ -23,6 +29,7 @@ import static ua.artcode.enums.UserType.TEACHER;
 public class UserServiceImpl implements UserService {
 
     private static Logger LOGGER = Logger.getLogger(UserServiceImpl.class);
+
     private final TeacherRepository teacherDB;
     private final StudentRepository studentDB;
     private final ValidationUtils validationUtils;
@@ -35,9 +42,7 @@ public class UserServiceImpl implements UserService {
     private String emailUsername;
 
     @Autowired
-    public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils,
-                           SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu,
-                           ResultChecker resultChecker, CourseRepository courseRepository) {
+    public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils, SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu, ResultChecker resultChecker, CourseRepository courseRepository) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
@@ -47,6 +52,7 @@ public class UserServiceImpl implements UserService {
         this.resultChecker = resultChecker;
         this.courseRepository = courseRepository;
     }
+
 
     @Override
     public User register(String login, String pass, String email, UserType type)
@@ -85,47 +91,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String login(String login, String pass) throws InvalidLoginInfo {
-
-        User loginResult;
-
-        boolean validatedPass = validationUtils.passValidation(pass);
-
-        if (!validationUtils.emailValidation(login) && !validationUtils.loginValidation(login)) {
-            LOGGER.error(String.format("Login %s has wrong format", login));
-            throw new InvalidLoginInfo("Wrong login format");
-
+    public User findByUserName(String userName) throws InvalidUserLoginException {
+        Teacher teacher = teacherDB.findByUsername(userName);
+        Student student = studentDB.findByUsername(userName);
+        if (student == null && teacher == null) {
+            throw new InvalidUserLoginException("User with name " + userName + " not found.");
         }
-        if (validatedPass) {
-            pass = securityUtils.encryptPass(pass);
-
-            loginResult = teacherDB.findByEmail(login) == null ?
-                    studentDB.findByEmail(login) : teacherDB.findByEmail(login);
-            if (loginResult == null) {
-                loginResult = teacherDB.findByLogin(login) == null ?
-                        studentDB.findByLogin(login) : teacherDB.findByLogin(login);
-            }
-
-            if (loginResult != null && loginResult.getPass().equals(pass)) {
-                Session session = sessionDB.findByUser(loginResult);
-
-                if (session == null)
-                    return sessionDB.save(new Session(loginResult)).getAccessKey();
-                else
-                    return session.getAccessKey();
-            }
-        }
-        LOGGER.error(String.format("User with login %s doesn't exist", login));
-        throw new InvalidLoginInfo("User doesn't exists");
-    }
-
-    @Override
-    public User find(String accessKey) throws InvalidUserSessionException {
-        Session session = sessionDB.findOne(accessKey);
-        if (session == null) {
-            throw new InvalidUserSessionException("Session not found.");
-        }
-        return session.getUser();
+        return teacher != null ? teacher : student;
     }
 
     @Override
@@ -140,15 +112,15 @@ public class UserServiceImpl implements UserService {
     public boolean changePersonalInfo(String oldPass, String newPass, String email, int userId, UserType userType) {
         if (userType.equals(TEACHER)) {
             Teacher teacher = teacherDB.findOne(userId);
-            if (teacher.getPass().equals(securityUtils.encryptPass(oldPass))) {
-                teacher.setPass(securityUtils.encryptPass(newPass));
+            if (teacher.getPassword().equals(securityUtils.encryptPass(oldPass))) {
+                teacher.setPassword(securityUtils.encryptPass(newPass));
                 teacher.setEmail(email.isEmpty() ? teacher.getEmail() : email);
                 return teacherDB.save(teacher) != null;
             }
         } else {
             Student student = studentDB.findOne(userId);
-            if (student.getPass().equals(securityUtils.encryptPass(oldPass))) {
-                student.setPass(securityUtils.encryptPass(newPass));
+            if (student.getPassword().equals(securityUtils.encryptPass(oldPass))) {
+                student.setPassword(securityUtils.encryptPass(newPass));
                 student.setEmail(email.isEmpty() ? student.getEmail() : email);
                 return studentDB.save(student) != null;
             }

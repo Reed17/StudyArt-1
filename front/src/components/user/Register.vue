@@ -6,7 +6,7 @@
       <v-flex sm6 offset-sm3>
         <form>
           <v-flex xs12>
-            <v-text-field label="Login" counter v-model="login" max="16"
+            <v-text-field label="Login" counter v-model="username" max="16"
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
@@ -14,7 +14,7 @@
             ></v-text-field>
           </v-flex>
           <v-flex xs12>
-            <v-text-field type="password" label="Password" counter v-model="pass" max="16"
+            <v-text-field type="password" label="Password" counter v-model="password" max="16"
             ></v-text-field>
           </v-flex>
 
@@ -23,12 +23,12 @@
           </v-flex>
 
           <v-btn primary @click.native="submitRegister">Submit</v-btn>
-          <v-btn primary router href="/login">Back</v-btn>
+          <v-btn primary router href="/username">Back</v-btn>
         </form>
 
         <v-alert success v-bind:value="registerOk">
           {{registerOkText}}
-          <v-btn flat white router href="/login">To login page</v-btn>
+          <v-btn flat white router href="/username">To username page</v-btn>
         </v-alert>
 
         <v-alert error v-bind:value="registerFail">
@@ -48,9 +48,9 @@
   export default {
     data () {
       return {
-        login: '',
+        username: '',
         email: '',
-        pass: '',
+        password: '',
         userType: '',
         types: ['Student', 'Teacher'],
         registerOk: false,
@@ -69,9 +69,9 @@
 
         axios.post(properties.HOST + '/register',
           {
-            login: this.login,
+            login: this.username,
             email: this.email,
-            pass: this.pass,
+            pass: this.password,
             type: this.userType.toUpperCase(),
           }).then(() => {
           this.registerOkText = 'Register done.';

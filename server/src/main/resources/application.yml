@@ -5,11 +5,16 @@ application:
       externalCode: temp
       dependencies: dependencies
   profiling: false
+  security:
+    expirationTime: 864_000_00
+    secret: ThisIsASecret
+    tokenPrefix: Bearer
+    headerString: Authorization
 
 email:
     server: "http://localhost:8080"
     user: "studyartteam@gmail.com"
-    pass: "pass_for_study"
+    password: "pass_for_study"
     host: smtp.gmail.com
     port: 587
     properties:
