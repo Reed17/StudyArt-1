@@ -63,26 +63,32 @@
     },
 
     methods: {
-      changePersonalInfo()
-      {
+      changePersonalInfo(){
+
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
         axios.post(properties.HOST + "/user/change-personal-info", {
             oldPass: this.oldPass,
             newPass: this.newPass,
             email: this.email,
             userId: this.$cookie.get('userId'),
             userType: this.$cookie.get('userType')
-          }
-        ).then((response) => {
-          if (response.data) {
-            this.changeOk = true;
-            this.changeFailed = false;
-            this.result = "FAILED";
-          } else {
-            this.changeFailed = true;
-            this.changeOk = false;
-            this.result = "OK";
-          }
-        })
+          },
+          headers)
+          .then((response) => {
+            if (response.data) {
+              this.changeOk = true;
+              this.changeFailed = false;
+              this.result = "FAILED";
+            } else {
+              this.changeFailed = true;
+              this.changeOk = false;
+              this.result = "OK";
+            }
+          })
       }
     }
   }

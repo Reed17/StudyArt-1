@@ -14,7 +14,7 @@ const routesForUsersOnly = ['/courses', '/lessonCard', '/user', '/course', '/use
 
 // redirect to login page (if path not available for guests)
 router.beforeEach((to, from, next) => {
-  const accessKey = Vue.cookie.get('accessKey');
+  const accessKey = Vue.cookie.get('token');
   routesForUsersOnly.includes(to.path) ? accessKey ? next() : next('/login') : next();
 });
 

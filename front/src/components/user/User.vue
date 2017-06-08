@@ -129,15 +129,34 @@
 
     methods: {
       fetchUserInfo(){
-        axios.get(properties.HOST + '/getUserByAccessKey' + '?key=' + this.$cookie.get('accessKey'))
+        axios.get(properties.HOST + '/findByUsername', {
+          params: {
+            username: this.$cookie.get('username')
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.$cookie.get('token'),
+          }
+        })
           .then((response) => {
             this.user = response.data;
           })
       },
 
       deleteAccount(){
-        axios.get(properties.HOST + '/user/delete' + '?userId=' + this.$cookie.get('userId'))
-          .then((response) => {
+
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.get(properties.HOST + '/user/delete', {
+          params: {
+            userId: this.$cookie.get('userId')
+          },
+          headers
+        })
+          .then(() => {
             // delete cookies
             this.$cookie.delete('accessKey');
             this.$cookie.delete('userId');

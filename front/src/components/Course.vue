@@ -48,7 +48,18 @@
     },
     methods: {
       fetchCourse() {
-        axios.get(PROPERTIES.HOST + '/courses/get?id=' + this.$route.params.id)
+
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.get(PROPERTIES.HOST + '/courses/get', {
+          params: {
+            id: this.$route.params.id,
+          },
+          headers
+        })
           .then((response) => {
             this.course = response.data;
           });

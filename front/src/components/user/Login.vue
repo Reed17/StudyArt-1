@@ -58,13 +58,14 @@
           url: "/login",
           withCredentials: true,
         };
+
         return axios(axiosConfig);
       },
 
 
       submitLogin(){
 
-         /* // todo replace with token
+        /* // todo replace with token
          if (this.$cookie.get('accessKey')) {
          this.loginOk = true;
          this.loginOkText = "Already logged in!";
@@ -77,39 +78,35 @@
             this.$cookie.set('token', response.headers.authorization);
             this.$cookie.set('username', this.username);
 
+            const headers = {
+              'Content-Type': 'application/json',
+              'Authorization': this.$cookie.get('token'),
+            };
 
-            const authorization = this.$cookie.get('token');
-
-            /*
-             const axiosConfig = {
-             method: 'get',
-             baseURL: PROPERTIES.HOST,
-             url: '/findByUsername?username=' + this.username,
-             withCredentials: true,
-             headers: {
-             'Authorization' : authorization
-             }
-             };
-             */
-
-            axios.get(PROPERTIES.HOST + '/findByUsername?username=' + this.username, {
-              header: {
-                Authorization: authorization
-              }
+            axios.get(PROPERTIES.HOST + '/findByUsername', {
+              params: {
+                username: this.username
+              },
+              headers
             }).then((response) => {
-              debugger;
+
+              this.$cookie.set('userId', response.data.id);
+              this.$cookie.set('userType', response.data.userType);
 
               this.loginOkText = 'Welcome to StudyArt!';
               this.loginFail = false;
               this.loginOk = true;
 
             }).catch((error) => {
-              debugger;
+              console.log(error);
+              this.loginFail = true;
+              this.loginOk = false;
             });
 
 
           })
-          .catch(() => {
+          .catch((error) => {
+            console.log(error);
             this.loginFail = true;
             this.loginOk = false;
           })

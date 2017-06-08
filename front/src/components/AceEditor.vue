@@ -47,7 +47,12 @@
       },
 
       runCode() {
-        axios.post(PROPERTIES.HOST + '/run-code', this.input)
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.post(PROPERTIES.HOST + '/run-code', this.input, headers)
           .then((response) => {
             this.response = response.data;
           });

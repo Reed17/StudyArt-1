@@ -80,10 +80,18 @@
           this.subscribedOkInfo = "Already subscribed.";
           return;
         }
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
 
-        axios.get(PROPERTIES.HOST +
-          '/subscribe?courseId=' + this.course.id +
-          '&userId=' + this.$cookie.get('userId'))
+        axios.get(PROPERTIES.HOST + '/subscribe', {
+          params: {
+            courseId: this.course.id,
+            userId: this.$cookie.get('userId')
+          },
+          headers
+        })
           .then((response) => {
             response.data.type === 'INFO' ?
               this.subscribeOk = true : this.subscribeFailed = true;
@@ -91,9 +99,17 @@
       },
 
       fetchSubscribed(){
-        axios.get(PROPERTIES.HOST +
-          '/getUserByAccessKey?key=' +
-          this.$cookie.get('accessKey'))
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.get(PROPERTIES.HOST + '/findByUsername', {
+          params: {
+            username: this.$cookie.get('username')
+          },
+          headers
+        })
           .then((response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id))
       }
     }
