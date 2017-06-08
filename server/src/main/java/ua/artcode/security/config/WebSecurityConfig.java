@@ -39,12 +39,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers(HttpMethod.POST, "/register").permitAll()
                     .antMatchers(HttpMethod.POST, "/login").permitAll()
+                    .antMatchers(HttpMethod.POST, "/run-class").permitAll()
                     .antMatchers(
                            "/courses/add",
                             "/courses/lessons/add")
                         .hasRole("TEACHER")
                     .antMatchers(
-                            "/run-class",
                             "/courses/lessons/send-solution-and-run-tests",
                             "/courses/lessons/send-solution-and-run-tests/**",
                             "/subscribe")
@@ -70,7 +70,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "GET", "POST", "PUT", "DELETE", "PATCH"));
         // setAllowCredentials(true) is important, otherwise:
         // The value of the 'Access-Control-Allow-Origin' header in the response must not be the wildcard '*' when the request's credentials mode is 'include'.
-        configuration.setAllowCredentials(true); // todo read more about this
+        configuration.setAllowCredentials(true);
         // setAllowedHeaders is important! Without it, OPTIONS preflight request
         // will fail with 403 Invalid CORS request
         configuration.setAllowedHeaders(ImmutableList.of("Authorization", "Cache-Control", "Content-Type"));

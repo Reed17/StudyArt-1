@@ -28,7 +28,7 @@
 
         <v-alert success v-bind:value="registerOk">
           {{registerOkText}}
-          <v-btn flat white router href="/username">To username page</v-btn>
+          <v-btn flat white router href="/login">To login page</v-btn>
         </v-alert>
 
         <v-alert error v-bind:value="registerFail">

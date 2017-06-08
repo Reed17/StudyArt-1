@@ -2,6 +2,7 @@ package ua.artcode.service;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.artcode.core.RunCore;
 import ua.artcode.core.method_checker.MethodCheckers;
@@ -14,7 +15,6 @@ import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.response.RunResults;
-import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.StringUtils;
@@ -27,17 +27,18 @@ import java.io.File;
 @Service
 public class RunServiceImpl implements RunService {
 
-    private final CommonIOUtils commonIOUtils;
     private final CourseRepository courseDB;
     private final LessonRepository lessonDB;
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
     private final ResultChecker resultChecker;
 
+    @Value("${application.courses.paths.externalCode}")
+    private String pathForExternalCode;
+
     @Autowired
-    public RunServiceImpl(CommonIOUtils commonIOUtils, CourseRepository courseDB, LessonRepository lessonDB,
+    public RunServiceImpl(CourseRepository courseDB, LessonRepository lessonDB,
                           CourseIOUtils courseIOUtils, RunCore runCore, ResultChecker resultChecker) {
-        this.commonIOUtils = commonIOUtils;
         this.courseDB = courseDB;
         this.lessonDB = lessonDB;
         this.courseIOUtils = courseIOUtils;
@@ -48,18 +49,21 @@ public class RunServiceImpl implements RunService {
     @Override
     public RunResults runMain(ExternalCode code) throws Exception {
         String path = courseIOUtils.saveExternalCodeLocally(code.getSourceCode());
-        String[] classes = {path};
 
-        String sourcesRoot = StringUtils.getClassRootFromClassPath(classes[0], File.separator);
+        String sourcesRoot = StringUtils.getClassRootFromClassPath(path, File.separator);
 
-        return runCore.run(sourcesRoot,
+        RunResults runResults = runCore.run(sourcesRoot,
                 new String[]{sourcesRoot},
-                classes,
+                new String[]{path},
                 new String[]{},
                 PreProcessors.singleClass,
                 MethodCheckers.main,
                 Runners.main,
                 ResultsProcessors.main);
+
+        FileUtils.deleteDirectory(new File(pathForExternalCode));
+
+        return runResults;
     }
 
 
