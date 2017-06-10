@@ -1,45 +1,64 @@
 <template>
+
   <div>
+
+    <v-app-bar>
+      <v-btn-dropdown v-bind:options="dropdown_font" v-model="fontSize" max-height="auto" editable="editable" overflow></v-btn-dropdown>
+    </v-app-bar>
+
     <brace style="height: 500px"
-           :fontsize="'12px'"
+           :fontsize="fontSize"
            :theme="'github'"
-           :mode="'java'"
+           :mode="'json'"
            :codefolding="'markbegin'"
            :softwrap="'free'"
            :selectionstyle="'text'"
            :highlightline="true"
-           @code-change="getCode($event)">
+           :dataedit="content"
+           @change="getCode($event)"
+           >
     </brace>
-    <div>
-      <v-btn dark default @click.native="runCode()">Run code</v-btn>
 
-      <v-text-field
-        name="input-7-1"
-        label="Result"
-        :value="formattedResponse"
-        multi-line
-        disabled>
-      </v-text-field>
-    </div>
+
+  <div>
+    <v-btn dark default @click.native="runCode()">Run code</v-btn>
+
+    <v-text-field
+      name="input-7-1"
+      label="Result"
+      :value="formattedResponse"
+      multi-line
+      disabled>
+    </v-text-field>
+  </div>
 
   </div>
 </template>
 
+
 <script>
-  import Brace from 'vue-bulma-brace'
+
   import axios from "axios";
   import PROPERTIES from '../properties'
+  import Brace from 'xen-brace'
 
   export default {
+
     data(){
       return {
         response: '',
-        input: '',
+        content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
+        dropdown_font: [
+            { text: '12pt' },
+            { text: '14pt' },
+            { text: '16pt' },
+            { text: '18pt' },
+            { text: '20pt' }
+          ],
+        fontSize: null,
       }
     },
-    components: {
-      Brace
-    },
+
     computed: {
       formattedResponse() {
         return this.response ?
@@ -49,20 +68,27 @@
       }
     },
 
-    methods: {
+    components: {
+      Brace
+    },
+
+    methods:{
+
       getCode(target){
-        this.$emit('code-change', target);
-        this.input = target;
+        this.content = target;
       },
 
       runCode() {
-        const code = {sourceCode: this.input};
+        this.fontSize = "20pt" //manual test
+        const code = {sourceCode: this.content};
         axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
             this.response = response.data;
           });
       },
-    }
 
+    },
   }
+
+
 </script>
