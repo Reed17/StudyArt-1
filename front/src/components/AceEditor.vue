@@ -3,14 +3,16 @@
   <div>
 
     <v-app-bar>
-      <v-btn-dropdown v-bind:options="dropdown_font" v-model="fontSize" max-height="auto" editable="editable" label="Font size" overflow></v-btn-dropdown>
-      <v-btn-dropdown v-bind:options="dropdown_lang" v-model="lang" max-height="auto" editable="editable" label="Programming lang" overflow></v-btn-dropdown>
+      <v-btn-dropdown v-bind:options="dropdown_font" v-model="fontSize"
+                      max-height="auto" editable="editable" label="Font size" overflow></v-btn-dropdown>
+      <v-btn-dropdown v-bind:options="dropdown_lang" v-model="lang"
+                      max-height="auto" editable="editable" label="Programming lang" overflow></v-btn-dropdown>
     </v-app-bar>
 
     <brace style="height: 500px"
-           :fontsize="fontSize"
+           :fontsize="fontSize.text"
            :theme="'github'"
-           :mode="lang"
+           :mode="lang.text"
            :codefolding="'markbegin'"
            :softwrap="'free'"
            :selectionstyle="'text'"
@@ -62,8 +64,8 @@
           { text: 'javascript' },
           { text: 'json' }
         ],
-        fontSize: '12pt',
-        lang: 'java',
+        fontSize: {text: '12pt'},
+        lang: { text : 'java'},
       }
     },
 
@@ -81,13 +83,11 @@
     },
 
     methods:{
-
       getCode(target){
         this.content = target;
       },
 
       runCode() {
-        this.fontSize = "20pt" //manual test
         const code = {sourceCode: this.content};
         axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
