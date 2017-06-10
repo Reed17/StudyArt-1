@@ -3,13 +3,14 @@
   <div>
 
     <v-app-bar>
-      <v-btn-dropdown v-bind:options="dropdown_font" v-model="fontSize" max-height="auto" editable="editable" overflow></v-btn-dropdown>
+      <v-btn-dropdown v-bind:options="dropdown_font" v-model="fontSize" max-height="auto" editable="editable" label="Font size" overflow></v-btn-dropdown>
+      <v-btn-dropdown v-bind:options="dropdown_lang" v-model="lang" max-height="auto" editable="editable" label="Programming lang" overflow></v-btn-dropdown>
     </v-app-bar>
 
     <brace style="height: 500px"
            :fontsize="fontSize"
            :theme="'github'"
-           :mode="'json'"
+           :mode="lang"
            :codefolding="'markbegin'"
            :softwrap="'free'"
            :selectionstyle="'text'"
@@ -55,7 +56,14 @@
             { text: '18pt' },
             { text: '20pt' }
           ],
-        fontSize: null,
+        dropdown_lang: [
+          { text: 'java' },
+          { text: 'html' },
+          { text: 'javascript' },
+          { text: 'json' }
+        ],
+        fontSize: '12pt',
+        lang: 'java',
       }
     },
 
