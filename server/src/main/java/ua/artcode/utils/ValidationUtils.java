@@ -1,5 +1,7 @@
 package ua.artcode.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
@@ -17,6 +19,9 @@ import java.util.regex.Pattern;
 
 @Component
 public class ValidationUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtils.class);
+
     private static final Pattern VALID_LOGIN_PATTERN =
             Pattern.compile("^[a-z0-9_-]{3,15}$", Pattern.CASE_INSENSITIVE);
     private static final Pattern VALID_EMAIL_PATTERN =
@@ -24,7 +29,6 @@ public class ValidationUtils {
     private static final Pattern VALID_PASSWORD_PATTERN =
             Pattern.compile("^[a-z0-9_-]{6,15}$", Pattern.CASE_INSENSITIVE);
 
-    // todo logging!!!
     public boolean loginValidation(String login) {
         return login != null &&
                 VALID_LOGIN_PATTERN.matcher(login).matches();
@@ -40,20 +44,32 @@ public class ValidationUtils {
                 VALID_PASSWORD_PATTERN.matcher(pass).matches();
     }
 
-    // todo logging!!!
     public void validateAllUserFields(String login, String email, String pass)
             throws InvalidUserLoginException, InvalidUserEmailException, InvalidUserPassException {
 
-        if (!loginValidation(login))
-            throw new InvalidUserLoginException("Login has to be 3 - 15 characters long " +
-                    "and contain ONLY latin letters, numbers or \"_\", \"-\"");
+        if (!loginValidation(login)) {
+            String message = "Login has to be 3 - 15 characters long and contain ONLY latin letters, numbers or \"_\", \"-\"";
+            InvalidUserLoginException invalidUserLoginException = new InvalidUserLoginException(message);
 
-        if (!emailValidation(email))
-            throw new InvalidUserEmailException("Enter real valid email, please");
+            LOGGER.error(message, invalidUserLoginException);
+            throw invalidUserLoginException;
+        }
 
-        if (!passValidation(pass))
-            throw new InvalidUserPassException("Password has to be 6 - 15 characters long " +
-                    "and contain ONLY latin letters, numbers or \"_\", \"-\"");
+        if (!emailValidation(email)) {
+            String message = "Invalid email format";
+            InvalidUserEmailException invalidUserEmailException = new InvalidUserEmailException(message);
+
+            LOGGER.error(message, invalidUserEmailException);
+            throw invalidUserEmailException;
+        }
+
+        if (!passValidation(pass)) {
+            String message = "Password has to be 6 - 15 characters long and contain ONLY latin letters, numbers or \"_\", \"-\"";
+            InvalidUserPassException invalidUserPassException = new InvalidUserPassException(message);
+
+            LOGGER.error(message, invalidUserPassException);
+            throw invalidUserPassException;
+        }
     }
 
     public boolean checkLoginOriginality(String login, TeacherRepository teacherRepository, StudentRepository studentRepository) {
@@ -66,15 +82,24 @@ public class ValidationUtils {
                 && studentRepository.findByEmail(email) == null);
     }
 
-    // todo logging!!!
     public void checkOriginality(String login, String email, TeacherRepository teacherRepository, StudentRepository studentRepository)
             throws InvalidUserLoginException, InvalidUserEmailException {
 
-        if (!checkLoginOriginality(login, teacherRepository, studentRepository))
-            throw new InvalidUserLoginException("Login already exists");
+        if (!checkLoginOriginality(login, teacherRepository, studentRepository)) {
+            String message = "Login already exists";
+            InvalidUserLoginException invalidUserLoginException = new InvalidUserLoginException(message);
 
-        if (!checkEmailOriginality(email, teacherRepository, studentRepository))
-            throw new InvalidUserEmailException("Email already exists");
+            LOGGER.error(message, invalidUserLoginException);
+            throw invalidUserLoginException;
+        }
+
+        if (!checkEmailOriginality(email, teacherRepository, studentRepository)) {
+            String message = "Email already exists";
+            InvalidUserEmailException invalidUserEmailException = new InvalidUserEmailException(message);
+
+            LOGGER.error(message, invalidUserEmailException);
+            throw invalidUserEmailException;
+        }
     }
 
     @SafeVarargs

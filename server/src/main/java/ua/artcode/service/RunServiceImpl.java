@@ -2,7 +2,6 @@ package ua.artcode.service;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.artcode.core.RunCore;
 import ua.artcode.core.method_checker.MethodCheckers;
@@ -15,8 +14,8 @@ import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.response.RunResults;
+import ua.artcode.utils.AppPropertyHolder;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
-import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
@@ -32,19 +31,16 @@ public class RunServiceImpl implements RunService {
     private final LessonRepository lessonDB;
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
-    private final ResultChecker resultChecker;
-
-    @Value("${application.courses.paths.externalCode}")
-    private String pathForExternalCode;
+    private final AppPropertyHolder.Courses.Paths paths;
 
     @Autowired
     public RunServiceImpl(CourseRepository courseDB, LessonRepository lessonDB,
-                          CourseIOUtils courseIOUtils, RunCore runCore, ResultChecker resultChecker) {
+                          CourseIOUtils courseIOUtils, RunCore runCore, AppPropertyHolder appPropertyHolder) {
         this.courseDB = courseDB;
         this.lessonDB = lessonDB;
         this.courseIOUtils = courseIOUtils;
         this.runCore = runCore;
-        this.resultChecker = resultChecker;
+        this.paths = appPropertyHolder.getCourses().getPaths();
     }
 
     @Override
@@ -62,7 +58,7 @@ public class RunServiceImpl implements RunService {
                 Runners.main,
                 ResultsProcessors.main);
 
-        FileUtils.deleteDirectory(new File(pathForExternalCode));
+        FileUtils.deleteDirectory(new File(paths.getExternalCode()));
 
         return runResults;
     }

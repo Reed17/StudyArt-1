@@ -3,7 +3,7 @@ package ua.artcode.utils;
 import com.google.common.collect.ObjectArrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.tools.*;
@@ -29,8 +29,12 @@ public class RunUtils {
     private static final JavaCompiler COMPILER = getSystemJavaCompiler();
     private static final Logger LOGGER = LoggerFactory.getLogger(RunUtils.class);
 
-    @Value("${application.courses.paths.dependencies}")
-    private String dependenciesPath;
+    private final AppPropertyHolder.Courses.Paths paths;
+
+    @Autowired
+    public RunUtils(AppPropertyHolder appPropertyHolder) {
+        this.paths = appPropertyHolder.getCourses().getPaths();
+    }
 
     private static JavaCompiler getSystemJavaCompiler() {
         return ToolProvider.getSystemJavaCompiler();
@@ -39,7 +43,7 @@ public class RunUtils {
     public String compile(String[] classPaths, String[] dependencies) throws IOException {
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
 
-        String jarPathsAsString = Arrays.stream(getJarPaths(dependenciesPath))
+        String jarPathsAsString = Arrays.stream(getJarPaths(paths.getDependencies()))
                 .filter(path -> Arrays.stream(dependencies)
                         .anyMatch(path::contains))
                 .map(path -> path + File.pathSeparator)
@@ -103,7 +107,7 @@ public class RunUtils {
      */
     private URL[] getClassPathsAsURLs(String[] sourcesRoot) throws IOException {
 
-        URL[] jarPathsAsURL = convertToURL(getJarPaths(dependenciesPath));
+        URL[] jarPathsAsURL = convertToURL(getJarPaths(paths.getDependencies()));
         URL[] classPathsAsURL = convertToURL(sourcesRoot);
 
         return ObjectArrays.concat(jarPathsAsURL, classPathsAsURL, URL.class);

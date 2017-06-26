@@ -48,6 +48,8 @@ public class RunCoreTest {
 
     @Before
     public void setUp() throws Exception {
+
+
         List<String> directoryTree = new ArrayList<>();
         directoryTree.add(projectRoot + "/src/main/java");
         directoryTree.add(projectRoot + "/src/main/resources");
@@ -179,13 +181,13 @@ public class RunCoreTest {
                 false);
 
         courseIOUtils.saveMavenDependenciesLocally(projectRoot);
-        courseIOUtils.copyDependencies(projectRoot);
+        final String[] dependencies = courseIOUtils.copyDependencies(projectRoot);
 
 
         RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
-                new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
+                dependencies,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
