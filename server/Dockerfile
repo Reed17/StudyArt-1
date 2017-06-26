@@ -1,4 +1,4 @@
-FROM anapsix/alpine-java:8_jdk
+FROM anapsix/alpine-java:8_jdk_unlimited
 
 COPY . /usr/src/study-art-server
 WORKDIR /usr/src/study-art-server
