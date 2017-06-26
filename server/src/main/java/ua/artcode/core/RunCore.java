@@ -13,7 +13,6 @@ import ua.artcode.model.response.MethodStats;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
-import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.RunUtils;
 import ua.artcode.utils.StringUtils;
 
@@ -22,8 +21,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLClassLoader;
-
-import static ua.artcode.utils.RunUtils.getUrlClassLoader;
 
 /**
  * Created by v21k on 15.04.17.
@@ -37,13 +34,12 @@ public class RunCore {
     private final RunUtils runUtils;
 
     @Autowired
-    public RunCore(CommonIOUtils ioUtils, CourseIOUtils courseIOUtils, RunUtils runUtils) {
+    public RunCore(CommonIOUtils ioUtils, RunUtils runUtils) {
         this.ioUtils = ioUtils;
         this.runUtils = runUtils;
     }
 
-    public RunResults run(String projectRoot,
-                          String[] rootPackages,
+    public RunResults run(String[] rootPackages,
                           String[] classPaths,
                           String[] dependencies,
                           MethodRunnerPreProcessor preProcessor,
@@ -67,7 +63,7 @@ public class RunCore {
 
         try (
                 // getting classLoader instance
-                URLClassLoader classLoader = getUrlClassLoader(projectRoot, rootPackages)
+                URLClassLoader classLoader = runUtils.getUrlClassLoader(rootPackages)
         ) {
             // prepare array with classes
             Class<?>[] classes = preProcessor.getClasses(classPaths, classLoader);
