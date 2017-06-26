@@ -9,14 +9,13 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.LessonClassPathsException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.utils.StringUtils;
+import ua.artcode.utils.AppPropertyHolder;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,31 +34,20 @@ public class CourseIOUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseIOUtils.class);
     private final CommonIOUtils commonIOUtils;
-    private final CourseRepository courseRepository;
     private final InvocationRequest request;
     private final Invoker invoker;
-    @Value("${application.courses.paths.git}")
-    private String localPathForProjects;
-    @Value("${application.courses.paths.externalCode}")
-    private String localPathForExternalCode;
-    @Value("${maven.dependenciesPath}")
-    private String mvnDependencyDownloadPath;
-    @Value("${maven.goals.copyToDirectory}")
-    private String mvnCopyToDirectory;
-    @Value("${maven.home}")
-    private String mvnHome;
-    @Value("${application.courses.paths.dependencies}")
-    private String dependenciesPath;
-    @Value("${maven.embedded.path}")
-    private String embeddedMavenExecutablePath;
+
+    private final AppPropertyHolder.Courses.Paths paths;
+    private AppPropertyHolder.Maven maven;
 
     @Autowired
-    public CourseIOUtils(CommonIOUtils commonIOUtils, CourseRepository courseRepository, InvocationRequest invocationRequest, Invoker invoker) {
+    public CourseIOUtils(CommonIOUtils commonIOUtils, InvocationRequest invocationRequest, Invoker invoker, AppPropertyHolder appPropertyHolder) {
 
         this.commonIOUtils = commonIOUtils;
-        this.courseRepository = courseRepository;
         this.request = invocationRequest;
         this.invoker = invoker;
+        this.paths = appPropertyHolder.getCourses().getPaths();
+        this.maven = appPropertyHolder.getMaven();
     }
 
     /**
@@ -72,6 +60,7 @@ public class CourseIOUtils {
      * @return path where project has been saved
      */
 
+    // todo save in directory from app.properties
     public String saveCourseLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
@@ -127,17 +116,17 @@ public class CourseIOUtils {
      */
     public String saveExternalCodeLocally(String code) throws IOException {
         String className = StringUtils.parseString(code, "class", "{").trim();
-        Path classPathDirectory = Paths.get(localPathForExternalCode);
+        Path classPathDirectory = Paths.get(paths.getExternalCode());
 
         Files.createDirectories(classPathDirectory);
-        FileUtils.cleanDirectory(new File(localPathForExternalCode));
+        FileUtils.cleanDirectory(new File(paths.getExternalCode()));
 
         String javaClassName = className + ".java";
-        File sourceFile = new File(localPathForExternalCode, javaClassName);
+        File sourceFile = new File(paths.getExternalCode(), javaClassName);
 
         Files.write(sourceFile.toPath(), code.getBytes(), StandardOpenOption.CREATE);
 
-        return localPathForExternalCode + File.separator + javaClassName;
+        return paths.getExternalCode() + File.separator + javaClassName;
     }
 
 
@@ -222,7 +211,7 @@ public class CourseIOUtils {
      * @return array with dependencies names (.jar) which will be saved in Course
      */
     public String[] copyDependencies(String projectPath) throws IOException, DirectoryCreatingException {
-        File globalDep = new File(dependenciesPath);
+        File globalDep = new File(paths.getDependencies());
         if (!globalDep.exists() && !globalDep.mkdir()) {
             throw new DirectoryCreatingException("Can't create directory for dependencies");
         }
@@ -272,9 +261,9 @@ public class CourseIOUtils {
 
     private String generateMavenGoal(String projectRoot) {
         projectRoot = checkEndsWithSeparator(projectRoot);
-        return mvnCopyToDirectory
+        return maven.getGoals().getCopyToDirectory()
                 + '"' + projectRoot
-                + mvnDependencyDownloadPath + '"';
+                + maven.getDependenciesPath() + '"';
     }
 
     private String checkEndsWithSeparator(String path) {
@@ -282,6 +271,6 @@ public class CourseIOUtils {
     }
 
     private String generatePath(String courseName, int courceID) {
-        return localPathForProjects + File.separator + courceID + courseName + File.separator;
+        return paths.getGit() + File.separator + courceID + courseName + File.separator;
     }
 }

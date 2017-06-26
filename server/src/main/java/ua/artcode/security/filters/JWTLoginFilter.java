@@ -9,6 +9,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ua.artcode.model.dto.LoginRequestDTO;
 import ua.artcode.security.service.TokenAuthenticationService;
+import ua.artcode.utils.AppPropertyHolder;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,13 +22,18 @@ import java.util.Collections;
  * Created by v21k on 07.06.17.
  */
 public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
-
+    private final String ACCESS_CONTROL_ALLOW_ORIGIN = "Access-Control-Allow-Origin";
+    private final String ACCESS_CONTROL_EXPOSE_HEADERS = "Access-Control-Expose-Headers";
+    private final String ACCESS_CONTROL_ALLOW_CREDENTIALS = "Access-Control-Allow-Credentials";
     private final TokenAuthenticationService tokenAuthenticationService;
 
-    public JWTLoginFilter(String url, AuthenticationManager authManager, TokenAuthenticationService tokenAuthenticationService) {
+    private final AppPropertyHolder.Security security;
+
+    public JWTLoginFilter(String url, AuthenticationManager authManager, TokenAuthenticationService tokenAuthenticationService, AppPropertyHolder appPropertyHolder) {
         super(new AntPathRequestMatcher(url));
         this.tokenAuthenticationService = tokenAuthenticationService;
         setAuthenticationManager(authManager);
+        this.security = appPropertyHolder.getSecurity();
     }
 
     @Override
@@ -39,10 +45,9 @@ public class JWTLoginFilter extends AbstractAuthenticationProcessingFilter {
         LoginRequestDTO creds = new ObjectMapper()
                 .readValue(req.getInputStream(), LoginRequestDTO.class);
 
-        // todo props
-        res.setHeader("Access-Control-Allow-Origin", "http://localhost:8081");
-        res.setHeader("Access-Control-Allow-Credentials", "true");
-        res.setHeader("Access-Control-Expose-Headers", "Access-Token, Authorization");
+        res.setHeader(ACCESS_CONTROL_ALLOW_ORIGIN, security.getResponseHeaders().getAccessControlAllowOrigin());
+        res.setHeader(ACCESS_CONTROL_ALLOW_CREDENTIALS, security.getResponseHeaders().getAccessControlAllowCredentials());
+        res.setHeader(ACCESS_CONTROL_EXPOSE_HEADERS, security.getResponseHeaders().getAccessControlExposeHeaders());
 
         return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(

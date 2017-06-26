@@ -3,6 +3,7 @@ package ua.artcode.utils.IO_utils;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.file.Files;
@@ -32,6 +33,7 @@ public class CommonIOUtils {
         return Files.walk(Paths.get(path))
                 .map(Path::toString)
                 .filter(filePath -> filePath.endsWith(endsWith))
+                .map(filePath -> new File(path).getAbsolutePath())
                 .toArray(String[]::new);
     }
 

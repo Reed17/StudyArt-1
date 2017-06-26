@@ -154,7 +154,7 @@ public class CourseServiceImpl implements CourseService {
     public Lesson getLessonByID(int id) throws LessonNotFoundException {
         Lesson result = lessonRepository.findOne(id);
 
-        if(result == null) {
+        if (result == null) {
             String message = "Lesson with id " + id + " not found.";
             LessonNotFoundException lessonNotFoundException = new LessonNotFoundException(message);
 
