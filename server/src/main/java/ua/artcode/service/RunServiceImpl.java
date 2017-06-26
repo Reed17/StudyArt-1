@@ -53,7 +53,7 @@ public class RunServiceImpl implements RunService {
 
         String sourcesRoot = StringUtils.getClassRootFromClassPath(path, File.separator);
 
-        RunResults runResults = runCore.run(sourcesRoot,
+        RunResults runResults = runCore.run(
                 new String[]{sourcesRoot},
                 new String[]{path},
                 new String[]{},
@@ -85,7 +85,7 @@ public class RunServiceImpl implements RunService {
         String sourcesRoot = course.getSourcesRoot();
         String testsRoot = course.getTestsRoot();
 
-        RunResults results = runCore.run(projectLocalPath,
+        RunResults results = runCore.run(
                 new String[]{sourcesRoot,
                         testsRoot},
                 classPaths,

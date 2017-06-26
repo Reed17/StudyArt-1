@@ -14,7 +14,6 @@ public class PreProcessors {
 
     public static MethodRunnerPreProcessor singleClass = ((classPaths, classLoader) -> {
 
-
         String[] classNames = new String[]{substringAfterDelimiter(classPaths[0], File.separator)};
 
         checkIfEmpty(classNames);
@@ -37,7 +36,6 @@ public class PreProcessors {
 
         String[] classNames = Arrays.stream(classPaths)
                 .map(path -> substringAfterDelimiter(path, "java" + File.separator))
-//                .map(path -> Paths.get(path).toAbsolutePath().toString())
                 .filter(path -> path.toLowerCase().contains("test"))
                 .toArray(String[]::new);
 
