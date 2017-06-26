@@ -180,3 +180,24 @@ Caused by: java.lang.IllegalStateException: The file is locked: nio:/home/v21k/d
 	at org.h2.mvstore.FileStore.open(FileStore.java:173)
 	at org.h2.mvstore.MVStore.<init>(MVStore.java:348)
 	... 63 more
+2017-06-26 08:26:49 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:27:05 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:27:16 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:27:51 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:28:00 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:29:44 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
+2017-06-26 08:36:50 jdbc[12]: exception
+org.h2.jdbc.JdbcSQLException: Value too long for column "DEPENDENCIES BINARY(255)": "X'aced0005757200135b4c6a6176612e6c616e672e537472696e673badd256e7e91d7b4702000078700000000e74002977696c64666c792d636f6e74726f6c6c... (463)"; SQL statement:
+update courses set author=?, dependencies=?, description=?, local_path=?, name=?, sources_root=?, tests_root=?, url=? where course_id=? [22001-193]
