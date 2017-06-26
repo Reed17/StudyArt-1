@@ -20,6 +20,7 @@ import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.StringUtils;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Created by v21k on 15.04.17.
@@ -70,10 +71,8 @@ public class RunServiceImpl implements RunService {
     @Override
     public RunResults runLessonWithSolutionTests(int lessonID, String url) throws Exception {
 
-        Lesson lesson = lessonDB.findOne(lessonID);
-        resultChecker.checkNull(lesson, "Lesson not found!");
-        Course course = courseDB.findOne(lesson.getCourseID());
-        resultChecker.checkNull(course, "Course not found!");
+        Lesson lesson = Objects.requireNonNull(lessonDB.findOne(lessonID));
+        Course course = Objects.requireNonNull(courseDB.findOne(lesson.getCourseID()));
 
         String projectLocalPath = courseIOUtils.saveCourseLocally(url, course.getName(), course.getId());
 
