@@ -9,9 +9,13 @@ application:
     paths:
       git: courses
       externalCode: temp
-      dependencies: server/dependencies
-
-  profiling: true
+      dependencies: dependencies
+  profiling: false
+  security:
+    expirationTime: 864_000_00
+    secret: ThisIsASecret
+    tokenPrefix: Bearer
+    headerString: Authorization
 
 email:
     server: "http://localhost:8080"
