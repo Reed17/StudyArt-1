@@ -10,6 +10,10 @@ application:
     secret: ThisIsASecret
     tokenPrefix: Bearer
     headerString: Authorization
+    responseHeaders:
+      accessControlAllowOrigin: http://localhost:8081
+      accessControlAllowCredentials: true
+      accessControlExposeHeaders: Access-Token, Authorization
 
 email:
     server: "http://localhost:8080"
