@@ -16,6 +16,7 @@ ENV M2_HOME /usr/share/maven
 VOLUME /usr/src/study-art-server/db
 VOLUME /usr/src/study-art-server/logs
 VOLUME /usr/src/study-art-server/dependencies
+VOLUME /usr/src/study-art-server/courses
 VOLUME $HOME/.m2
 
 EXPOSE 8080
