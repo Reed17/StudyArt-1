@@ -12,7 +12,7 @@ import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.exceptions.UnexpectedNullException;
+import ua.artcode.exceptions.UserNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
@@ -78,12 +78,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User activate(int userId) throws UnexpectedNullException {
+    public User activate(int userId) throws UserNotFoundException {
         User user = teacherDB.findOne(userId);
 
         user = user == null ? studentDB.findOne(userId) : user;
 
-        resultChecker.checkNull(user, "User with this id doesn't exists");
+        if (user == null) {
+            String message = "User with this id doesn't exists";
+            UserNotFoundException userNotFoundException = new UserNotFoundException(message);
+
+            LOGGER.error(message, userNotFoundException);
+            throw userNotFoundException;
+        }
 
         user.activate();
 
