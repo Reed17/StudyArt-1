@@ -2,6 +2,8 @@ package ua.artcode.service;
 
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
@@ -30,6 +32,8 @@ import static ua.artcode.utils.StringUtils.normalizePath;
  */
 @Service
 public class CourseServiceImpl implements CourseService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseServiceImpl.class);
 
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
@@ -78,8 +82,6 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Lesson addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException {
 
-        // todo if we already have this lesson, what should we do?
-        // todo think about updateLesson method and corresponding query in LessonRepo
         Course course = getByID(courseID);
 
         // save locally for further operations
@@ -129,8 +131,12 @@ public class CourseServiceImpl implements CourseService {
                 lesson.getRequiredClasses());
 
         List<Lesson> courseLessons = course.getLessons();
-        if (courseLessons.contains(lesson)) { // todo check equals and hash
-            throw new SuchLessonAlreadyExist("Such lesson already exist!");
+        if (courseLessons.contains(lesson)) {
+            String message = "Such lesson already exist!";
+            SuchLessonAlreadyExist suchLessonAlreadyExist = new SuchLessonAlreadyExist(message);
+
+            LOGGER.error(message, suchLessonAlreadyExist);
+            throw suchLessonAlreadyExist;
         } else {
             lesson.setCourseID(course.getId());
             courseLessons.add(lesson);
@@ -145,9 +151,16 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Lesson getLessonByID(int id) throws UnexpectedNullException {
+    public Lesson getLessonByID(int id) throws LessonNotFoundException {
         Lesson result = lessonRepository.findOne(id);
-        resultChecker.checkNull(result, "Lesson not found!");
+
+        if(result == null) {
+            String message = "Lesson with id " + id + " not found.";
+            LessonNotFoundException lessonNotFoundException = new LessonNotFoundException(message);
+
+            LOGGER.error(message, lessonNotFoundException);
+            throw lessonNotFoundException;
+        }
 
         return result;
     }
