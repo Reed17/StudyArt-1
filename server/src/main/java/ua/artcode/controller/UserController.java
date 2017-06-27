@@ -35,9 +35,7 @@ public class UserController {
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    // todo usecure passing of params
-    // return general response
-    // see how to throw an exception to client, ExceptionHandler
+    // todo secure passing of params
     public User registerUser(@RequestBody RegisterRequestDTO dto) throws AppException {
         User newUser = userService.register(dto.login, dto.pass, dto.email, dto.type);
 
@@ -51,7 +49,6 @@ public class UserController {
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    // todo use the id as String
     public User activateUser(@RequestParam int id) throws UserNotFoundException {
         User activatedUser = userService.activate(id);
 

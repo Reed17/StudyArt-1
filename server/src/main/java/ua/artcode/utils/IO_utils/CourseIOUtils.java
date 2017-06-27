@@ -14,8 +14,8 @@ import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.LessonClassPathsException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
-import ua.artcode.utils.StringUtils;
 import ua.artcode.utils.AppPropertyHolder;
+import ua.artcode.utils.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,12 +36,14 @@ public class CourseIOUtils {
     private final CommonIOUtils commonIOUtils;
     private final InvocationRequest request;
     private final Invoker invoker;
-
     private final AppPropertyHolder.Courses.Paths paths;
-    private AppPropertyHolder.Maven maven;
+    private final AppPropertyHolder.Maven maven;
 
     @Autowired
-    public CourseIOUtils(CommonIOUtils commonIOUtils, InvocationRequest invocationRequest, Invoker invoker, AppPropertyHolder appPropertyHolder) {
+    public CourseIOUtils(CommonIOUtils commonIOUtils,
+                         InvocationRequest invocationRequest,
+                         Invoker invoker,
+                         AppPropertyHolder appPropertyHolder) {
 
         this.commonIOUtils = commonIOUtils;
         this.request = invocationRequest;
@@ -61,7 +63,9 @@ public class CourseIOUtils {
      */
 
     // todo save in directory from app.properties
-    public String saveCourseLocally(String courseURL, String courseName, int courseID) throws DirectoryCreatingException, GitAPIException {
+    public String saveCourseLocally(String courseURL,
+                                    String courseName,
+                                    int courseID) throws DirectoryCreatingException, GitAPIException {
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
@@ -130,7 +134,9 @@ public class CourseIOUtils {
     }
 
 
-    public AbstractMap.SimpleEntry<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths, String sourceRoot, String courseRoot) throws IOException, LessonClassPathsException {
+    public AbstractMap.SimpleEntry<List<String>, String> ensureLessonClassPathsAndRoot(List<String> classPaths,
+                                                                                       String sourceRoot,
+                                                                                       String courseRoot) throws IOException, LessonClassPathsException {
 
         if (sourceRoot == null) {
             if (classPaths == null || classPaths.size() == 0) {
@@ -142,19 +148,16 @@ public class CourseIOUtils {
                         .map(path -> path.startsWith(courseRoot) ? path : StringUtils.normalizePath(courseRoot + path))
                         .collect(Collectors.toList());
 
-                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0).replace("/", File.separator), "java" + File.separator);
+                sourceRoot = StringUtils.getClassRootFromClassPath(classPaths.get(0).replace("/", File.separator),
+                        "java" + File.separator);
             }
         } else {
             if (classPaths == null || classPaths.size() == 0) {
-                try {
-                    classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot.replace("/", File.separator), "java"));
-                } catch (IOException e) {
-                    e.printStackTrace(); // todo why catch if we throw IOExc?
-                }
+                classPaths = Arrays.asList(commonIOUtils.parseFilePaths(sourceRoot.replace("/", File.separator),
+                        "java"));
             }
         }
 
-        // todo NPE warning
         classPaths = classPaths.stream().
                 map(path -> path.replace("/", File.separator))
                 .collect(Collectors.toList());
