@@ -14,7 +14,6 @@ public class Runners {
         for (Class<?> aClass : classes) {
             Method method = aClass.getMethod("main", String[].class);
             String[] argumentsForMain = null;
-            // todo test this place with a negative test
             method.invoke(null, (Object) argumentsForMain);
         }
         return null;

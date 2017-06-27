@@ -2,7 +2,6 @@ package ua.artcode.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.StudentRepository;
@@ -16,6 +15,7 @@ import ua.artcode.model.Course;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 import ua.artcode.model.User;
+import ua.artcode.utils.AppPropertyHolder;
 import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
@@ -34,18 +34,23 @@ public class UserServiceImpl implements UserService {
     private final SecurityUtils securityUtils;
     private final MailUtils mu;
     private final CourseRepository courseRepository;
-
-    @Value("${email.user}")
-    private String emailUsername;
+    private final AppPropertyHolder.Email mailProps;
 
     @Autowired
-    public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils, SecurityUtils securityUtils, MailUtils mu, CourseRepository courseRepository) {
+    public UserServiceImpl(TeacherRepository teacherDB,
+                           StudentRepository studentDB,
+                           ValidationUtils validationUtils,
+                           SecurityUtils securityUtils,
+                           MailUtils mu,
+                           CourseRepository courseRepository,
+                           AppPropertyHolder appPropertyHolder) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
         this.securityUtils = securityUtils;
         this.mu = mu;
         this.courseRepository = courseRepository;
+        this.mailProps = appPropertyHolder.getEmail();
     }
 
 
@@ -67,7 +72,7 @@ public class UserServiceImpl implements UserService {
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-        mu.sendEmail(emailUsername, newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
+        mu.sendEmail(mailProps.getUser(), newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
 
         return newUser;
     }

@@ -14,8 +14,6 @@ import static ua.artcode.enums.UserType.TEACHER;
 @Entity
 public class Teacher extends User {
 
-    //TODO add more cpecific fields
-
     private static final Map<String, Boolean> TEACHER_RIGHTS = createRightsMap();
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "TEACHER_CORSES",

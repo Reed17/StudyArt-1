@@ -17,38 +17,8 @@ public class AppPropertyHolder {
     private Security security;
     @NestedConfigurationProperty
     private Maven maven;
-
-    public String getProfiling() {
-        return profiling;
-    }
-
-    public void setProfiling(String profiling) {
-        this.profiling = profiling;
-    }
-
-    public Courses getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Courses courses) {
-        this.courses = courses;
-    }
-
-    public Security getSecurity() {
-        return security;
-    }
-
-    public void setSecurity(Security security) {
-        this.security = security;
-    }
-
-    public Maven getMaven() {
-        return maven;
-    }
-
-    public void setMaven(Maven maven) {
-        this.maven = maven;
-    }
+    @NestedConfigurationProperty
+    private Email email;
 
     public static class Courses {
         @NestedConfigurationProperty
@@ -206,5 +176,138 @@ public class AppPropertyHolder {
                 this.copyToDirectory = copyToDirectory;
             }
         }
+    }
+
+    public static class Email {
+        private String server;
+        private String user;
+        private String password;
+        private String host;
+        private int port;
+        @NestedConfigurationProperty
+        private Properties properties;
+
+        public static class Properties {
+            @NestedConfigurationProperty
+            private Smtp smtp;
+
+            public static class Smtp {
+                private String auth;
+                private String starttls;
+
+                public String getAuth() {
+                    return auth;
+                }
+
+                public void setAuth(String auth) {
+                    this.auth = auth;
+                }
+
+                public String getStarttls() {
+                    return starttls;
+                }
+
+                public void setStarttls(String starttls) {
+                    this.starttls = starttls;
+                }
+            }
+
+            public Smtp getSmtp() {
+                return smtp;
+            }
+
+            public void setSmtp(Smtp smtp) {
+                this.smtp = smtp;
+            }
+        }
+
+
+        public String getServer() {
+            return server;
+        }
+
+        public void setServer(String server) {
+            this.server = server;
+        }
+
+        public String getUser() {
+            return user;
+        }
+
+        public void setUser(String user) {
+            this.user = user;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        public String getHost() {
+            return host;
+        }
+
+        public void setHost(String host) {
+            this.host = host;
+        }
+
+        public int getPort() {
+            return port;
+        }
+
+        public void setPort(int port) {
+            this.port = port;
+        }
+
+        public Properties getProperties() {
+            return properties;
+        }
+
+        public void setProperties(Properties properties) {
+            this.properties = properties;
+        }
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public void setEmail(Email email) {
+        this.email = email;
+    }
+
+    public String getProfiling() {
+        return profiling;
+    }
+
+    public void setProfiling(String profiling) {
+        this.profiling = profiling;
+    }
+
+    public Courses getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Courses courses) {
+        this.courses = courses;
+    }
+
+    public Security getSecurity() {
+        return security;
+    }
+
+    public void setSecurity(Security security) {
+        this.security = security;
+    }
+
+    public Maven getMaven() {
+        return maven;
+    }
+
+    public void setMaven(Maven maven) {
+        this.maven = maven;
     }
 }
