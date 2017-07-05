@@ -1,21 +1,26 @@
 <template>
 
   <div>
-  <v-card-flat>
-    <v-card-title>
-      {{lesson.name}}
-    </v-card-title>
-    <v-card-text>
-      <div v-html="compiledMarkdown"></div>
-    </v-card-text>
+
+    <v-expansion-panel expand>
+      <v-expansion-panel-content class="white" v-model=expanded>
+        <div slot="header" >
+          <v-card-title >{{lesson.name}}</v-card-title>
+        </div>
+        <v-card-text class="white">
+          <div v-html="compiledMarkdown"></div>
+        </v-card-text>
+      </v-expansion-panel-content>
+    </v-expansion-panel>
+
     <div class="example-2">
       <div id="one" class="split split-horizontal">
-        <p>#one</p>
+
 
       </div>
       <div id="two" class="split split-horizontal">
         <div id="three" class="split split-vertical">
-          <p>#three</p>
+
           <brace style="height: 500px"
                  :fontsize="'12pt'"
                  :theme="'github'"
@@ -28,12 +33,11 @@
           </brace>
         </div>
         <div id="four" class="split split-vertical">
-          <p>#four</p>
+
         </div>
       </div>
     </div>
 
-  </v-card-flat>
 
 
 
@@ -53,6 +57,7 @@
     data(){
       return {
         lesson: Object,
+        expanded: 'True'
       }
     },
     computed: {
@@ -89,9 +94,15 @@
 
       split() {
         Split(['#three', '#four'], {
-          direction: 'vertical'
+          direction: 'vertical',
+          sizes: [85,15],
+          minSize: [0,0],
+          gutterSize: 5
         });
         Split(['#one', '#two'], {
+          sizes: [30,70],
+          minSize: [0,0],
+          gutterSize: 5
         });
       }
     },

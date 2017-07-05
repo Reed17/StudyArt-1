@@ -32,6 +32,9 @@ public class Lesson implements Comparable<Lesson> {
     private String sourcesRoot;
     private String testsRoot;
     private String description;
+    private String theory;
+
+
 
     // todo date
     public Lesson() {
@@ -139,6 +142,14 @@ public class Lesson implements Comparable<Lesson> {
 
     public void setCourseID(int course) {
         this.courseID = course;
+    }
+
+    public String getTheory() {
+        return theory;
+    }
+
+    public void setTheory(String theory) {
+        this.theory = theory;
     }
 
     @Override
