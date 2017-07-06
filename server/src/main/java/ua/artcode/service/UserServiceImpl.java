@@ -2,23 +2,21 @@ package ua.artcode.service;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
-import ua.artcode.dao.repositories.SessionRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.exceptions.UnexpectedNullException;
+import ua.artcode.exceptions.UserNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.Student;
 import ua.artcode.model.Teacher;
 import ua.artcode.model.User;
+import ua.artcode.utils.AppPropertyHolder;
 import ua.artcode.utils.MailUtils;
-import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
@@ -34,23 +32,25 @@ public class UserServiceImpl implements UserService {
     private final StudentRepository studentDB;
     private final ValidationUtils validationUtils;
     private final SecurityUtils securityUtils;
-    private final SessionRepository sessionDB;
     private final MailUtils mu;
-    private final ResultChecker resultChecker;
     private final CourseRepository courseRepository;
-    @Value("${email.user}")
-    private String emailUsername;
+    private final AppPropertyHolder.Email mailProps;
 
     @Autowired
-    public UserServiceImpl(TeacherRepository teacherDB, StudentRepository studentDB, ValidationUtils validationUtils, SecurityUtils securityUtils, SessionRepository sessionDB, MailUtils mu, ResultChecker resultChecker, CourseRepository courseRepository) {
+    public UserServiceImpl(TeacherRepository teacherDB,
+                           StudentRepository studentDB,
+                           ValidationUtils validationUtils,
+                           SecurityUtils securityUtils,
+                           MailUtils mu,
+                           CourseRepository courseRepository,
+                           AppPropertyHolder appPropertyHolder) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
         this.securityUtils = securityUtils;
-        this.sessionDB = sessionDB;
         this.mu = mu;
-        this.resultChecker = resultChecker;
         this.courseRepository = courseRepository;
+        this.mailProps = appPropertyHolder.getEmail();
     }
 
 
@@ -72,18 +72,24 @@ public class UserServiceImpl implements UserService {
         else
             newUser = studentDB.save(new Student(login, securityUtils.encryptPass(pass), email));
 
-        mu.sendEmail(emailUsername, newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
+        mu.sendEmail(mailProps.getUser(), newUser.getEmail(), "Registration", mu.getActivationLink(newUser));
 
         return newUser;
     }
 
     @Override
-    public User activate(int userId) throws UnexpectedNullException {
+    public User activate(int userId) throws UserNotFoundException {
         User user = teacherDB.findOne(userId);
 
         user = user == null ? studentDB.findOne(userId) : user;
 
-        resultChecker.checkNull(user, "User with this id doesn't exists");
+        if (user == null) {
+            String message = "User with this id doesn't exists";
+            UserNotFoundException userNotFoundException = new UserNotFoundException(message);
+
+            LOGGER.error(message, userNotFoundException);
+            throw userNotFoundException;
+        }
 
         user.activate();
 

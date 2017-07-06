@@ -4,8 +4,9 @@ import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.InvalidUserLoginException;
-import ua.artcode.exceptions.UnexpectedNullException;
+import ua.artcode.exceptions.UserNotFoundException;
 import ua.artcode.model.User;
 import ua.artcode.model.dto.ChangeUserInfoDTO;
 import ua.artcode.model.dto.RegisterRequestDTO;
@@ -34,14 +35,11 @@ public class UserController {
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    // todo usecure passing of params
-    // return general response
-    // see how to throw an exception to client, ExceptionHandler
-    public User registerUser(@RequestBody RegisterRequestDTO dto) throws Throwable { // todo not throwable, more readable exceptions, not only error code
+    // todo secure passing of params
+    public User registerUser(@RequestBody RegisterRequestDTO dto) throws AppException {
         User newUser = userService.register(dto.login, dto.pass, dto.email, dto.type);
 
         LOGGER.info("Registration - OK, id = " + newUser.getId());
-
 
         return newUser;
     }
@@ -51,8 +49,7 @@ public class UserController {
             response = User.class,
             produces = "application/json")
     @RequestMapping(value = "/activate", method = RequestMethod.GET)
-    // todo use the id as String
-    public User activateUser(@RequestParam int id) throws UnexpectedNullException {
+    public User activateUser(@RequestParam int id) throws UserNotFoundException {
         User activatedUser = userService.activate(id);
 
         LOGGER.info("Activation - OK, id = " + activatedUser.getId());

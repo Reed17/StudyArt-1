@@ -48,6 +48,8 @@ public class RunCoreTest {
 
     @Before
     public void setUp() throws Exception {
+
+
         List<String> directoryTree = new ArrayList<>();
         directoryTree.add(projectRoot + "/src/main/java");
         directoryTree.add(projectRoot + "/src/main/resources");
@@ -88,7 +90,7 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.print(\"Some text\");");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
                 new String[]{},
@@ -105,7 +107,7 @@ public class RunCoreTest {
         String classBody = "";
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        core.run(projectRoot,
+        core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
                 new String[]{},
@@ -120,7 +122,7 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(\"Some text\";");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
                 new String[]{},
@@ -137,7 +139,7 @@ public class RunCoreTest {
         String classBody = insertInMain("System.out.println(2/0);");
         String classPath = generateAndSaveClass(1, "", "Main", classBody, false);
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
                 new String[]{},
@@ -153,7 +155,7 @@ public class RunCoreTest {
     public void testRunClassNonExistingClass() throws Exception {
         String classPath = sourcesRoot + File.separator + "_01_lesson";
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
                 new String[]{},
@@ -179,13 +181,13 @@ public class RunCoreTest {
                 false);
 
         courseIOUtils.saveMavenDependenciesLocally(projectRoot);
-        courseIOUtils.copyDependencies(projectRoot);
+        final String[] dependencies = courseIOUtils.copyDependencies(projectRoot);
 
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesRoot},
                 new String[]{classPath},
-                new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
+                dependencies,
                 PreProcessors.lessonsMain,
                 MethodCheckers.main,
                 Runners.main,
@@ -215,7 +217,7 @@ public class RunCoreTest {
         courseIOUtils.copyDependencies(projectRoot);
 
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 new String[]{"junit-4.12.jar", "args4j-2.33.jar"},
@@ -246,7 +248,7 @@ public class RunCoreTest {
         courseIOUtils.saveMavenDependenciesLocally(projectRoot);
         courseIOUtils.copyDependencies(projectRoot);
 
-        RunResults results = core.run(projectRoot,
+        RunResults results = core.run(
                 new String[]{sourcesTestRoot},
                 new String[]{classPath},
                 new String[]{"junit-4.12.jar", "args4j-2.33.jar"},

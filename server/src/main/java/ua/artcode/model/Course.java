@@ -30,6 +30,7 @@ public class Course {
     @NotNull
     private String testsRoot;
 
+    @Column(length = 5000)
     private String[] dependencies;
 
     public Course() {

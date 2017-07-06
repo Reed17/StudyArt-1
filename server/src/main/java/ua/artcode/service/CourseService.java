@@ -24,7 +24,7 @@ public interface CourseService {
 
     Lesson addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException, ValidationException;
 
-    Lesson getLessonByID(int id) throws UnexpectedNullException;
+    Lesson getLessonByID(int id) throws UnexpectedNullException, LessonNotFoundException;
 
     List<Lesson> getAllLessons();
 

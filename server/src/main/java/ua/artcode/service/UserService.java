@@ -4,7 +4,7 @@ import ua.artcode.enums.UserType;
 import ua.artcode.exceptions.InvalidUserEmailException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.exceptions.UnexpectedNullException;
+import ua.artcode.exceptions.UserNotFoundException;
 import ua.artcode.model.User;
 
 /**
@@ -31,7 +31,7 @@ public interface UserService {
      * @param userId - id of user for activation
      * @return activated user
      */
-    User activate(int userId) throws UnexpectedNullException;
+    User activate(int userId) throws UserNotFoundException;
 
     User findByUserName(String userName) throws InvalidUserLoginException;
 

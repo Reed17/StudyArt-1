@@ -5,7 +5,6 @@ import org.apache.maven.shared.invoker.DefaultInvoker;
 import org.apache.maven.shared.invoker.InvocationRequest;
 import org.apache.maven.shared.invoker.Invoker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,6 +17,7 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import ua.artcode.utils.AppPropertyHolder;
 import ua.artcode.utils.CommandLineRunnerUtils;
 
 import java.util.Properties;
@@ -27,19 +27,8 @@ import java.util.Properties;
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 public class Application {
 
-    @Value("${email.host}")
-    private String mailHost;
-    @Value("${email.port}")
-    private int mailPort;
-    @Value("${email.user}")
-    private String mailUser;
-    @Value("${email.password}")
-    private String mailPass;
-    @Value("${email.properties.smtp.auth}")
-    private String mailSmtpAuth;
-    @Value("${email.properties.smtp.starttls.enable}")
-    private String mailSmtpStartTLS;
-
+    @Autowired
+    private AppPropertyHolder properties;
     @Autowired
     private CommandLineRunnerUtils commandLineRunnerUtils;
 
@@ -59,14 +48,14 @@ public class Application {
     @Bean
     public JavaMailSender mailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(mailHost);
-        mailSender.setPort(mailPort);
-        mailSender.setUsername(mailUser);
-        mailSender.setPassword(mailPass);
+        mailSender.setHost(properties.getEmail().getHost());
+        mailSender.setPort(properties.getEmail().getPort());
+        mailSender.setUsername(properties.getEmail().getUser());
+        mailSender.setPassword(properties.getEmail().getPassword());
 
         Properties props = new Properties();
-        props.setProperty("mail.smtp.auth", mailSmtpAuth);
-        props.setProperty("mail.smtp.starttls.enable", mailSmtpStartTLS);
+        props.setProperty("mail.smtp.auth", properties.getEmail().getProperties().getSmtp().getAuth());
+        props.setProperty("mail.smtp.starttls.enable", properties.getEmail().getProperties().getSmtp().getStarttls());
 
         mailSender.setJavaMailProperties(props);
 
