@@ -75,7 +75,7 @@ public class Application {
     @Bean
     public CommandLineRunner commandLineRunner() {
         return strings -> {
-//            commandLineRunnerUtils.createCoursesAndLessons();
+            commandLineRunnerUtils.createCoursesAndLessons();
             commandLineRunnerUtils.registerTestUsers();
         };
     }

@@ -37,12 +37,12 @@ public class CommandLineRunnerUtils {
                             "password",
                             UserType.STUDENT));
             userController.registerUser(
-                    new RegisterRequestDTO("student2",
-                            "student2@gmail.com",
+                    new RegisterRequestDTO("student",
+                            "student@gmail.com",
                             "password",
                             UserType.STUDENT));
             userController.registerUser(
-                    new RegisterRequestDTO("teacher",
+                    new RegisterRequestDTO("teacher44",
                             "teacher@gmail.com",
                             "password",
                             UserType.TEACHER));
@@ -66,6 +66,17 @@ public class CommandLineRunnerUtils {
         courseName.put(4, "Web Services");
         courseName.put(5, "Java JPA");
 
+        String theory = "### Understanding Java’s Reflection API in Five Minutes\n" +
+                "A language that is capable of **reflection**, like **Java** is, allows developers to inspect _types, methods, fields, annotations, etc._" +
+                " at run time and to defer the decision on how to use them from compile time to run time. To that end, Java’s **reflection API** offers types like " +
+                "Class, Field, Constructor, Method, Annotation, and others. With them it is possible to interact with types that were not known at compile time, " +
+                "for example to create instances of an unknown class and call methods on them.\n" +
+                "\n" +
+                "This quick tip is intended to give you a high-level understanding of what **reflection** is, what it looks like " +
+                "in Java, and what it could be used for. After it you will be ready to get started or work through longer tutorials. " +
+                "To get the most out of it you should have a good understanding of how Java is structured, specifically what classes " +
+                "and methods are and how they relate. Knowing about annotations unlocks a separate section.";
+        String description = "This lesson is dedicated to _Java Reflection API_.  Please do\n * Task1\n * Task2\n * Task 3 ";
 
         for (int i = 1; i <= courseName.size(); i++) {
 
@@ -87,7 +98,8 @@ public class CommandLineRunnerUtils {
                                 Collections.singletonList("src/test/java/_02_lesson/SolutionTests.java"),
                                 "src/main/java/_02_lesson",
                                 null,
-                                "Test description"),
+                                description,
+                                theory),
                         null
                 );
             }
