@@ -76,7 +76,7 @@ public class Application {
     public CommandLineRunner commandLineRunner() {
         return strings -> {
 //            commandLineRunnerUtils.createCoursesAndLessons();
-            commandLineRunnerUtils.registerTestUsers();
+//            commandLineRunnerUtils.registerTestUsers();
         };
     }
 }
