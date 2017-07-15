@@ -76,7 +76,8 @@ public class Application {
     public CommandLineRunner commandLineRunner() {
         return strings -> {
             // todo we do not need to comment each time, when out db was already inited
-            commandLineRunnerUtils.createCoursesAndLessons();
+            //commandLineRunnerUtils.createCoursesAndLessons();
+            commandLineRunnerUtils.createBaseCourse();
             commandLineRunnerUtils.registerTestUsers();
         };
     }

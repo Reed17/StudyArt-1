@@ -15,6 +15,7 @@ import ua.artcode.service.CourseService;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -132,10 +133,10 @@ public class CommandLineRunnerUtils {
         // how to create lesson correctly?
         Lesson firstLesson = new Lesson(
                 "FirstLesson",
-                "week1/task1",
-                null, null,
+                "week1",
+                Collections.singletonList("src/main/java/week1/Task1.java"), null,
                 Collections.singletonList("src/test/java/week1/TestTask1.java"),
-                "src/main/java/week1", null, null);
+                null, null, null);
 
         try {
             Lesson savedLesson = courseService.addLesson(firstLesson, savedCourse.getId());
