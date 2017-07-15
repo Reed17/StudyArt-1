@@ -75,7 +75,8 @@ public class Application {
     @Bean
     public CommandLineRunner commandLineRunner() {
         return strings -> {
-//            commandLineRunnerUtils.createCoursesAndLessons();
+            // todo we do not need to comment each time, when out db was already inited
+            commandLineRunnerUtils.createCoursesAndLessons();
             commandLineRunnerUtils.registerTestUsers();
         };
     }

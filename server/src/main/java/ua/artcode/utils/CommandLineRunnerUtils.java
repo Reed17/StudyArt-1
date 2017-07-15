@@ -1,15 +1,20 @@
 package ua.artcode.utils;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ua.artcode.controller.CourseController;
 import ua.artcode.controller.UserController;
 import ua.artcode.enums.UserType;
+import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.SuchCourseAlreadyExists;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.dto.RegisterRequestDTO;
+import ua.artcode.service.CourseService;
 
+import javax.xml.bind.ValidationException;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,11 +27,13 @@ public class CommandLineRunnerUtils {
 
     private final UserController userController;
     private final CourseController courseController;
+    private final CourseService courseService;
 
     @Autowired
-    public CommandLineRunnerUtils(UserController userController, CourseController courseController) {
+    public CommandLineRunnerUtils(UserController userController, CourseController courseController, CourseService courseService) {
         this.userController = userController;
         this.courseController = courseController;
+        this.courseService = courseService;
     }
 
     public void registerTestUsers() {
@@ -50,6 +57,8 @@ public class CommandLineRunnerUtils {
         }
     }
 
+
+    // todo Why did you use Contoroller for adding, you might use courseService
     public void createCoursesAndLessons() throws SuchCourseAlreadyExists {
         Map<Integer, String> courseName = new HashMap<>();
         Map<Integer, String> courseDescription = new HashMap<>();
@@ -92,6 +101,37 @@ public class CommandLineRunnerUtils {
                 );
             }
         }
+    }
+
+    public void createBaseCourse() throws SuchCourseAlreadyExists {
+        String courseName = "ArtCodeBaseCourse";
+        String description = "BaseCourseDesc";
+
+
+        Course savedCourse = courseService.addCourse(new Course(
+                courseName,
+                "Serhii Bilobrov",
+                "https://github.com/ksyashka/ACBCourse.git",
+                description,
+                "src/main/java",
+                "src/test/java"));
+
+
+        // how to create lesson correctly?
+        Lesson firstLesson = new Lesson(
+                "FirstLesson",
+                "week1/task1",
+                null, null,
+                Collections.singletonList("src/test/java/week1/TestTask1.java"),
+                "src/main/java/week1", null, null);
+
+        try {
+            Lesson savedLesson = courseService.addLesson(firstLesson, savedCourse.getId());
+        } catch (GitAPIException | IOException | ValidationException | AppException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
 }
