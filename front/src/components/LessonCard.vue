@@ -27,6 +27,7 @@
             <v-btn-dropdown v-bind:options="dropdown_lang" v-model="lang"
                             max-height="auto" editable="editable" label="Programming lang" overflow></v-btn-dropdown>
             <v-btn flat primary dark default @click.native="runCode()">Run code</v-btn>
+            <v-progress-circular indeterminate class="primary--text" v-show="show_progress"></v-progress-circular>
           </v-app-bar>
           <brace style="height: 500px"
                  :fontsize="fontSize.text"
@@ -91,7 +92,8 @@
           { text: 'json' }
         ],
         fontSize: {text: '12pt'},
-        lang: { text : 'java'}
+        lang: { text : 'java'},
+        show_progress: false
       }
     },
     computed: {
@@ -153,11 +155,14 @@
         this.content = target;
       },
       runCode() {
+        this.show_progress = !this.show_progress;
         const code = {sourceCode: this.content};
         axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
             this.response = response.data;
+            this.show_progress = !this.show_progress;
           });
+
       }
     },
   }
