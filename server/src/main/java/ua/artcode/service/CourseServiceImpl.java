@@ -82,6 +82,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Lesson addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException {
 
+        // todo make more simple
         Course course = getByID(courseID);
 
         // save locally for further operations
@@ -90,7 +91,8 @@ public class CourseServiceImpl implements CourseService {
         // update source and test root paths for lesson
         if (!lesson.getSourcesRoot().isEmpty()) {
             lesson.setSourcesRoot(normalizePath(checkStartsWithAndAppend(lesson.getSourcesRoot(), courseLocalPath)));
-        } else if (!lesson.getTestsRoot().isEmpty()) {
+        }
+        if (!lesson.getTestsRoot().isEmpty()) {
             lesson.setTestsRoot(normalizePath(checkStartsWithAndAppend(lesson.getTestsRoot(), courseLocalPath)));
         }
 
@@ -127,8 +129,7 @@ public class CourseServiceImpl implements CourseService {
         // check if files exist
         validationUtils.validateFiles(
                 lesson.getBaseClasses(),
-                lesson.getTestsClasses(),
-                lesson.getRequiredClasses());
+                lesson.getTestsClasses());
 
         List<Lesson> courseLessons = course.getLessons();
         if (courseLessons.contains(lesson)) {

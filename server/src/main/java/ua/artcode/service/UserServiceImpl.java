@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
     public boolean subscribe(int courseId, int userId) {
         Student student = studentDB.findOne(userId);
         Course course = courseRepository.findOne(courseId);
-
+        // todo save copy of original course for user and link path to user
         return student.subscribeTo(course) && studentDB.save(student) != null;
     }
 

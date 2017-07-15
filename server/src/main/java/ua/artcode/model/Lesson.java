@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 public class Lesson implements Comparable<Lesson> {
 
+    // todo remove fields, describe schema
     @Id
     @GeneratedValue
     @Column(name = "LESSON_ID")
@@ -20,12 +21,10 @@ public class Lesson implements Comparable<Lesson> {
     @NotNull
     private String name;
     @NotNull
-    private String localPath;
+    private String lessonPackage;
 
     @ElementCollection
     private List<String> baseClasses;
-    @ElementCollection
-    private List<String> requiredClasses;
     @ElementCollection
     private List<String> testsClasses;
 
@@ -44,23 +43,21 @@ public class Lesson implements Comparable<Lesson> {
 
     public Lesson(String name, String localPath) {
         this.name = name;
-        this.localPath = localPath;
+        this.lessonPackage = localPath;
     }
 
 
     public Lesson(String name,
                   String localPath,
                   List<String> baseClasses,
-                  List<String> requiredClasses,
                   List<String> testsClasses,
                   String sourcesRoot,
                   String testsRoot,
                   String description,
                   String theory) {
         this.name = name;
-        this.localPath = localPath;
+        this.lessonPackage = localPath;
         this.baseClasses = baseClasses;
-        this.requiredClasses = requiredClasses;
         this.testsClasses = testsClasses;
         this.sourcesRoot = sourcesRoot;
         this.testsRoot = testsRoot;
@@ -71,15 +68,13 @@ public class Lesson implements Comparable<Lesson> {
     public Lesson(String name,
                   String localPath,
                   List<String> baseClasses,
-                  List<String> requiredClasses,
                   List<String> testsClasses,
                   String sourcesRoot,
                   String testsRoot,
                   String description) {
         this.name = name;
-        this.localPath = localPath;
+        this.lessonPackage = localPath;
         this.baseClasses = baseClasses;
-        this.requiredClasses = requiredClasses;
         this.testsClasses = testsClasses;
         this.sourcesRoot = sourcesRoot;
         this.testsRoot = testsRoot;
@@ -93,14 +88,6 @@ public class Lesson implements Comparable<Lesson> {
 
     public void setBaseClasses(List<String> baseClasses) {
         this.baseClasses = baseClasses;
-    }
-
-    public List<String> getRequiredClasses() {
-        return requiredClasses;
-    }
-
-    public void setRequiredClasses(List<String> requiredClasses) {
-        this.requiredClasses = requiredClasses;
     }
 
     public List<String> getTestsClasses() {
@@ -152,11 +139,11 @@ public class Lesson implements Comparable<Lesson> {
     }
 
     public String getLocalPath() {
-        return localPath;
+        return lessonPackage;
     }
 
     public void setLocalPath(String localPath) {
-        this.localPath = localPath;
+        this.lessonPackage = localPath;
     }
 
     public int getCourseID() {

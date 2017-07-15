@@ -158,18 +158,20 @@ public class CourseIOUtils {
             }
         }
 
+        String finalSourceRoot = sourceRoot;
+
         classPaths = classPaths.stream().
                 map(path -> path.replace("/", File.separator))
+                .map(path -> finalSourceRoot + File.separator + path)
                 .collect(Collectors.toList());
 
         return new AbstractMap.SimpleEntry<>(classPaths, sourceRoot.replace("/", File.separator));
     }
 
     public String[] getLessonClassAndTestsPaths
-            (List<String> lessonSourceClasses, List<String> lessonTestsClasses, List<String> lessonRequiredClasses) throws
+            (List<String> lessonSourceClasses, List<String> lessonTestsClasses) throws
             IOException {
         lessonSourceClasses.addAll(lessonTestsClasses);
-        lessonSourceClasses.addAll(lessonRequiredClasses);
         return lessonSourceClasses.stream()
                 .filter(lesson -> lesson.endsWith(".java"))
                 .toArray(String[]::new);

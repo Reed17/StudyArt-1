@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -104,11 +105,14 @@ public class ValidationUtils {
 
     @SafeVarargs
     public final void validateFiles(List<String>... pathLists) throws ValidationException {
-        if (!Arrays.stream(pathLists)
+        final List<String> nonExistingFiles = Arrays.stream(pathLists)
                 .filter(list -> list != null && list.size() > 0)
                 .flatMap(Collection::stream)
-                .allMatch(path -> new File(path).exists())) {
-            throw new ValidationException("Files don't exist!");
+                .filter(path -> !new File(path).exists())
+                .collect(Collectors.toList());
+
+        if (!nonExistingFiles.isEmpty()) {
+            throw new ValidationException("Files don't exist!\n" + nonExistingFiles.stream().collect(Collectors.joining("\n")));
         }
     }
 }

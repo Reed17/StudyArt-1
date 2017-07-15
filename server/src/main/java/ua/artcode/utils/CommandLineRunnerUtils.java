@@ -104,10 +104,8 @@ public class CommandLineRunnerUtils {
                                 "Test lesson " + j,
                                 "_02_lesson",
                                 null,
-                                null,
                                 Collections.singletonList("src/test/java/_02_lesson/SolutionTests.java"),
                                 "src/main/java/_02_lesson",
-                                null,
                                 description,
                                 theory),
                         null
@@ -134,9 +132,10 @@ public class CommandLineRunnerUtils {
         Lesson firstLesson = new Lesson(
                 "FirstLesson",
                 "week1",
-                Collections.singletonList("src/main/java/week1/Task1.java"), null,
-                Collections.singletonList("src/test/java/week1/TestTask1.java"),
-                null, null, null);
+                Collections.singletonList("Task1.java"),
+                Collections.singletonList("TestTask1.java"), // todo if null - parse from local path
+                "src/main/java/week1", "src/test/java/week1", ""); // remove
+        // todo we already have 'src/main/java' and 'course local path', so there is no need in sources/tests root
 
         try {
             Lesson savedLesson = courseService.addLesson(firstLesson, savedCourse.getId());

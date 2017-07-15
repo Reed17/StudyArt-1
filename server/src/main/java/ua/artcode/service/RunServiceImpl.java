@@ -75,8 +75,7 @@ public class RunServiceImpl implements RunService {
         String[] classPaths =
                 courseIOUtils.getLessonClassAndTestsPaths(
                         lesson.getBaseClasses(),
-                        lesson.getTestsClasses(),
-                        lesson.getRequiredClasses());
+                        lesson.getTestsClasses());
 
         String sourcesRoot = course.getSourcesRoot();
         String testsRoot = course.getTestsRoot();

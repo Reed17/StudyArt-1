@@ -1,6 +1,7 @@
 package ua.artcode.model;
 
 import javax.persistence.*;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -16,11 +17,18 @@ import static ua.artcode.enums.UserType.STUDENT;
 public class Student extends User {
 
     private static final Map<String, Boolean> STUDENT_RIGHTS = createRightsMap();
+
+
+//    private Map<Integer, String> userCourseCopies = new HashMap<>(); // todo course copies
+    // course1 --- git... or local path
+    // course2 --- git...
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "STUDENT_SUBSCRIBED",
             joinColumns = {@JoinColumn(name = "USER_ID")},
             inverseJoinColumns = {@JoinColumn(name = "COURSE_ID")})
     private Set<Course> subscribed;
+
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "STUDENT_COMPLETED",
             joinColumns = {@JoinColumn(name = "USER_ID")},
