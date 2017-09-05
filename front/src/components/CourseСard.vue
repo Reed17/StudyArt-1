@@ -22,6 +22,7 @@
         </v-container>
       </v-card-text>
 
+     <!-- TODO fix bug -->
       <v-card-row v-if="userType==='STUDENT' && !subscribed.includes(course.id)" actions>
         <v-btn @click.native="subscribe">Subscribe</v-btn>
       </v-card-row>
@@ -47,9 +48,11 @@
   import AppLesson from "./Lesson";
   import axios from 'axios';
   import PROPERTIES from '../properties'
+
   export default{
     components: {AppLesson},
     name: 'course-card',
+
     data() {
       return {
         subscribeOk: false,
@@ -59,11 +62,13 @@
         subscribed: [],
       }
     },
+
     computed: {
       link: function () {
         return '/course/' + this.course.id;
       }
     },
+
     props: {
       course: {
         required: true,

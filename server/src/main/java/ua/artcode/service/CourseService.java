@@ -26,6 +26,10 @@ public interface CourseService {
 
     Lesson getLessonByID(int id) throws UnexpectedNullException, LessonNotFoundException;
 
+    Integer getPreviousLessonId(int id) throws LessonNotFoundException, UnexpectedNullException;
+
+    Integer getNextLessonId(int id) throws UnexpectedNullException, LessonNotFoundException;
+
     List<Lesson> getAllLessons();
 
     List<Course> getAllCourses();

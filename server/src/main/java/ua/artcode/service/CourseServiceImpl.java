@@ -167,6 +167,26 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Integer getPreviousLessonId(int id) throws LessonNotFoundException, UnexpectedNullException {
+        Lesson lesson = getLessonByID(id);
+        List<Lesson> courseLessons = getByID(lesson.getCourseID()).getLessons();
+
+        int ind = courseLessons.indexOf(lesson);
+
+        return (ind - 1 < 0) ? null : courseLessons.get(ind - 1).getId();
+    }
+
+    @Override
+    public Integer getNextLessonId(int id) throws UnexpectedNullException, LessonNotFoundException {
+
+        Lesson lesson = getLessonByID(id);
+        List<Lesson> courseLessons = getByID(lesson.getCourseID()).getLessons();
+        int ind = courseLessons.indexOf(lesson);
+
+        return (ind < 0 || ind >= (courseLessons.size() - 1)) ? null : courseLessons.get(ind + 1).getId();
+    }
+
+    @Override
     public List<Lesson> getAllLessons() {
         return StreamSupport.stream(lessonRepository.findAll().spliterator(), false)
                 .collect(Collectors.toList());

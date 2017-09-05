@@ -39,10 +39,10 @@
     },
 
     computed: {
-      filteredCourses: function () {
+      filteredCourses() {
         return this.filterCourses()
       },
-      filterKeyLowerCase: function () {
+      filterKeyLowerCase() {
         return this.filterKey.toLowerCase();
       }
     },
@@ -71,11 +71,7 @@
         return courses.filter((course) =>
           course.name.toLowerCase().includes(this.filterKeyLowerCase) ||
           course.description.toLowerCase().includes(this.filterKeyLowerCase)
-        ).sort(this.sortCoursesComparator);
-      },
-
-      sortCoursesComparator(course1, course2){
-        return course1.name.localeCompare(course2.name) > 0;
+        ).sort((course1, course2) => course1.name.localeCompare(course2.name) > 0);
       },
     }
   }

@@ -3,11 +3,23 @@
   <div>
 
     <v-expansion-panel expand>
-      <v-expansion-panel-content class="white" v-model=expanded>
+      <v-expansion-panel-content class="white" v-model="expanded">
         <div slot="header" >
-          <v-card-title >{{lesson.name}}</v-card-title>
+          <v-card-title >
+
+            <v-btn icon :disabled="!prevLessonLink" class="indigo--text lesson-navigation-links" router :href="prevLessonLink">
+              <v-icon>arrow_back</v-icon>
+            </v-btn>
+
+            {{lesson.name}}
+
+            <v-btn icon :disabled="!nextLessonLink" class="indigo--text lesson-navigation-links" router :href="nextLessonLink">
+              <v-icon>arrow_forward</v-icon>
+            </v-btn>
+
+          </v-card-title>
         </div>
-        <v-card-text class="white">
+        <v-card-text class="white" v-if="compiledMarkdownDescr != ''">
           <div v-html="compiledMarkdownDescr"></div>
         </v-card-text>
       </v-expansion-panel-content>
@@ -77,7 +89,7 @@
         response: '',
         lesson: Object,
         content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
-        expanded: 'True',
+        expanded: false,
         dropdown_font: [
           { text: '12pt' },
           { text: '14pt' },
@@ -93,35 +105,86 @@
         ],
         fontSize: {text: '12pt'},
         lang: { text : 'java'},
-        show_progress: false
+        show_progress: false,
+        nextLessonId: '',
+        prevLessonId: ''
       }
     },
+
     computed: {
       compiledMarkdownDescr: function () {
         if (this.lesson.description != undefined)
           return marked(this.lesson.description, {sanitize: true})
       },
+
       compiledMarkdownTheory: function () {
         if (this.lesson.theory != undefined)
           return marked(this.lesson.theory, {sanitize: true})
       },
+
       formattedResponse() {
         return this.response ?
           this.response.methodResult ?
             `${this.response.methodResult.systemOut}`
             : `Error: ${this.response.generalResponse.message}` : ''
+      },
+
+      nextLessonLink() {
+        return this.nextLessonId ? ('/lessonCard/' + this.nextLessonId) : '';
+      },
+
+      prevLessonLink() {
+        return this.prevLessonId ? ('/lessonCard/' + this.prevLessonId) : '';
       }
     },
+
     components: {
       Brace
     },
+
     mounted(){
       this.fetchLesson();
+      this.fetchNextLessonId();
+      this.fetchPrevLessonId();
       this.split();
     },
-    methods: {
-      fetchLesson() {
 
+    methods: {
+      fetchNextLessonId() {
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.get(PROPERTIES.HOST + '/courses/lessons/getNextId', {
+          params: {
+            id: this.$route.params.id
+          },
+          headers
+        })
+          .then((response) => {
+            this.nextLessonId = response.data;
+          });
+      },
+
+      fetchPrevLessonId() {
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        axios.get(PROPERTIES.HOST + '/courses/lessons/getPrevId', {
+          params: {
+            id: this.$route.params.id
+          },
+          headers
+        })
+          .then((response) => {
+            this.prevLessonId = response.data;
+          });
+      },
+
+      fetchLesson() {
         const headers = {
           'Content-Type': 'application/json',
           'Authorization': this.$cookie.get('token'),
@@ -151,9 +214,11 @@
           gutterSize: 5
         });
       },
+
       getCode(target){
         this.content = target;
       },
+
       runCode() {
         this.show_progress = !this.show_progress;
         const code = {sourceCode: this.content};
@@ -256,4 +321,3 @@
     float: left;
   }
 </style>
-

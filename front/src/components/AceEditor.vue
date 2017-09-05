@@ -41,7 +41,7 @@
 
 <script>
 
-  import axios from "axios";
+  import axios from 'axios'
   import PROPERTIES from '../properties'
   import Brace from 'xen-brace'
 

@@ -34,18 +34,22 @@
 </template>
 
 <script>
-  import axios from "axios";
+  import axios from 'axios'
   import PROPERTIES from '../properties'
+
   export default {
     name: 'course',
+
     data(){
       return {
         course: Object,
       }
     },
+
     mounted(){
       this.fetchCourse();
     },
+
     methods: {
       fetchCourse() {
 

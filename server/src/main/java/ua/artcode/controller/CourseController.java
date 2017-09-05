@@ -5,8 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ua.artcode.exceptions.AppException;
-import ua.artcode.exceptions.SuchCourseAlreadyExists;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
@@ -71,6 +70,33 @@ public class CourseController {
         return lesson;
 
     }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get a next lesson, returns id or null",
+            response = Integer.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/getNextId", method = RequestMethod.GET)
+    public Integer getNextLessonID(@RequestParam int id) throws AppException {
+
+        Integer resId = courseService.getNextLessonId(id);
+        LOGGER.info("Lesson get next - OK");
+
+        return resId;
+    }
+
+    @ApiOperation(httpMethod = "GET",
+            value = "Resource to get a previous lesson, returns id or null",
+            response = Integer.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/getPrevId", method = RequestMethod.GET)
+    public Integer getPreviousLessonID(@RequestParam int id) throws AppException {
+
+        Integer resId = courseService.getPreviousLessonId(id);
+        LOGGER.info("Lesson get previous - OK");
+
+        return resId;
+    }
+
 
     @ApiOperation(httpMethod = "GET",
             value = "Resource to get all lesson",
@@ -157,4 +183,11 @@ public class CourseController {
         }
     }
 
+    // helper
+    private int getLessonIndex(int id) throws AppException {
+        Lesson lesson = courseService.getLessonByID(id);
+        List<Lesson> courseLessons = courseService.getByID(lesson.getCourseID()).getLessons();
+
+        return courseLessons.indexOf(lesson);
+    }
 }
