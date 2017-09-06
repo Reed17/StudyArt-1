@@ -19,8 +19,13 @@
 
           </v-card-title>
         </div>
-        <v-card-text class="white" v-if="compiledMarkdownDescr != ''">
+        <!-- <v-card-text class="white" v-if="compiledMarkdownDescr != ''">
           <div v-html="compiledMarkdownDescr"></div>
+        </v-card-text> -->
+        <v-card-text class="white">
+          <!-- <v-expansion-panel> -->
+            <app-lesson v-for="lessonObj in allLessons" :current="lessonObj.id == lesson.id" :lesson="lessonObj" :key="lessonObj.name"></app-lesson>
+          <!-- </v-expansion-panel> -->
         </v-card-text>
       </v-expansion-panel-content>
     </v-expansion-panel>
@@ -74,16 +79,20 @@
 </template>
 
 <script>
+  import Vue from 'vue';
+  import AppLesson from "./Lesson";
   import axios from "axios";
   import PROPERTIES from '../properties';
   import marked from 'marked';
   import Split from 'split.js'
   import Brace from 'xen-brace'
 
+  Vue.component('app-lesson', AppLesson);
 
   export default {
-
+    // components: {AppLesson},
     name: 'lesson-card',
+
     data(){
       return {
         response: '',
@@ -106,8 +115,7 @@
         fontSize: {text: '12pt'},
         lang: { text : 'java'},
         show_progress: false,
-        nextLessonId: '',
-        prevLessonId: ''
+        allLessons: []
       }
     },
 
@@ -130,11 +138,25 @@
       },
 
       nextLessonLink() {
-        return this.nextLessonId ? ('/lessonCard/' + this.nextLessonId) : '';
+        let ind = -1
+
+        this.allLessons.forEach((l, i) => {
+          if(l.id == this.$route.params.id) ind = i;
+        });
+        ind++;
+
+        return ((ind > 0) && (ind < this.allLessons.length)) ? `/lessonCard/${this.allLessons[ind].id}` : '';
       },
 
       prevLessonLink() {
-        return this.prevLessonId ? ('/lessonCard/' + this.prevLessonId) : '';
+        let ind = -1
+
+        this.allLessons.forEach((l, i) => {
+          if(l.id == this.$route.params.id) ind = i;
+        });
+        ind--;
+
+        return (ind >= 0) ? `/lessonCard/${this.allLessons[ind].id}` : '';
       }
     },
 
@@ -144,43 +166,26 @@
 
     mounted(){
       this.fetchLesson();
-      this.fetchNextLessonId();
-      this.fetchPrevLessonId();
+      this.fetchAllLessonsOfCourse();
       this.split();
     },
 
     methods: {
-      fetchNextLessonId() {
+      fetchAllLessonsOfCourse() {
         const headers = {
           'Content-Type': 'application/json',
           'Authorization': this.$cookie.get('token'),
         };
 
-        axios.get(PROPERTIES.HOST + '/courses/lessons/getNextId', {
+        axios.get(PROPERTIES.HOST + '/courses/lessons/getAllLessonsOfCourse', {
           params: {
             id: this.$route.params.id
           },
           headers
         })
           .then((response) => {
-            this.nextLessonId = response.data;
-          });
-      },
-
-      fetchPrevLessonId() {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
-
-        axios.get(PROPERTIES.HOST + '/courses/lessons/getPrevId', {
-          params: {
-            id: this.$route.params.id
-          },
-          headers
-        })
-          .then((response) => {
-            this.prevLessonId = response.data;
+            console.log(response);
+            this.allLessons = response.data;
           });
       },
 

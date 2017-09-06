@@ -4,6 +4,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.model.response.FetchLessonsResponseEntity;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
@@ -26,9 +27,7 @@ public interface CourseService {
 
     Lesson getLessonByID(int id) throws UnexpectedNullException, LessonNotFoundException;
 
-    Integer getPreviousLessonId(int id) throws LessonNotFoundException, UnexpectedNullException;
-
-    Integer getNextLessonId(int id) throws UnexpectedNullException, LessonNotFoundException;
+    List<FetchLessonsResponseEntity> getAllLessonsOfCourse(int id) throws LessonNotFoundException, UnexpectedNullException;
 
     List<Lesson> getAllLessons();
 

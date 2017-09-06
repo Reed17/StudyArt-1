@@ -11,6 +11,7 @@ import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.model.response.FetchLessonsResponseEntity;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.ResultChecker;
@@ -167,23 +168,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Integer getPreviousLessonId(int id) throws LessonNotFoundException, UnexpectedNullException {
-        Lesson lesson = getLessonByID(id);
-        List<Lesson> courseLessons = getByID(lesson.getCourseID()).getLessons();
+    public List<FetchLessonsResponseEntity> getAllLessonsOfCourse(int id) throws LessonNotFoundException, UnexpectedNullException {
 
-        int ind = courseLessons.indexOf(lesson);
-
-        return (ind - 1 < 0) ? null : courseLessons.get(ind - 1).getId();
-    }
-
-    @Override
-    public Integer getNextLessonId(int id) throws UnexpectedNullException, LessonNotFoundException {
-
-        Lesson lesson = getLessonByID(id);
-        List<Lesson> courseLessons = getByID(lesson.getCourseID()).getLessons();
-        int ind = courseLessons.indexOf(lesson);
-
-        return (ind < 0 || ind >= (courseLessons.size() - 1)) ? null : courseLessons.get(ind + 1).getId();
+        return getByID(getLessonByID(id).getId()).getLessons()
+                .stream().map(l -> new FetchLessonsResponseEntity(l.getName(), l.getId()))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -3,11 +3,11 @@
     <div slot="header">{{ course.name }}</div>
     <v-card>
       <v-card-text class="grey lighten-3">
-        Author: {{course.author}}
+        Author: {{ course.author }}
       </v-card-text>
       <v-divider></v-divider>
       <v-card-text class="grey lighten-3">
-        URL: {{course.url}}
+        URL: {{ course.url }}
       </v-card-text>
       <v-divider></v-divider>
       <v-card-text class="grey lighten-3">
@@ -64,7 +64,7 @@
     },
 
     computed: {
-      link: function () {
+      link() {
         return '/course/' + this.course.id;
       }
     },
@@ -75,12 +75,12 @@
       }
     },
 
-    mounted(){
+    mounted() {
       this.fetchSubscribed();
     },
 
     methods: {
-      subscribe(){
+      subscribe() {
         if (this.subscribeOk) {
           this.subscribedOkInfo = "Already subscribed.";
           return;
@@ -103,7 +103,7 @@
           });
       },
 
-      fetchSubscribed(){
+      fetchSubscribed() {
         const headers = {
           'Content-Type': 'application/json',
           'Authorization': this.$cookie.get('token'),

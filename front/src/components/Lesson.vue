@@ -1,13 +1,9 @@
 <template>
 
   <v-card>
-    <!-- <v-card-row class="grey lighten-3"> -->
-      <!-- <v-card-title> -->
-        <v-btn block class="lesson-link" router :href='link'>
-          <span class="lesson-name">{{ lesson.name }}</span>
-        </v-btn>
-      <!-- </v-card-title> -->
-    <!-- </v-card-row> -->
+    <v-btn block :warning="current" class="lesson-link" router :href='link'>
+      <span class="lesson-name">{{ lesson.name }}</span>
+    </v-btn>
   </v-card>
 </template>
 
@@ -24,6 +20,9 @@
     props: {
       lesson: {
         required: true,
+      },
+      current: {
+        required: false
       }
     },
 

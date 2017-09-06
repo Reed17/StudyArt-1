@@ -9,6 +9,7 @@ import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
+import ua.artcode.model.response.FetchLessonsResponseEntity;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.model.response.RunResults;
@@ -18,6 +19,7 @@ import ua.artcode.service.RunService;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class CourseController {
@@ -72,29 +74,16 @@ public class CourseController {
     }
 
     @ApiOperation(httpMethod = "GET",
-            value = "Resource to get a next lesson, returns id or null",
-            response = Integer.class,
+            value = "Resource to get all lessons of course(by id of any lesson)",
+            response = List.class,
             produces = "application/json")
-    @RequestMapping(value = "/courses/lessons/getNextId", method = RequestMethod.GET)
-    public Integer getNextLessonID(@RequestParam int id) throws AppException {
+    @RequestMapping(value = "/courses/lessons/getAllLessonsOfCourse", method = RequestMethod.GET)
+    public List<FetchLessonsResponseEntity> getAllLessonsOfCourse(@RequestParam int id) throws AppException {
 
-        Integer resId = courseService.getNextLessonId(id);
-        LOGGER.info("Lesson get next - OK");
+        List<FetchLessonsResponseEntity> responseList = courseService.getAllLessonsOfCourse(id);
+        LOGGER.info("Lesson get all lesson of course - OK");
 
-        return resId;
-    }
-
-    @ApiOperation(httpMethod = "GET",
-            value = "Resource to get a previous lesson, returns id or null",
-            response = Integer.class,
-            produces = "application/json")
-    @RequestMapping(value = "/courses/lessons/getPrevId", method = RequestMethod.GET)
-    public Integer getPreviousLessonID(@RequestParam int id) throws AppException {
-
-        Integer resId = courseService.getPreviousLessonId(id);
-        LOGGER.info("Lesson get previous - OK");
-
-        return resId;
+        return responseList;
     }
 
 
