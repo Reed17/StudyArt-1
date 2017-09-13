@@ -1,5 +1,7 @@
 package ua.artcode.model;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -18,8 +20,8 @@ public class Student extends User {
 
     private static final Map<String, Boolean> STUDENT_RIGHTS = createRightsMap();
 
-
-//    private Map<Integer, String> userCourseCopies = new HashMap<>(); // todo course copies
+    @Type(type = "org.hibernate.type.SerializableToBlobType")
+    private Map<Integer, UserCourseCopy> userCourseCopies = new HashMap<>(); // todo course copies
     // course1 --- git... or local path
     // course2 --- git...
 
@@ -43,6 +45,13 @@ public class Student extends User {
         super(login, pass, email, STUDENT);
         subscribed = new HashSet<>();
         completed = new HashSet<>();
+    }
+
+    public Student(String login, String pass, String email, Map<Integer, UserCourseCopy> userCourseCopies) {
+        super(login, pass, email, STUDENT);
+        subscribed = new HashSet<>();
+        completed = new HashSet<>();
+        this.userCourseCopies = userCourseCopies;
     }
 
     private static Map<String, Boolean> createRightsMap() {
@@ -76,12 +85,24 @@ public class Student extends User {
         this.completed = completed;
     }
 
-    public boolean subscribeTo(Course course) {
-        return !subscribed.contains(course) && subscribed.add(course);
+//    public boolean subscribeTo(Course course) {
+//        if (!subscribed.contains(course)) {
+//
+//            return subscribed.add(course);
+//        }
+////        return !subscribed.contains(course) && subscribed.add(course);
+//    }
+
+    public Map<Integer, UserCourseCopy> getUserCourseCopies() {
+        return userCourseCopies;
+    }
+
+    public void setUserCourseCopies(Map<Integer, UserCourseCopy> userCourseCopies) {
+        this.userCourseCopies = userCourseCopies;
     }
 
     @Override
-    public boolean isAccessable(String reqUrl) {
+    public boolean isAccessible(String reqUrl) {
         return STUDENT_RIGHTS.get(reqUrl);
     }
 }

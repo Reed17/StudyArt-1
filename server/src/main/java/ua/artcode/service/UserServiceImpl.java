@@ -1,24 +1,24 @@
 package ua.artcode.service;
 
 import org.apache.log4j.Logger;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.dao.repositories.TeacherRepository;
 import ua.artcode.enums.UserType;
-import ua.artcode.exceptions.InvalidUserEmailException;
-import ua.artcode.exceptions.InvalidUserLoginException;
-import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.exceptions.UserNotFoundException;
-import ua.artcode.model.Course;
-import ua.artcode.model.Student;
-import ua.artcode.model.Teacher;
-import ua.artcode.model.User;
+import ua.artcode.exceptions.*;
+import ua.artcode.model.*;
 import ua.artcode.utils.AppPropertyHolder;
+import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static ua.artcode.enums.UserType.TEACHER;
 
@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final MailUtils mu;
     private final CourseRepository courseRepository;
     private final AppPropertyHolder.Email mailProps;
+    private final CourseIOUtils courseIOUtils;
 
     @Autowired
     public UserServiceImpl(TeacherRepository teacherDB,
@@ -43,7 +44,8 @@ public class UserServiceImpl implements UserService {
                            SecurityUtils securityUtils,
                            MailUtils mu,
                            CourseRepository courseRepository,
-                           AppPropertyHolder appPropertyHolder) {
+                           AppPropertyHolder appPropertyHolder,
+                           CourseIOUtils courseIOUtils) {
         this.teacherDB = teacherDB;
         this.studentDB = studentDB;
         this.validationUtils = validationUtils;
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
         this.mu = mu;
         this.courseRepository = courseRepository;
         this.mailProps = appPropertyHolder.getEmail();
+        this.courseIOUtils = courseIOUtils;
     }
 
 
@@ -107,11 +110,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean subscribe(int courseId, int userId) {
+    public boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException {
         Student student = studentDB.findOne(userId);
         Course course = courseRepository.findOne(courseId);
         // todo save copy of original course for user and link path to user
-        return student.subscribeTo(course) && studentDB.save(student) != null;
+
+//        return student.subscribeTo(course) && studentDB.save(student) != null;
+        Set<Course> subscribed = student.getSubscribed();
+
+
+        return !subscribed.contains(course) && (subscribed.add(course) &&
+            student.getUserCourseCopies()
+                .put(courseId,
+                    new UserCourseCopy(
+                        courseIOUtils.saveCourseLocally(
+                            course.getUrl(), course.getName(), course.getId(), userId)))
+                                != null);
+
     }
 
     @Override

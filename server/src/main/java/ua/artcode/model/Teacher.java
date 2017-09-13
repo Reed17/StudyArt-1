@@ -58,7 +58,7 @@ public class Teacher extends User {
     }
 
     @Override
-    public boolean isAccessable(String reqUrl) {
+    public boolean isAccessible(String reqUrl) {
         return TEACHER_RIGHTS.get(reqUrl);
     }
 }

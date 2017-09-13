@@ -81,7 +81,7 @@ public class User {
         this.userType = userType;
     }
 
-    public boolean isAccessable(String reqUrl) {
+    public boolean isAccessible(String reqUrl) {
         return false;
     }
 }

@@ -2,9 +2,11 @@ package ua.artcode.controller;
 
 import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.AppException;
+import ua.artcode.exceptions.DirectoryCreatingException;
 import ua.artcode.exceptions.InvalidUserLoginException;
 import ua.artcode.exceptions.UserNotFoundException;
 import ua.artcode.model.User;
@@ -13,6 +15,8 @@ import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.model.response.GeneralResponse;
 import ua.artcode.model.response.ResponseType;
 import ua.artcode.service.UserServiceImpl;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Created by zhenia on 27.04.17.
@@ -71,11 +75,16 @@ public class UserController {
         return found;
     }
 
+    // TODO check passing userId with request
     @ApiOperation(httpMethod = "GET",
             value = "Subscribe to course",
             produces = "application/json")
     @RequestMapping(value = "/subscribe", method = RequestMethod.GET)
-    public GeneralResponse subscribeToCourse(@RequestParam int courseId, @RequestParam int userId) {
+    public GeneralResponse subscribeToCourse(@RequestParam int courseId, HttpServletRequest req) throws GitAPIException, DirectoryCreatingException, InvalidUserLoginException {
+
+        Integer userId = (Integer) req.getAttribute("User");
+        if (userId == null) throw new InvalidUserLoginException("Invalid access token");
+
         boolean result = userService.subscribe(courseId, userId);
 
         LOGGER.info(String.format("Subscribe to course - %s, userId %d, courseId %d",

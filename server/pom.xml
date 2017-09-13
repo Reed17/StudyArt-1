@@ -125,6 +125,11 @@
             <artifactId>mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${apache.validator.version}</version>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -142,6 +147,7 @@
         <spring-data-version>1.11.3.RELEASE</spring-data-version>
         <spring-aop.version>4.3.8.RELEASE</spring-aop.version>
         <jjwt.version>0.7.0</jjwt.version>
+        <apache.validator.version>1.6</apache.validator.version>
     </properties>
 
     <build>

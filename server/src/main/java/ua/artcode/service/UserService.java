@@ -1,10 +1,8 @@
 package ua.artcode.service;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import ua.artcode.enums.UserType;
-import ua.artcode.exceptions.InvalidUserEmailException;
-import ua.artcode.exceptions.InvalidUserLoginException;
-import ua.artcode.exceptions.InvalidUserPassException;
-import ua.artcode.exceptions.UserNotFoundException;
+import ua.artcode.exceptions.*;
 import ua.artcode.model.User;
 
 /**
@@ -35,7 +33,7 @@ public interface UserService {
 
     User findByUserName(String userName) throws InvalidUserLoginException;
 
-    boolean subscribe(int courseId, int userId);
+    boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException;
 
     boolean changePersonalInfo(String oldPass, String newPass, String email, int id, UserType userType) throws InvalidUserPassException;
 

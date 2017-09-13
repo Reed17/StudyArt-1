@@ -65,7 +65,33 @@ public class CourseIOUtils {
     // todo save in directory from app.properties
     public String saveCourseLocally(String courseURL,
                                     String courseName,
+                                    int courseID,
+                                    int userID) throws DirectoryCreatingException, GitAPIException {
+
+        String projectPath = generatePath(courseName, courseID, userID);
+        File projectDirectory = new File(projectPath);
+        try {
+            if (projectDirectory.exists()) {
+                FileUtils.cleanDirectory(new File(projectPath));
+            }
+            Files.createDirectories(Paths.get(projectPath));
+            Git.cloneRepository()
+                    .setURI(courseURL)
+                    .setDirectory(projectDirectory)
+                    .call()
+                    .getRepository()
+                    .close();
+
+        } catch (IOException e) {
+            throw new DirectoryCreatingException("Unable to create a directory for course: " + courseName);
+        }
+        return projectPath;
+    }
+
+    public String saveCourseLocally(String courseURL,
+                                    String courseName,
                                     int courseID) throws DirectoryCreatingException, GitAPIException {
+
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
         try {
@@ -85,6 +111,7 @@ public class CourseIOUtils {
         }
         return projectPath;
     }
+
 
     /**
      * Parse lessons from project folder and save them in corresponding course field (as List)
@@ -275,7 +302,11 @@ public class CourseIOUtils {
         return path.endsWith(File.separator) ? path : path + File.separator;
     }
 
-    private String generatePath(String courseName, int courceID) {
-        return paths.getGit() + File.separator + courceID + courseName + File.separator;
+    private String generatePath(String courseName, int courseID, int userID) {
+        return paths.getGit() + File.separator + userID + courseID + courseName + File.separator;
+    }
+
+    private String generatePath(String courseName, int courseID) {
+        return paths.getGit() + File.separator + courseID + courseName + File.separator;
     }
 }

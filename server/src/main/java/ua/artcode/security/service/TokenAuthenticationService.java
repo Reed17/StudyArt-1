@@ -56,6 +56,7 @@ public class TokenAuthenticationService {
 
             try {
                 appUser = userService.findByUserName(user);
+                request.setAttribute("User", appUser.getId());
             } catch (InvalidUserLoginException e) {
                 return null;
             }
