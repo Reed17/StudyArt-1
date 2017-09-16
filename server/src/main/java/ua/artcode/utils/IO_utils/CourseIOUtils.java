@@ -285,6 +285,15 @@ public class CourseIOUtils {
                 .toArray(String[]::new);
     }
 
+    public String getValidPathForUsersCourse(String pathToClass, String userSource) {
+        String[] sourceSplitted = userSource.split(File.separator);
+        String[] pathSplitted = pathToClass.split(File.separator);
+
+        pathSplitted[sourceSplitted.length - 1] = sourceSplitted[sourceSplitted.length - 1];
+
+        return String.join(File.separator, pathSplitted);
+    }
+
     private String generatePomPath(String projectRoot) {
         projectRoot = checkEndsWithSeparator(projectRoot);
         return projectRoot + "pom.xml";

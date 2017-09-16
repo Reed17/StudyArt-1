@@ -8,20 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
+import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
+import ua.artcode.model.Student;
+import ua.artcode.model.UserCourseCopy;
 import ua.artcode.model.response.FetchLessonsResponseEntity;
+import ua.artcode.model.response.LessonResponse;
 import ua.artcode.utils.IO_utils.CommonIOUtils;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
 import ua.artcode.utils.ResultChecker;
 import ua.artcode.utils.ValidationUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.AbstractMap;
-import java.util.Collection;
-import java.util.List;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -38,6 +41,7 @@ public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
+    private final StudentRepository studentRepository;
     private final CourseIOUtils courseIOUtils;
     private final ValidationUtils validationUtils;
     private final ResultChecker resultChecker;
@@ -45,12 +49,14 @@ public class CourseServiceImpl implements CourseService {
     @Autowired
     public CourseServiceImpl(CourseRepository courseRepository, LessonRepository lessonRepository,
                              CourseIOUtils courseIOUtils, CommonIOUtils commonIOUtils,
-                             ValidationUtils validateFiles, ResultChecker resultChecker) {
+                             ValidationUtils validateFiles, ResultChecker resultChecker,
+                             StudentRepository studentRepository) {
         this.courseRepository = courseRepository;
         this.lessonRepository = lessonRepository;
         this.courseIOUtils = courseIOUtils;
         this.validationUtils = validateFiles;
         this.resultChecker = resultChecker;
+        this.studentRepository = studentRepository;
     }
 
     @Override
@@ -153,7 +159,41 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Lesson getLessonByID(int id) throws LessonNotFoundException {
+    public LessonResponse getLessonByID(int id, int userId) throws LessonNotFoundException {
+        Lesson result = lessonRepository.findOne(id);
+
+        if (result == null) {
+            String message = "Lesson with id " + id + " not found.";
+            LessonNotFoundException lessonNotFoundException = new LessonNotFoundException(message);
+
+            LOGGER.error(message, lessonNotFoundException);
+            throw lessonNotFoundException;
+        }
+
+
+        List<String> classes = new ArrayList<>();
+
+        result.getBaseClasses().forEach(c -> {
+            try {
+                Student student = studentRepository.findOne(userId);
+                UserCourseCopy copy = student.getUserCourseCopies().get(result.getCourseID());
+
+                String userSource = copy.getPath();
+
+                classes.add(new String(Files.readAllBytes(
+                        Paths.get(courseIOUtils.getValidPathForUsersCourse(c, userSource)))));
+
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage());
+            }
+        });
+
+        return new LessonResponse(
+                result.getId(), result.getName(), classes, result.getDescription(), result.getTheory());
+    }
+
+    @Override
+    public Lesson getLessonByID(int id) throws UnexpectedNullException, LessonNotFoundException {
         Lesson result = lessonRepository.findOne(id);
 
         if (result == null) {
@@ -168,9 +208,10 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public List<FetchLessonsResponseEntity> getAllLessonsOfCourse(int id) throws LessonNotFoundException, UnexpectedNullException {
+    public List<FetchLessonsResponseEntity> getAllLessonsOfCourse(int id)
+            throws LessonNotFoundException, UnexpectedNullException {
 
-        return getByID(getLessonByID(id).getId()).getLessons()
+        return getByID(lessonRepository.findOne(id).getCourseID()).getLessons()
                 .stream().map(l -> new FetchLessonsResponseEntity(l.getName(), l.getId()))
                 .collect(Collectors.toList());
     }

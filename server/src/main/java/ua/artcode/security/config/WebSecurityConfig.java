@@ -47,7 +47,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .hasRole("TEACHER")
                 .antMatchers(
                         "/courses/lessons/send-solution-and-run-tests",
+                        "/courses/lessons/send-base-solution-and-run-tests",
                         "/courses/lessons/send-solution-and-run-tests/**",
+                        "/courses/lessons/send-base-solution-and-run-tests/**",
                         "/subscribe")
                 .hasRole("STUDENT")
                 .anyRequest()

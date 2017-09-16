@@ -5,6 +5,7 @@ import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.Lesson;
 import ua.artcode.model.response.FetchLessonsResponseEntity;
+import ua.artcode.model.response.LessonResponse;
 
 import javax.xml.bind.ValidationException;
 import java.io.IOException;
@@ -24,6 +25,8 @@ public interface CourseService {
     Collection<Course> getAll();
 
     Lesson addLesson(Lesson lesson, int courseID) throws GitAPIException, IOException, AppException, ValidationException;
+
+    LessonResponse getLessonByID(int id, int userId) throws UnexpectedNullException, LessonNotFoundException;
 
     Lesson getLessonByID(int id) throws UnexpectedNullException, LessonNotFoundException;
 

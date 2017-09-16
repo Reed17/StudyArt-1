@@ -4,22 +4,20 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import ua.artcode.exceptions.*;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
-import ua.artcode.model.response.FetchLessonsResponseEntity;
-import ua.artcode.model.response.GeneralResponse;
-import ua.artcode.model.response.ResponseType;
-import ua.artcode.model.response.RunResults;
+import ua.artcode.model.response.*;
 import ua.artcode.service.CourseService;
 import ua.artcode.service.RunService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class CourseController {
@@ -65,9 +63,15 @@ public class CourseController {
             response = Lesson.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
-    public Lesson getLessonByID(@RequestParam int id) throws AppException {
+    public LessonResponse getLessonByID(@RequestParam int id, HttpServletRequest request) throws AppException, AuthenticationException {
 
-        Lesson lesson = courseService.getLessonByID(id);
+        Integer userId = (Integer) request.getAttribute("User");
+
+        if (userId == null) {
+            throw new AuthenticationServiceException("Not authorised");
+        }
+
+        LessonResponse lesson = courseService.getLessonByID(id, userId);
         LOGGER.info("Lesson get - OK, id {}", id);
         return lesson;
 
@@ -105,7 +109,9 @@ public class CourseController {
             response = GeneralResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/add", method = RequestMethod.POST)
-    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request) throws SuchCourseAlreadyExists {
+    public GeneralResponse addCourse(@RequestBody @Valid Course course, HttpServletRequest request)
+            throws SuchCourseAlreadyExists {
+
         Course result = courseService.addCourse(course);
 
         LOGGER.info("Course ADD - OK. Course (name - {}, author - {}, url - {})",
@@ -142,8 +148,34 @@ public class CourseController {
     public RunResults runLessonWithSolutionTests(@RequestParam int lessonId,
                                                  @RequestParam String url,
                                                  HttpServletRequest request) {
+
         try {
             RunResults results = runService.runLessonWithSolutionTests(lessonId, url);
+            LOGGER.info("Run class with solution (lesson ID: {}) - OK", lessonId);
+            return results;
+        } catch (Exception e) {
+            LOGGER.error("Run class from lesson with solution - FAILED", e);
+            return new RunResults(new GeneralResponse(ResponseType.ERROR, e.getMessage()));
+        }
+    }
+
+    @ApiOperation(httpMethod = "POST",
+            value = "Resource to run class from lesson with solution (need to add solution before)",
+            notes = "Runs a tests for a certain lesson",
+            response = GeneralResponse.class,
+            produces = "application/json")
+    @RequestMapping(value = "/courses/lessons/send-base-solution-and-run-tests", method = RequestMethod.POST)
+    public RunResults runBaseLessonWithSolutionTests(@RequestParam int lessonId,
+                                                 @RequestBody String classText,
+                                                 HttpServletRequest request) {
+
+        Integer userId = (Integer) request.getAttribute("User");
+        if (userId == null) {
+            throw new AuthenticationServiceException("Not authorised!");
+        }
+
+        try {
+            RunResults results = runService.runBaseLessonWithSolutionTests(lessonId, classText, userId);
             LOGGER.info("Run class with solution (lesson ID: {}) - OK", lessonId);
             return results;
         } catch (Exception e) {
@@ -170,13 +202,5 @@ public class CourseController {
             LOGGER.error("Add lesson to course - FAILED", e);
             return new GeneralResponse(ResponseType.ERROR, "Lesson already exists!");
         }
-    }
-
-    // helper
-    private int getLessonIndex(int id) throws AppException {
-        Lesson lesson = courseService.getLessonByID(id);
-        List<Lesson> courseLessons = courseService.getByID(lesson.getCourseID()).getLessons();
-
-        return courseLessons.indexOf(lesson);
     }
 }

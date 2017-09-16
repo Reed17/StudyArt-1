@@ -97,6 +97,7 @@
       return {
         response: '',
         lesson: Object,
+        package: '',
         content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
         expanded: false,
         dropdown_font: [
@@ -131,10 +132,16 @@
       },
 
       formattedResponse() {
-        return this.response ?
+        let failures = '';
+
+        if (this.response) {
+          this.response.methodStats.failures.forEach(f => failures += f.message + '\n');
+        }
+
+        return (this.response ?
           this.response.methodResult ?
             `${this.response.methodResult.systemOut}`
-            : `Error: ${this.response.generalResponse.message}` : ''
+            : `Error: ${this.response.generalResponse.message}` : '') + failures;
       },
 
       nextLessonLink() {
@@ -203,6 +210,9 @@
         })
           .then((response) => {
             this.lesson = response.data;
+            this.content = response.data.classes[0];
+            this.package = this.content.substr(this.content.indexOf('package'), this.content.indexOf(';') - this.content.indexOf('package') + 1);
+            this.content = this.content.replace(this.package, '');
           });
       },
 
@@ -226,13 +236,40 @@
 
       runCode() {
         this.show_progress = !this.show_progress;
-        const code = {sourceCode: this.content};
-        axios.post(PROPERTIES.HOST + '/run-class', code)
-          .then((response) => {
-            this.response = response.data;
-            this.show_progress = !this.show_progress;
-          });
+        const code = {sourceCode: this.package + this.content};
 
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': this.$cookie.get('token'),
+        };
+
+        const axiosConfig = {
+          baseURL: PROPERTIES.HOST,
+          data: this.package + this.content,
+          params: {
+            lessonId: this.$route.params.id
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': this.$cookie.get('token'),
+          },
+          method: "post",
+          url: "/courses/lessons/send-base-solution-and-run-tests",
+          withCredentials: true,
+        };
+
+//        return axios(axiosConfig);
+
+  //      axios.post(PROPERTIES.HOST + '/courses/lessons/send-base-solution-and-run-tests', code, headers)
+    //      .then((response) => {
+      //      this.response = response.data;
+        //    this.show_progress = !this.show_progress;
+          //});
+          axios(axiosConfig)
+            .then((response) => {
+              this.response = response.data;
+              this.show_progress = !this.show_progress;
+            });
       }
     },
   }

@@ -16,6 +16,7 @@ import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,18 +116,27 @@ public class UserServiceImpl implements UserService {
         Course course = courseRepository.findOne(courseId);
         // todo save copy of original course for user and link path to user
 
-//        return student.subscribeTo(course) && studentDB.save(student) != null;
+        student.setSubscribed(new HashSet<>());
         Set<Course> subscribed = student.getSubscribed();
 
+        if (!subscribed.contains(course) && subscribed.add(course)) {
+            Map<Integer, UserCourseCopy> copies = student.getUserCourseCopies();
 
-        return !subscribed.contains(course) && (subscribed.add(course) &&
-            student.getUserCourseCopies()
-                .put(courseId,
-                    new UserCourseCopy(
-                        courseIOUtils.saveCourseLocally(
-                            course.getUrl(), course.getName(), course.getId(), userId)))
-                                != null);
+            int prevSize = copies.size();
 
+            copies.put(courseId,
+                            new UserCourseCopy(
+                                    courseIOUtils.saveCourseLocally(
+                                            course.getUrl(), course.getName(), course.getId(), userId)));
+
+            course.getLessons().forEach(l -> LOGGER.info(l));
+
+            studentDB.save(student);
+
+            return copies.size() > prevSize;
+        }
+
+        return false;
     }
 
     @Override

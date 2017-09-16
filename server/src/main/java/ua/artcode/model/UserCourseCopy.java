@@ -39,7 +39,7 @@ public class UserCourseCopy implements Serializable {
     }
 
     public String getSource() {
-        return git.isEmpty() ? path : git;
+        return ((git != null) && (!git.isEmpty())) ? git : path;
     }
 
     public void setSource(String source) {
