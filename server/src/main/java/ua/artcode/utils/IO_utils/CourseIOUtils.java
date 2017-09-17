@@ -290,6 +290,7 @@ public class CourseIOUtils {
         String[] sourceSplitted = userSource.split(separator);
         String[] pathSplitted = pathToClass.split(separator);
 
+
         pathSplitted[sourceSplitted.length - 1] = sourceSplitted[sourceSplitted.length - 1];
 
         return String.join(File.separator, pathSplitted);
