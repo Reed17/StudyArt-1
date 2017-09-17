@@ -60,7 +60,7 @@ public class CourseController {
 
     @ApiOperation(httpMethod = "GET",
             value = "Resource to get a lesson",
-            response = Lesson.class,
+            response = LessonResponse.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/get", method = RequestMethod.GET)
     public LessonResponse getLessonByID(@RequestParam int id, HttpServletRequest request) throws AppException, AuthenticationException {
@@ -139,10 +139,10 @@ public class CourseController {
         }
     }
 
-    @ApiOperation(httpMethod = "POST",
+    @ApiOperation(httpMethod = "GET",
             value = "Resource to run class from lesson with solution (need to add solution before)",
             notes = "Runs a tests for a certain lesson",
-            response = GeneralResponse.class,
+            response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/send-solution-and-run-tests", method = RequestMethod.GET)
     public RunResults runLessonWithSolutionTests(@RequestParam int lessonId,
@@ -162,7 +162,7 @@ public class CourseController {
     @ApiOperation(httpMethod = "POST",
             value = "Resource to run class from lesson with solution (need to add solution before)",
             notes = "Runs a tests for a certain lesson",
-            response = GeneralResponse.class,
+            response = RunResults.class,
             produces = "application/json")
     @RequestMapping(value = "/courses/lessons/send-base-solution-and-run-tests", method = RequestMethod.POST)
     public RunResults runBaseLessonWithSolutionTests(@RequestParam int lessonId,

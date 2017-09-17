@@ -13,6 +13,7 @@ public class Runners {
     public static MethodRunner main = (classes -> {
         for (Class<?> aClass : classes) {
             Method method = aClass.getMethod("main", String[].class);
+            // TODO: 17.09.17 fix null
             String[] argumentsForMain = null;
             method.invoke(null, (Object) argumentsForMain);
         }

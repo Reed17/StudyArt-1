@@ -114,9 +114,7 @@ public class UserServiceImpl implements UserService {
     public boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException {
         Student student = studentDB.findOne(userId);
         Course course = courseRepository.findOne(courseId);
-        // todo save copy of original course for user and link path to user
 
-        student.setSubscribed(new HashSet<>());
         Set<Course> subscribed = student.getSubscribed();
 
         if (!subscribed.contains(course) && subscribed.add(course)) {
@@ -131,9 +129,7 @@ public class UserServiceImpl implements UserService {
 
             course.getLessons().forEach(l -> LOGGER.info(l));
 
-            studentDB.save(student);
-
-            return copies.size() > prevSize;
+            return (studentDB.save(student) != null) && (copies.size() > prevSize);
         }
 
         return false;

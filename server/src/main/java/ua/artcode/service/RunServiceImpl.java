@@ -141,7 +141,7 @@ public class RunServiceImpl implements RunService {
         String sourcesRoot = courseIOUtils.getValidPathForUsersCourse(course.getSourcesRoot(), studentSource);
         String testsRoot = courseIOUtils.getValidPathForUsersCourse(course.getTestsRoot(), studentSource);
 
-        RunResults results = runCore.run(
+        return runCore.run(
                 new String[]{sourcesRoot,
                         testsRoot},
                 classPaths,
@@ -150,8 +150,6 @@ public class RunServiceImpl implements RunService {
                 MethodCheckers.testChecker,
                 Runners.test,
                 ResultsProcessors.main);
-
-        return results;
     }
 
 
