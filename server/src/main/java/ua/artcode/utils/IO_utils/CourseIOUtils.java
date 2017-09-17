@@ -286,8 +286,10 @@ public class CourseIOUtils {
     }
 
     public String getValidPathForUsersCourse(String pathToClass, String userSource) {
-        String[] sourceSplitted = userSource.split(File.separator);
-        String[] pathSplitted = pathToClass.split(File.separator);
+        String separator = File.separator.equals("\\") ? "\\\\" : File.separator;
+        String[] sourceSplitted = userSource.split(separator);
+        String[] pathSplitted = pathToClass.split(separator);
+
 
         pathSplitted[sourceSplitted.length - 1] = sourceSplitted[sourceSplitted.length - 1];
 
