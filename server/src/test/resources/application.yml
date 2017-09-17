@@ -9,7 +9,7 @@ application:
     paths:
       git: courses
       externalCode: temp
-      dependencies: server/dependencies
+      dependencies: dependencies/
   profiling: false
   security:
     expirationTime: 864_000_00

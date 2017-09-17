@@ -26,16 +26,30 @@
   <div>
     <v-btn dark default @click.native="runCode()">Run code</v-btn>
 
-    <v-text-field
+    <!-- <v-text-field
       name="input-7-1"
       label="Result"
       :value="formattedResponse"
       multi-line
       disabled>
-    </v-text-field>
+    </v-text-field> -->
+    <!-- <result :response="response"></result> -->
+    <div id="four" class="split split-vertical">
+      <div class="result">
+        <p v-if="sout">{{ sout }}</p>
+
+        <p class="fail" v-if="errors">{{ errors }}</p>
+
+        <p class="fail" v-if="failures" v-for="failure in failures">{{ failure }}</p>
+
+        <p class="good" v-if="succeeded">Success: {{ succeeded }}</p>
+
+        <p class="fail" v-if="failed">Failed: {{ failed }}</p>
+      </div>
   </div>
 
   </div>
+</div>
 </template>
 
 
@@ -44,12 +58,18 @@
   import axios from 'axios'
   import PROPERTIES from '../properties'
   import Brace from 'xen-brace'
+  import result from './Result.vue'
 
   export default {
 
     data(){
       return {
         response: '',
+        errors: '',
+        sout: '',
+        failures: [],
+        failed: '',
+        succeeded: '',
         content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
         dropdown_font: [
             { text: '12pt' },
@@ -64,7 +84,7 @@
           { text: 'javascript' },
           { text: 'json' }
         ],
-        fontSize: {text: '12pt'},
+        fontSize: {text: '14pt'},
         lang: { text : 'java'},
       }
     },
@@ -79,7 +99,8 @@
     },
 
     components: {
-      Brace
+      Brace,
+      result
     },
 
     methods:{
@@ -91,7 +112,15 @@
         const code = {sourceCode: this.content};
         axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
-            this.response = response.data;
+
+              console.log(response.data);
+              this.response = response.data;
+              this.show_progress = !this.show_progress;
+              this.errors = response.data ? !response.data.methodResult ? `Error: ${response.data.generalResponse.message}` : '' : '';
+              this.sout = response.data ? response.data.methodResult ? `${response.data.methodResult.systemOut}` : '' : '';
+              this.failures = response.data ? response.data.methodStats ? response.data.methodStats.failures.map(f => f.message) : [] : [];
+              this.succeeded = response.data ? response.data.methodStats ? response.data.methodStats.passedTests : '' : '';
+              this.failed = response.data ? response.data.methodStats ? response.data.methodStats.failedTests : '' : '';
           });
       },
 

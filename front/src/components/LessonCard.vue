@@ -61,13 +61,17 @@
 
         </div>
         <div id="four" class="split split-vertical">
-          <v-text-field
-            name="input-7-1"
-            label="Result"
-            :value="formattedResponse"
-            multi-line
-            disabled>
-          </v-text-field>
+          <div class="result">
+            <p v-if="sout">{{ sout }}</p>
+
+            <p class="fail" v-if="errors">{{ errors }}</p>
+
+            <p class="fail" v-if="failures" v-for="failure in failures">{{ failure }}</p>
+
+            <p class="good" v-if="succeeded">Success: {{ succeeded }}</p>
+
+            <p class="fail" v-if="failed">Failed: {{ failed }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -86,6 +90,7 @@
   import marked from 'marked';
   import Split from 'split.js'
   import Brace from 'xen-brace'
+  import result from './Result.vue'
 
   Vue.component('app-lesson', AppLesson);
 
@@ -97,6 +102,11 @@
       return {
         response: '',
         lesson: Object,
+        errors: '',
+        sout: '',
+        failures: [],
+        failed: '',
+        succeeded: '',
         package: '',
         content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
         expanded: false,
@@ -113,7 +123,7 @@
           { text: 'javascript' },
           { text: 'json' }
         ],
-        fontSize: {text: '12pt'},
+        fontSize: {text: '14pt'},
         lang: { text : 'java'},
         show_progress: false,
         allLessons: []
@@ -132,11 +142,14 @@
       },
 
       formattedResponse() {
-        let failures = '';
+        this.failures = '';
 
         if (this.response) {
-          this.response.methodStats.failures.forEach(f => failures += f.message + '\n');
+          this.response.methodStats.failures.forEach(f => this.failures += f.message + '\n');
         }
+
+        this.errors = this.response ? !this.response.methodResult ? `Error: ${this.response.generalResponse.message}` : '' : '';
+        this.sout = this.response ? this.response.methodResult ? `${this.response.methodResult.systemOut}` : '' : '';
 
         return (this.response ?
           this.response.methodResult ?
@@ -168,10 +181,11 @@
     },
 
     components: {
-      Brace
+      Brace,
+      result
     },
 
-    mounted(){
+    mounted() {
       this.fetchLesson();
       this.fetchAllLessonsOfCourse();
       this.split();
@@ -258,18 +272,17 @@
           withCredentials: true,
         };
 
-//        return axios(axiosConfig);
-
-  //      axios.post(PROPERTIES.HOST + '/courses/lessons/send-base-solution-and-run-tests', code, headers)
-    //      .then((response) => {
-      //      this.response = response.data;
-        //    this.show_progress = !this.show_progress;
-          //});
-          axios(axiosConfig)
-            .then((response) => {
-              this.response = response.data;
-              this.show_progress = !this.show_progress;
-            });
+        axios(axiosConfig)
+          .then((response) => {
+            console.log(response.data);
+            this.response = response.data;
+            this.show_progress = !this.show_progress;
+            this.errors = response.data ? !response.data.methodResult ? `Error: ${response.data.generalResponse.message}` : '' : '';
+            this.sout = response.data ? response.data.methodResult ? `${response.data.methodResult.systemOut}` : '' : '';
+            this.failures = response.data ? response.data.methodStats ? response.data.methodStats.failures.map(f => f.message) : [] : [];
+            this.succeeded = response.data ? response.data.methodStats ? response.data.methodStats.passedTests : '' : '';
+            this.failed = response.data ? response.data.methodStats ? response.data.methodStats.failedTests : '' : '';
+          });
       }
     },
   }
@@ -361,5 +374,13 @@
   .split.split-horizontal, .gutter.gutter-horizontal {
     height: 100%;
     float: left;
+  }
+  .result .fail {
+    font-weight: normal;
+    color: red;
+  }
+
+  .result .good {
+    color: green;
   }
 </style>
