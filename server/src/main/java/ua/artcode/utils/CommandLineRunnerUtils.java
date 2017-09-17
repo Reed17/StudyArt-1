@@ -14,8 +14,9 @@ import ua.artcode.model.dto.RegisterRequestDTO;
 import ua.artcode.service.CourseService;
 
 import javax.xml.bind.ValidationException;
+import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,11 +31,16 @@ public class CommandLineRunnerUtils {
     private final CourseController courseController;
     private final CourseService courseService;
 
+    private String sourceRoot,testRoot, separator;
+
     @Autowired
     public CommandLineRunnerUtils(UserController userController, CourseController courseController, CourseService courseService) {
         this.userController = userController;
         this.courseController = courseController;
         this.courseService = courseService;
+        sourceRoot = Paths.get("src", "main", "java").toString();
+        testRoot = Paths.get("src", "test", "java").toString();
+        separator = File.separator.equals("\\") ? "\\\\" : File.separator;
     }
 
     public void registerTestUsers() {
@@ -96,16 +102,16 @@ public class CommandLineRunnerUtils {
                     "Vlad Kornieiev",
                     "https://github.com/v21k/TestGitProject.git",
                     courseDescription.get(i),
-                    "src/main/java",
-                    "src/test/java"), null);
-
+                    sourceRoot,
+                    testRoot), null);
             for (int j = 0; j < 3; j++) {
                 courseController.addLessonToCourse(i, new Lesson(
                                 "Test lesson " + j,
                                 "_02_lesson",
                                 null,
-                                Collections.singletonList("src/test/java/_02_lesson/SolutionTests.java"),
-                                "src/main/java/_02_lesson",
+                                Collections.singletonList(
+                                        Paths.get(testRoot,"_02_lesson","SolutionTests.java").toString()),
+                                sourceRoot + separator + "_02_lesson",
                                 description,
                                 theory),
                         null
@@ -124,8 +130,8 @@ public class CommandLineRunnerUtils {
                 "Serhii Bilobrov",
                 "https://github.com/ksyashka/ACBCourse.git",
                 description,
-                "src/main/java",
-                "src/test/java"));
+                sourceRoot,
+                testRoot));
 
 
         // how to create lesson correctly?
@@ -134,7 +140,9 @@ public class CommandLineRunnerUtils {
                 "week1",
                 Collections.singletonList("Task1.java"),
                 Collections.singletonList("TestTask1.java"), // todo if null - parse from local path
-                "src/main/java/week1", "src/test/java/week1", ""); // remove
+                Paths.get(sourceRoot, "week1").toString(),
+                Paths.get(testRoot, "week1").toString(),
+                ""); // remove
         // todo we already have 'src/main/java' and 'course local path', so there is no need in sources/tests root
 
         try {
