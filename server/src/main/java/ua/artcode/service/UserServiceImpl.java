@@ -16,10 +16,7 @@ import ua.artcode.utils.MailUtils;
 import ua.artcode.utils.SecurityUtils;
 import ua.artcode.utils.ValidationUtils;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static ua.artcode.enums.UserType.TEACHER;
 
@@ -81,39 +78,60 @@ public class UserServiceImpl implements UserService {
         return newUser;
     }
 
+
+    // todo ask about this
     @Override
-    public User activate(int userId) throws UserNotFoundException {
+    public boolean activate(int userId) throws UserNotFoundException {
         User user = teacherDB.findOne(userId);
 
-        user = user == null ? studentDB.findOne(userId) : user;
+        if (Objects.isNull(user)) {
+            user = studentDB.findOne(userId);
+        }
 
-        if (user == null) {
-            String message = "User with this id doesn't exists";
-            UserNotFoundException userNotFoundException = new UserNotFoundException(message);
+        if (Objects.isNull(user)) {
 
-            LOGGER.error(message, userNotFoundException);
-            throw userNotFoundException;
+            throw new UserNotFoundException("User with this id doesn't exists");
         }
 
         user.activate();
+
+        // todo try avoid casting!
+        if (user.getUserType() == UserType.TEACHER) {
+            teacherDB.save((Teacher) user);
+        } else {
+            studentDB.save((Student) user);
+        }
+
+        return user.isActivated();
+    }
+
+    @Override
+    public User findByUserName(String userName) throws InvalidUserLoginException {
+
+        User user = teacherDB.findByUsername(userName);
+
+        if (Objects.isNull(user)) {
+            user = studentDB.findByUsername(userName);
+        }
+
+        if (Objects.isNull(user)) {
+
+            throw new InvalidUserLoginException("User with name \"" + userName + "\" not found.");
+        }
 
         return user;
     }
 
     @Override
-    public User findByUserName(String userName) throws InvalidUserLoginException {
-        Teacher teacher = teacherDB.findByUsername(userName);
-        Student student = studentDB.findByUsername(userName);
-        if (student == null && teacher == null) {
-            throw new InvalidUserLoginException("User with name " + userName + " not found.");
-        }
-        return teacher != null ? teacher : student;
-    }
+    public boolean subscribe(int courseId, int userId)
+            throws GitAPIException, DirectoryCreatingException, CourseNotFoundException {
 
-    @Override
-    public boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException {
         Student student = studentDB.findOne(userId);
         Course course = courseRepository.findOne(courseId);
+
+        if (course == null) {
+            throw new CourseNotFoundException("Course with id \"" + courseId + "\" does not exists");
+        }
 
         Set<Course> subscribed = student.getSubscribed();
 
@@ -126,8 +144,6 @@ public class UserServiceImpl implements UserService {
                             new UserCourseCopy(
                                     courseIOUtils.saveCourseLocally(
                                             course.getUrl(), course.getName(), course.getId(), userId)));
-
-            course.getLessons().forEach(l -> LOGGER.info(l));
 
             return (studentDB.save(student) != null) && (copies.size() > prevSize);
         }

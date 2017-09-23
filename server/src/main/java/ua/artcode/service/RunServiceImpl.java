@@ -1,6 +1,7 @@
 package ua.artcode.service;
 
 import com.sun.xml.internal.bind.v2.TODO;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,8 @@ import ua.artcode.core.pre_processor.PreProcessors;
 import ua.artcode.dao.repositories.CourseRepository;
 import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.dao.repositories.StudentRepository;
+import ua.artcode.exceptions.AppException;
+import ua.artcode.exceptions.LessonNotFoundException;
 import ua.artcode.model.Course;
 import ua.artcode.model.ExternalCode;
 import ua.artcode.model.Lesson;
@@ -32,6 +35,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static java.util.stream.Collectors.toList;
+
 /**
  * Created by v21k on 15.04.17.
  */
@@ -44,6 +49,7 @@ public class RunServiceImpl implements RunService {
     private final CourseIOUtils courseIOUtils;
     private final RunCore runCore;
     private final AppPropertyHolder.Courses.Paths paths;
+    private static final Logger LOGGER = Logger.getLogger(RunService.class);
 
     @Autowired
     public RunServiceImpl(CourseRepository courseDB, LessonRepository lessonDB,
@@ -112,44 +118,55 @@ public class RunServiceImpl implements RunService {
 
     @Override
     public RunResults runBaseLessonWithSolutionTests(int lessonId, String classText, Integer userId)
-            throws IOException, NoSuchMethodException, IllegalAccessException, ClassNotFoundException {
+            throws AppException {
 
         Lesson lesson = Objects.requireNonNull(lessonDB.findOne(lessonId));
         Course course = Objects.requireNonNull(courseDB.findOne(lesson.getCourseID()));
         Student student = Objects.requireNonNull(studentDB.findOne(userId));
 
-        Files.write(
-                Paths.get(
-                        courseIOUtils.getValidPathForUsersCourse(lesson.getBaseClasses().get(0),
-                                student.getUserCourseCopies().get(lesson.getCourseID()).getPath())),
-                Arrays.asList(classText),
-                Charset.forName("UTF-8"));
+        try {
+            Files.write(
+                    Paths.get(
+                            courseIOUtils.getValidPathForUsersCourse(lesson.getBaseClasses().get(0),
+                                    student.getUserCourseCopies().get(lesson.getCourseID()).getPath())),
+                    Arrays.asList(classText),
+                    Charset.forName("UTF-8"));
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage());
 
-        List<String> baseClasses = new ArrayList<>();
-        List<String> testClasses = new ArrayList<>();
+            throw new AppException("Something gone wrong ;(");
+        }
 
-        // TODO: 16.09.17 check this
 
         String studentSource = student.getUserCourseCopies().get(lesson.getCourseID()).getPath();
 
-        lesson.getBaseClasses().forEach(c -> baseClasses.add(courseIOUtils.getValidPathForUsersCourse(c, studentSource)));
+        List<String> baseClasses = lesson.getBaseClasses().stream()
+                .map(c -> courseIOUtils.getValidPathForUsersCourse(c, studentSource)).collect(toList());
 
-        lesson.getTestsClasses().forEach(c -> testClasses.add(courseIOUtils.getValidPathForUsersCourse(c, studentSource)));
+        List<String> testClasses = lesson.getTestsClasses().stream()
+                .map(c -> courseIOUtils.getValidPathForUsersCourse(c, studentSource)).collect(toList());
 
-        String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(baseClasses, testClasses);
 
         String sourcesRoot = courseIOUtils.getValidPathForUsersCourse(course.getSourcesRoot(), studentSource);
         String testsRoot = courseIOUtils.getValidPathForUsersCourse(course.getTestsRoot(), studentSource);
 
-        return runCore.run(
-                new String[]{sourcesRoot,
-                        testsRoot},
-                classPaths,
-                course.getDependencies(),
-                PreProcessors.lessonsTests,
-                MethodCheckers.testChecker,
-                Runners.test,
-                ResultsProcessors.main);
+        try {
+            String[] classPaths = courseIOUtils.getLessonClassAndTestsPaths(baseClasses, testClasses);
+
+            return runCore.run(
+                    new String[]{sourcesRoot,
+                            testsRoot},
+                    classPaths,
+                    course.getDependencies(),
+                    PreProcessors.lessonsTests,
+                    MethodCheckers.testChecker,
+                    Runners.test,
+                    ResultsProcessors.main);
+        } catch (IOException | IllegalAccessException | NoSuchMethodException | ClassNotFoundException e) {
+            LOGGER.error(e.getMessage());
+
+            throw new LessonNotFoundException("Invalid lesson id");
+        }
     }
 
 

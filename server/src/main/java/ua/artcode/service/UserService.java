@@ -27,13 +27,13 @@ public interface UserService {
      * method for accepting email
      *
      * @param userId - id of user for activation
-     * @return activated user
+     * @return true if user activated
      */
-    User activate(int userId) throws UserNotFoundException;
+    boolean activate(int userId) throws UserNotFoundException;
 
     User findByUserName(String userName) throws InvalidUserLoginException;
 
-    boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException;
+    boolean subscribe(int courseId, int userId) throws GitAPIException, DirectoryCreatingException, CourseNotFoundException;
 
     boolean changePersonalInfo(String oldPass, String newPass, String email, int id, UserType userType) throws InvalidUserPassException;
 

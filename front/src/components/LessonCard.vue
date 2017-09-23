@@ -226,7 +226,6 @@
             this.lesson = response.data;
             this.content = response.data.classes[0];
             this.package = this.content.substr(this.content.indexOf('package'), this.content.indexOf(';') - this.content.indexOf('package') + 1);
-            this.content = this.content.replace(this.package, '');
           });
       },
 
@@ -259,7 +258,7 @@
 
         const axiosConfig = {
           baseURL: PROPERTIES.HOST,
-          data: this.package + this.content,
+          data: this.content,
           params: {
             lessonId: this.$route.params.id
           },
