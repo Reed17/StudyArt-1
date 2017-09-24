@@ -48,6 +48,8 @@
 <script>
   import axios from 'axios';
   import properties from '../../properties';
+  import AjaxUtils from '../../utils/axiosUtils';
+
   export default{
     data(){
       return {
@@ -56,6 +58,7 @@
         newPassAgain: '',
         email: '',
         result: '',
+        // try to keep one type values in one variable
         rules: [() => this.newPass !== this.newPassAgain ? 'Passwords do not match' : true],
         changeOk: false,
         changeFailed: false,
@@ -65,30 +68,30 @@
     methods: {
       changePersonalInfo(){
 
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
-
-        axios.post(properties.HOST + "/user/change-personal-info", {
-            oldPass: this.oldPass,
-            newPass: this.newPass,
-            email: this.email,
-            userId: this.$cookie.get('userId'),
-            userType: this.$cookie.get('userType')
+        AjaxUtils.prepareStandartPost(
+          '/user/change-personal-info',
+          this.$cookie.get('token'),
+          {
+              oldPass: this.oldPass,
+              newPass: this.newPass,
+              email: this.email,
+              userId: this.$cookie.get('userId'),
+              userType: this.$cookie.get('userType')
           },
-          headers)
-          .then((response) => {
-            if (response.data) {
-              this.changeOk = true;
-              this.changeFailed = false;
-              this.result = "FAILED";
-            } else {
-              this.changeFailed = true;
-              this.changeOk = false;
-              this.result = "OK";
-            }
-          })
+          {},
+          (response) => {
+              if (response.data) {
+                this.changeOk = true;
+                this.changeFailed = false;
+                this.result = "FAILED";
+              } else {
+                this.changeFailed = true;
+                this.changeOk = false;
+                this.result = "OK";
+              }
+          }
+        );
+
       }
     }
   }

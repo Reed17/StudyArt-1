@@ -26,7 +26,9 @@
 <script>
   import axios from "axios";
   import CourseCard from "./CourseСard";
-  import PROPERTIES from "../properties"
+  import PROPERTIES from "../properties";
+  import AjaxUtils from '../utils/axiosUtils';
+
   export default {
     components: {CourseCard},
     name: 'courses',
@@ -53,17 +55,12 @@
 
     methods: {
       fetchCourses() {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
-
-        axios.get(PROPERTIES.HOST + '/courses/getAll', {
-          headers
-        })
-          .then((response) => {
-            this.courseData = response.data;
-          });
+        AjaxUtils.prepareStandartGet(
+          '/courses/getAll',
+          this.$cookie.get('token'),
+          {},
+          (response) => this.courseData = response.data
+        );
       },
 
       filterCourses() {

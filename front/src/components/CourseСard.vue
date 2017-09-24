@@ -47,7 +47,8 @@
 <script>
   import AppLesson from "./Lesson";
   import axios from 'axios';
-  import PROPERTIES from '../properties'
+  import PROPERTIES from '../properties';
+  import AjaxUtils from '../utils/axiosUtils';
 
   export default{
     components: {AppLesson},
@@ -85,37 +86,29 @@
           this.subscribedOkInfo = "Already subscribed.";
           return;
         }
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
 
-        axios.get(PROPERTIES.HOST + '/subscribe', {
-          params: {
+        AjaxUtils.prepareStandartGet(
+          '/subscribe',
+          this.$cookie.get('token'),
+          {
             courseId: this.course.id,
             userId: this.$cookie.get('userId')
           },
-          headers
-        })
-          .then((response) => {
-            response.data.type === 'INFO' ?
-              this.subscribeOk = true : this.subscribeFailed = true;
-          });
+          (response) => {
+              response.data.type === 'INFO' ?
+                this.subscribeOk = true : this.subscribeFailed = true;
+          }
+        );
       },
 
       fetchSubscribed() {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
 
-        axios.get(PROPERTIES.HOST + '/findByUsername', {
-          params: {
-            username: this.$cookie.get('username')
-          },
-          headers
-        })
-          .then((response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id))
+        AjaxUtils.prepareStandartGet(
+          '/findByUsername',
+          this.$cookie.get('token'),
+          { username: this.$cookie.get('username') },
+          (response) => this.subscribed = response.data.subscribed.map((currentValue) => currentValue.id)
+        );
       }
     }
   }

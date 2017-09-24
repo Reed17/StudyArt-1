@@ -112,7 +112,9 @@
 
 <script>
   import axios from 'axios';
-  import properties from '../../properties'
+  import properties from '../../properties';
+  import AjaxUtils from '../../utils/axiosUtils';
+  
   export default {
 
     name: 'app-user',
@@ -128,43 +130,65 @@
     },
 
     methods: {
-      fetchUserInfo(){
-        axios.get(properties.HOST + '/findByUsername', {
-          params: {
-            username: this.$cookie.get('username')
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': this.$cookie.get('token'),
-          }
-        })
-          .then((response) => {
-            this.user = response.data;
-          })
+      fetchUserInfo() {
+
+        AjaxUtils.prepareStandartGet(
+          '/findByUsername',
+          this.$cookie.get('token'),
+          { username: this.$cookie.get('username') },
+          () => this.user = response.data
+        );
+
+        // axios.get(properties.HOST + '/findByUsername', {
+        //   params: {
+        //     username: this.$cookie.get('username')
+        //   },
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     'Authorization': this.$cookie.get('token'),
+        //   }
+        // })
+        //   .then((response) => {
+        //     this.user = response.data;
+        //   })
       },
 
       deleteAccount(){
 
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
+        // const headers = {
+        //   'Content-Type': 'application/json',
+        //   'Authorization': this.$cookie.get('token'),
+        // };
+        //
+        // axios.get(properties.HOST + '/user/delete', {
+        //   params: {
+        //     userId: this.$cookie.get('userId')
+        //   },
+        //   headers
+        // })
+        //   .then(() => {
+        //     // delete cookies
+        //     this.$cookie.delete('accessKey');
+        //     this.$cookie.delete('userId');
+        //     this.$cookie.delete('userType');
+        //
+        //     // router push to new page
+        //     this.$router.push('/');
+        //   })
 
-        axios.get(properties.HOST + '/user/delete', {
-          params: {
-            userId: this.$cookie.get('userId')
-          },
-          headers
-        })
-          .then(() => {
-            // delete cookies
+        AjaxUtils.prepareStandartGet(
+          '/user/delete',
+          this.$cookie.get('token'),
+          { userId: this.$cookie.get('userId') },
+          () => {
             this.$cookie.delete('accessKey');
             this.$cookie.delete('userId');
             this.$cookie.delete('userType');
 
             // router push to new page
             this.$router.push('/');
-          })
+          }
+        );
       }
     }
 

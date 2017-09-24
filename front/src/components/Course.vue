@@ -34,8 +34,9 @@
 </template>
 
 <script>
-  import axios from 'axios'
-  import PROPERTIES from '../properties'
+  import axios from 'axios';
+  import PROPERTIES from '../properties';
+  import AjaxUtils from '../utils/axiosUtils';
 
   export default {
     name: 'course',
@@ -53,20 +54,12 @@
     methods: {
       fetchCourse() {
 
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
-
-        axios.get(PROPERTIES.HOST + '/courses/get', {
-          params: {
-            id: this.$route.params.id,
-          },
-          headers
-        })
-          .then((response) => {
-            this.course = response.data;
-          });
+        AjaxUtils.prepareStandartGet(
+          '/courses/get',
+          this.$cookie.get('token'),
+          { id: this.$route.params.id },
+          (response) => this.course = response.data
+        );
       },
     }
   }

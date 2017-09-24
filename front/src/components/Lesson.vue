@@ -8,8 +8,8 @@
 </template>
 
 <script>
-  // todo es6
-  var marked = require('marked');
+  import marked from 'marked';
+
   export default {
     name: 'app-lesson',
     computed: {
@@ -25,6 +25,5 @@
         required: false
       }
     },
-
   }
 </script>

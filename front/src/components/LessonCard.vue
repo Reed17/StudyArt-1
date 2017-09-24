@@ -88,14 +88,14 @@
   import axios from "axios";
   import PROPERTIES from '../properties';
   import marked from 'marked';
-  import Split from 'split.js'
-  import Brace from 'xen-brace'
-  import result from './Result.vue'
+  import Split from 'split.js';
+  import Brace from 'xen-brace';
+  import result from './Result.vue';
+  import AjaxUtils from '../utils/axiosUtils';
 
   Vue.component('app-lesson', AppLesson);
 
   export default {
-    // components: {AppLesson},
     name: 'lesson-card',
 
     data(){
@@ -193,40 +193,30 @@
 
     methods: {
       fetchAllLessonsOfCourse() {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
 
-        axios.get(PROPERTIES.HOST + '/courses/lessons/getAllLessonsOfCourse', {
-          params: {
-            id: this.$route.params.id
-          },
-          headers
-        })
-          .then((response) => {
-            console.log(response);
-            this.allLessons = response.data;
-          });
+        AjaxUtils.prepareStandartGet(
+          '/courses/lessons/getAllLessonsOfCourse',
+          this.$cookie.get('token'),
+          { id: this.$route.params.id },
+          (response) => {
+              console.log(response);
+              this.allLessons = response.data;
+          }
+        );
       },
 
       fetchLesson() {
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
 
-        axios.get(PROPERTIES.HOST + '/courses/lessons/get', {
-          params: {
-            id: this.$route.params.id
-          },
-          headers
-        })
-          .then((response) => {
-            this.lesson = response.data;
-            this.content = response.data.classes[0];
-            this.package = this.content.substr(this.content.indexOf('package'), this.content.indexOf(';') - this.content.indexOf('package') + 1);
-          });
+        AjaxUtils.prepareStandartGet(
+          '/courses/lessons/get',
+          this.$cookie.get('token'),
+          { id: this.$route.params.id },
+          (response) => {
+              this.lesson = response.data;
+              this.content = response.data.classes[0];
+              this.package = this.content.substr(this.content.indexOf('package'), this.content.indexOf(';') - this.content.indexOf('package') + 1);
+          }
+        );
       },
 
       split() {
@@ -251,37 +241,33 @@
         this.show_progress = !this.show_progress;
         const code = {sourceCode: this.package + this.content};
 
-        const headers = {
-          'Content-Type': 'application/json',
-          'Authorization': this.$cookie.get('token'),
-        };
+        AjaxUtils.prepareStandartPost(
+          '/courses/lessons/send-base-solution-and-run-tests',
+          this.$cookie.get('token'),
+          this.content,
+          { lessonId: this.$route.params.id },
 
-        const axiosConfig = {
-          baseURL: PROPERTIES.HOST,
-          data: this.content,
-          params: {
-            lessonId: this.$route.params.id
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': this.$cookie.get('token'),
-          },
-          method: "post",
-          url: "/courses/lessons/send-base-solution-and-run-tests",
-          withCredentials: true,
-        };
+          (response) => {
+              this.response = response.data;
+              this.show_progress = !this.show_progress;
 
-        axios(axiosConfig)
-          .then((response) => {
-            console.log(response.data);
-            this.response = response.data;
-            this.show_progress = !this.show_progress;
-            this.errors = response.data ? !response.data.methodResult ? `Error: ${response.data.generalResponse.message}` : '' : '';
-            this.sout = response.data ? response.data.methodResult ? `${response.data.methodResult.systemOut}` : '' : '';
-            this.failures = response.data ? response.data.methodStats ? response.data.methodStats.failures.map(f => f.message) : [] : [];
-            this.succeeded = response.data ? response.data.methodStats ? response.data.methodStats.passedTests : '' : '';
-            this.failed = response.data ? response.data.methodStats ? response.data.methodStats.failedTests : '' : '';
-          });
+              if (response.data) {
+
+                if (response.data.methodResult) {
+                  this.sout = `${response.data.methodResult.systemOut}`;
+                } else {
+                  this.errors = `Error: ${response.data.generalResponse.message}`;
+                }
+
+                if (response.data.methodStats) {
+                  this.failures = response.data.methodStats.failures.map(f => f.message);
+                  this.succeeded = response.data.methodStats.passedTests;
+                  this.failed = response.data.methodStats.failedTests;
+                }
+              }
+            }
+        );
+
       }
     },
   }

@@ -55,10 +55,11 @@
 
 <script>
 
-  import axios from 'axios'
-  import PROPERTIES from '../properties'
-  import Brace from 'xen-brace'
-  import result from './Result.vue'
+  import axios from 'axios';
+  import PROPERTIES from '../properties';
+  import Brace from 'xen-brace';
+  import result from './Result.vue';
+  import AjaxUtils from '../utils/axiosUtils';
 
   export default {
 
@@ -70,6 +71,7 @@
         failures: [],
         failed: '',
         succeeded: '',
+        // probably we should delete it, or take from servers according to choosen language
         content: 'public class HelloWorld {\n public static void main(String[] args) {\n    System.out.println("Hello, World");\n }\n}',
         dropdown_font: [
             { text: '12pt' },
@@ -110,17 +112,27 @@
 
       runCode() {
         const code = {sourceCode: this.content};
+
         axios.post(PROPERTIES.HOST + '/run-class', code)
           .then((response) => {
 
-              console.log(response.data);
-              this.response = response.data;
-              this.show_progress = !this.show_progress;
-              this.errors = response.data ? !response.data.methodResult ? `Error: ${response.data.generalResponse.message}` : '' : '';
-              this.sout = response.data ? response.data.methodResult ? `${response.data.methodResult.systemOut}` : '' : '';
-              this.failures = response.data ? response.data.methodStats ? response.data.methodStats.failures.map(f => f.message) : [] : [];
-              this.succeeded = response.data ? response.data.methodStats ? response.data.methodStats.passedTests : '' : '';
-              this.failed = response.data ? response.data.methodStats ? response.data.methodStats.failedTests : '' : '';
+            this.response = response.data;
+            this.show_progress = !this.show_progress;
+
+            if (response.data) {
+
+              if (response.data.methodResult) {
+                this.sout = `${response.data.methodResult.systemOut}`;
+              } else {
+                this.errors = `Error: ${response.data.generalResponse.message}`;
+              }
+
+              if (response.data.methodStats) {
+                this.failures = response.data.methodStats.failures.map(f => f.message);
+                this.succeeded = response.data.methodStats.passedTests;
+                this.failed = response.data.methodStats.failedTests;
+              }
+            }
           });
       },
 
