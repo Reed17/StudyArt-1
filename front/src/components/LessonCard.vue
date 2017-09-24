@@ -220,12 +220,14 @@
       },
 
       split() {
+
         Split(['#three', '#four'], {
           direction: 'vertical',
           sizes: [85,15],
           minSize: [0,0],
           gutterSize: 5
         });
+
         Split(['#one', '#two'], {
           sizes: [30,70],
           minSize: [0,0],
