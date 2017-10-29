@@ -8,6 +8,7 @@
     <version>1.0</version>
     <modules>
         <module>server</module>
+        <module>front</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -94,10 +94,12 @@ public class CourseIOUtils {
 
         String projectPath = generatePath(courseName, courseID);
         File projectDirectory = new File(projectPath);
+
         try {
             if (projectDirectory.exists()) {
                 FileUtils.cleanDirectory(new File(projectPath));
             }
+
             Files.createDirectories(Paths.get(projectPath));
             Git.cloneRepository()
                     .setURI(courseURL)
@@ -195,9 +197,9 @@ public class CourseIOUtils {
         return new AbstractMap.SimpleEntry<>(classPaths, sourceRoot.replace("/", File.separator));
     }
 
-    public String[] getLessonClassAndTestsPaths
-            (List<String> lessonSourceClasses, List<String> lessonTestsClasses) throws
-            IOException {
+    public String[] getLessonClassAndTestsPaths(List<String> lessonSourceClasses, List<String> lessonTestsClasses)
+            throws IOException {
+
         lessonSourceClasses.addAll(lessonTestsClasses);
         return lessonSourceClasses.stream()
                 .filter(lesson -> lesson.endsWith(".java"))
@@ -319,5 +321,16 @@ public class CourseIOUtils {
 
     private String generatePath(String courseName, int courseID) {
         return paths.getGit() + File.separator + courseID + courseName + File.separator;
+    }
+
+    public String getValidPathForCourseLesson(String c, String localPath) {
+        String separator = File.separator.equals("\\") ? "\\\\" : File.separator;
+        String[] sourceSplitted = localPath.split(separator);
+        String[] pathSplitted = c.split(separator);
+
+
+        pathSplitted[sourceSplitted.length - 1] = sourceSplitted[sourceSplitted.length - 1];
+
+        return String.join(File.separator, pathSplitted);
     }
 }

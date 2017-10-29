@@ -1,6 +1,6 @@
 package ua.artcode.service;
 
-import com.sun.xml.internal.bind.v2.TODO;
+
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,8 @@ import ua.artcode.dao.repositories.LessonRepository;
 import ua.artcode.dao.repositories.StudentRepository;
 import ua.artcode.exceptions.AppException;
 import ua.artcode.exceptions.LessonNotFoundException;
-import ua.artcode.model.Course;
-import ua.artcode.model.ExternalCode;
-import ua.artcode.model.Lesson;
-import ua.artcode.model.Student;
+import ua.artcode.exceptions.UserNotSubscribedException;
+import ua.artcode.model.*;
 import ua.artcode.model.response.RunResults;
 import ua.artcode.utils.AppPropertyHolder;
 import ua.artcode.utils.IO_utils.CourseIOUtils;
@@ -125,10 +123,16 @@ public class RunServiceImpl implements RunService {
         Student student = Objects.requireNonNull(studentDB.findOne(userId));
 
         try {
+            UserCourseCopy copy =  student.getUserCourseCopies().get(lesson.getCourseID());
+
+            if (copy == null) {
+                throw new UserNotSubscribedException("Please, subscribe to course first!");
+            }
+
             Files.write(
                     Paths.get(
                             courseIOUtils.getValidPathForUsersCourse(lesson.getBaseClasses().get(0),
-                                    student.getUserCourseCopies().get(lesson.getCourseID()).getPath())),
+                                    copy.getPath())),
                     Arrays.asList(classText),
                     Charset.forName("UTF-8"));
         } catch (IOException e) {

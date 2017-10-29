@@ -64,6 +64,19 @@ public class CourseServiceImpl implements CourseService {
         if (courseRepository.findByNameAndAuthor(course.getName(), course.getAuthor()) != null) {
             throw new SuchCourseAlreadyExists("This course already in database!");
         }
+
+        course = courseRepository.save(course);
+
+        try {
+            course.setLocalPath(courseIOUtils.saveCourseLocally(course.getUrl(), course.getName(), course.getId()));
+
+            LOGGER.info("123123123123");
+            LOGGER.info(course.getLocalPath());
+
+        } catch (GitAPIException | DirectoryCreatingException e) {
+            LOGGER.error(e.getMessage());
+        }
+
         return courseRepository.save(course);
     }
 
@@ -104,7 +117,9 @@ public class CourseServiceImpl implements CourseService {
         }
 
         // update source and test root paths for course
-        if (!course.getSourcesRoot().startsWith(courseLocalPath) && !course.getTestsRoot().startsWith(courseLocalPath)) {
+        if (!course.getSourcesRoot().startsWith(courseLocalPath)
+                && !course.getTestsRoot().startsWith(courseLocalPath)) {
+
             course.setSourcesRoot(courseLocalPath + course.getSourcesRoot());
             course.setTestsRoot(courseLocalPath + course.getTestsRoot());
         }
@@ -151,9 +166,6 @@ public class CourseServiceImpl implements CourseService {
             course.setLessons(courseLessons);
         }
 
-        // delete all downloaded files
-        FileUtils.deleteDirectory(new File(courseLocalPath));
-
         courseRepository.save(course);
         return lesson;
     }
@@ -173,20 +185,34 @@ public class CourseServiceImpl implements CourseService {
 
         List<String> classes = new ArrayList<>();
 
-        result.getBaseClasses().forEach(c -> {
-            try {
-                Student student = studentRepository.findOne(userId);
-                UserCourseCopy copy = student.getUserCourseCopies().get(result.getCourseID());
+        Student student = studentRepository.findOne(userId);
+        UserCourseCopy copy = student.getUserCourseCopies().get(result.getCourseID());
 
-                String userSource = copy.getPath();
+        if (copy == null) {
+            Course course = courseRepository.findOne(result.getCourseID());
 
-                classes.add(new String(Files.readAllBytes(
-                        Paths.get(courseIOUtils.getValidPathForUsersCourse(c, userSource)))));
+            result.getBaseClasses().forEach(c -> {
+                try {
+                    classes.add(new String(Files.readAllBytes(
+                            Paths.get(courseIOUtils.getValidPathForCourseLesson(c, course.getLocalPath())))));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage());
-            }
-        });
+        } else {
+            String userSource = copy.getPath();
+
+            result.getBaseClasses().forEach(c -> {
+                try {
+                    classes.add(new String(Files.readAllBytes(
+                            Paths.get(courseIOUtils.getValidPathForUsersCourse(c, userSource)))));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
+
 
         return new LessonResponse(
                 result.getId(), result.getName(), classes, result.getDescription(), result.getTheory());

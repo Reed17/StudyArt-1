@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -22,6 +23,7 @@ import ua.artcode.utils.CommandLineRunnerUtils;
 
 import java.util.Properties;
 
+@EnableWebMvc
 @SpringBootApplication(scanBasePackages = {"ua.artcode"})
 @EnableSwagger2 // http://localhost:8080/swagger-ui.html
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -77,6 +79,7 @@ public class Application {
         return strings -> {
             // todo we do not need to comment each time, when out db was already inited
 //            commandLineRunnerUtils.createCoursesAndLessons();
+            System.out.println(123);
             commandLineRunnerUtils.createBaseCourse();
             commandLineRunnerUtils.registerTestUsers();
         };

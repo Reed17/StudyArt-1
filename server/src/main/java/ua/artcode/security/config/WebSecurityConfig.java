@@ -40,12 +40,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/register").permitAll()
                 .antMatchers(HttpMethod.POST, "/login").permitAll()
                 .antMatchers(HttpMethod.POST, "/run-class").permitAll()
-                .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/swagger-ui.html", "/webjars/**", "/swagger-resources/configuration/ui", "/swagger-resources/configuration/security").permitAll()
+                .antMatchers("/v2/api-docs", "/configuration/ui", "/swagger-resources", "/configuration/security", "/public/index.html", "/index.html", "/swagger-ui.html", "/webjars/**", "/swagger-resources/configuration/ui", "/swagger-resources/configuration/security").permitAll()
                 .antMatchers(
                         "/courses/add",
                         "/courses/lessons/add")
                 .hasRole("TEACHER")
                 .antMatchers(
+                        "/courses/lessons/get",
                         "/courses/lessons/send-solution-and-run-tests",
                         "/courses/lessons/send-base-solution-and-run-tests",
                         "/courses/lessons/send-solution-and-run-tests/**",
